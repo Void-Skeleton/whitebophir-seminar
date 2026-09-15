@@ -63,6 +63,26 @@ baseline. Board SVG, preview, export, and download routes are in
 random-board redirects, and static fallbacks are in
 [static.mjs](./server/routes/static.mjs).
 
+Native compressed backups use `GET` and `POST /archive/{board}` in
+[board_archive.mjs](./server/routes/board_archive.mjs). The codec and validation
+live in [archive.mjs](./server/board/archive.mjs). Export saves a snapshot under
+the board session queue before reading its SVG and encoding internal items.
+Import validates the entire archive, creates fresh IDs, and atomically adds
+objects under the same queue, then records and broadcasts ordinary sequenced
+mutations. It preserves existing content and rejects capacity overflow. Import
+requires board moderator access (`permissions.canBan()`), rechecked under the
+session queue. It also enforces HTTP editing permissions, blocked-tool settings,
+and existing Turnstile policy. Permanent and active temporary moderators are
+supported. Its separate bulk admission limit is one attempt per IP every
+10 seconds; imports require `X-WBO-Archive: 1` and
+`Content-Type: application/gzip`. Limits default to 64 MiB compressed and
+256 MiB decompressed, configured by `WBO_MAX_ARCHIVE_BYTES` and
+`WBO_MAX_ARCHIVE_JSON_BYTES` (positive byte counts, at most 1 GiB each).
+Archives are bounded to 1,000,000 generated live mutations. Native `.wbo`
+files are gzip-compressed JSON `{format: "whitebophir-board", version: 1,
+items: [...]}` using string tool IDs and complete item payloads in paint order.
+Archive metadata never grants access or replaces destination permissions.
+
 Board access decisions belong to
 [board_capabilities.mjs](./server/auth/board_capabilities.mjs). Board-scoped
 JWTs use [board_jwt.mjs](./server/auth/board_jwt.mjs) and the generic helpers in
@@ -127,6 +147,15 @@ pointer dispatch. Shared tool exports live in
 [shape_tool.js](./client-data/tools/shape_tool.js), and each concrete tool keeps
 its interaction, DOM, rendering, cleanup, and stored-item behavior in
 `client-data/tools/<tool-id>/index.js`.
+
+The existing Download tool owns the native backup dialog alongside SVG export;
+viewers can download SVG or WBO files, and board moderators also get the import
+file picker. The tool reads live `permissions.canBan` and `canEdit` getters so
+temporary moderator grants and revocations affect subsequent actions. All
+archive actions are loaded with that tool. The standard-library Python CLI is
+[seminar_helper.py](./scripts/seminar_helper.py). `WBO_SOURCE_URL` configures
+the corresponding-source links in the homepage and Download dialog; deployments
+of this modified version must point it at their complete modified source.
 
 When a user interaction modifies the board, the active tool creates a live board
 message with primitives from [message_common.js](./client-data/js/message_common.js),
@@ -521,7 +550,9 @@ When touching hot paths:
   `npm run bench:broadcast`, `npm run bench:e2e`.
 - Profiling: `npm run profile -- <e2e|load|persist|broadcast>`.
 
-`npm test` needs Chromium and local browser/network capability. If Chromium is
+`npm test` needs Python 3.10+, Chromium and local browser/network capability. The
+Node archive tests also exercise the Python helper against a local server.
+If Chromium is
 missing, run `npx playwright install chromium`.
 
 In Playwright specs, assert authoritative app or socket state. Avoid sleeps. When

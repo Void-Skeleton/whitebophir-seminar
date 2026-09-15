@@ -1,3 +1,4 @@
+// Modified 2026-09-14: publish validated archive imports to synced viewers.
 import * as socketIO from "socket.io";
 import { SocketEvents } from "../../client-data/js/socket_events.js";
 import { BoardData } from "../board/data.mjs";
@@ -969,4 +970,25 @@ export const __test = {
   },
 };
 
-export { shutdownBoards as shutdown, startIO as start };
+/**
+ * Archive imports have no optimistic sender; every synced viewer applies them.
+ * @param {BoardData} board
+ * @param {import("../../types/server-runtime.d.ts").MutationLogEntry[]} entries
+ */
+function emitArchiveMutations(board, entries) {
+  const targets = Array.from(board.users)
+    .filter((id) => syncedPersistentSockets.has(id))
+    .map((id) => activeSockets.get(id))
+    .filter((socket) => socket !== undefined);
+  for (const entry of entries) {
+    for (const socket of targets) socket.emit(SocketEvents.BROADCAST, entry);
+  }
+}
+
+export {
+  shutdownBoards as shutdown,
+  startIO as start,
+  getBoard,
+  getActiveSocket,
+  emitArchiveMutations,
+};

@@ -24,6 +24,8 @@
  * @licend
  */
 
+// Modified 2026-09-15: native compressed backups with moderator import controls.
+
 /** @import { ToolBootContext } from "../../../types/app-runtime" */
 /** @typedef {ReturnType<typeof boot>} DownloadToolState */
 
@@ -83,12 +85,120 @@ export function boot(ctx) {
   return {
     board: ctx.runtime.board,
     identity: ctx.runtime.identity,
+    access: ctx.runtime.permissions,
+    connection: ctx.runtime.connection,
+    i18n: ctx.runtime.i18n,
+    ui: ctx.runtime.ui,
+    config: ctx.runtime.config.serverConfig,
+    busy: false,
   };
 }
 
 /** @param {DownloadToolState} state */
 export function onstart(state) {
-  downloadSvgFile(state);
+  if (!state.busy) void chooseFileAction(state);
+  return false;
+}
+
+/** @param {DownloadToolState} state */
+function archiveUrl(state) {
+  const url = new URL(
+    `../archive/${encodeURIComponent(state.identity.boardName)}`,
+    window.location.href,
+  );
+  if (state.identity.token) url.searchParams.set("token", state.identity.token);
+  return url;
+}
+
+/** @param {DownloadToolState} state @param {string} key */
+function showNotice(state, key) {
+  return state.ui.confirm({
+    message: state.i18n.t(key),
+    confirmLabel: state.i18n.t("moderation_acknowledge"),
+    cancelLabel: state.i18n.t("Cancel"),
+  });
+}
+
+/** @param {DownloadToolState} state @param {File} file */
+async function importFile(state, file) {
+  if (state.busy) return;
+  state.busy = true;
+  try {
+    if (!state.access.canBan || !state.access.canEdit)
+      throw new Error("write_blocked");
+    if (file.size > (state.config.MAX_ARCHIVE_BYTES || 64 * 1024 * 1024))
+      throw new Error("archive_too_large");
+    const response = await fetch(archiveUrl(state), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/gzip",
+        "X-WBO-Archive": "1",
+        "X-WBO-Socket-Id": state.connection.socket?.id || "",
+      },
+      body: file,
+    });
+    if (!response.ok) throw new Error("archive_import_failed");
+    await showNotice(state, "archive_import_success");
+  } catch {
+    await showNotice(state, "archive_import_failed");
+  } finally {
+    state.busy = false;
+  }
+}
+
+/** @param {DownloadToolState} state */
+async function chooseFileAction(state) {
+  state.busy = true;
+  try {
+    const choices = [
+      { value: "svg", label: state.i18n.t("archive_export_svg") },
+      { value: "wbo", label: state.i18n.t("archive_export_wbo") },
+    ];
+    if (state.access.canBan && state.access.canEdit)
+      choices.push({
+        value: "import",
+        label: state.i18n.t("archive_import_wbo"),
+      });
+    const action = await state.ui.showActionDialog({
+      title: state.i18n.t("download"),
+      message: state.i18n.t("archive_import_note"),
+      cancelLabel: state.i18n.t("Cancel"),
+      sections: [{ id: "file", layout: "stacked", submit: true, choices }],
+      link: {
+        href:
+          state.config.SOURCE_URL || "https://github.com/lovasoa/whitebophir",
+        label: state.i18n.t("source_code"),
+      },
+    });
+    if (action?.value === "svg") downloadSvgFile(state);
+    if (action?.value === "wbo") {
+      const response = await fetch(archiveUrl(state));
+      if (!response.ok) throw new Error("archive_export_failed");
+      downloadContent(await response.blob(), `${state.identity.boardName}.wbo`);
+    }
+    if (action?.value === "import") {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".wbo,application/gzip";
+      input.hidden = true;
+      input.addEventListener(
+        "change",
+        () => {
+          const file = input.files?.[0];
+          input.remove();
+          if (file) void importFile(state, file);
+        },
+        { once: true },
+      );
+      input.addEventListener("cancel", () => input.remove(), { once: true });
+      document.body.appendChild(input);
+      input.click();
+    }
+  } catch {
+    await showNotice(state, "archive_export_failed");
+  } finally {
+    state.busy = false;
+  }
 }
 
 export function draw() {}

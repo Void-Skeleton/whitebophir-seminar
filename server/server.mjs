@@ -1,9 +1,11 @@
+// Modified 2026-09-14: native archive route.
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import * as productionConfig from "./configuration.mjs";
 import { route, routeHttpRequests } from "./http/dispatch.mjs";
 import observability from "./observability/index.mjs";
+import { boardArchive } from "./routes/board_archive.mjs";
 import {
   downloadBoard,
   rejectMissingBoardName,
@@ -45,6 +47,7 @@ function createWhiteboardHttpHandler() {
       where: (params) => !hasDot(params.board),
     }),
     ...boardNameRouteGroup("/download", downloadBoard, "download_board"),
+    ...boardNameRouteGroup("/archive", boardArchive, "board_archive"),
     ...boardNameRouteGroup("/preview", serveBoardPreview, "preview_board"),
     ...boardNameRouteGroup("/export", serveBoardPreview, "preview_board", {
       access: "user",

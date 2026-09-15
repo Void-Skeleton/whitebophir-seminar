@@ -1,3 +1,4 @@
+// Modified 2026-09-14: serialize archive snapshots/imports with board writes.
 import { SerialTaskQueue } from "./serial_task_queue.mjs";
 
 /** @typedef {import("../../types/server-runtime.d.ts").MutationLogEntry} MutationLogEntry */
@@ -18,6 +19,7 @@ import { SerialTaskQueue } from "./serial_task_queue.mjs";
 /**
  * @typedef {{
  *   board: BoardSessionBoard,
+ *   runExclusive: SerialTaskQueue["runExclusive"],
  *   acceptPersistentMutation: (
  *     mutation: NormalizedMessageData,
  *     nowMs?: number,
@@ -48,6 +50,7 @@ export function createBoardSession(board) {
   const queue = new SerialTaskQueue();
   return {
     board,
+    runExclusive: queue.runExclusive.bind(queue),
     async acceptPersistentMutation(mutation, nowMs = Date.now()) {
       return queue.runExclusive(async () => {
         consumePendingMutationEffects(

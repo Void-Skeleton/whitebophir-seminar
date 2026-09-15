@@ -768,6 +768,9 @@ export function createToolRuntimeModules(mountedTools, ownerToolName = "") {
       get canClear() {
         return mountedTools.access.canClear;
       },
+      get canBan() {
+        return mountedTools.access.canBan;
+      },
       get canWrite() {
         return mountedTools.access.canEdit;
       },

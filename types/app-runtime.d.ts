@@ -548,7 +548,10 @@ export type OptimisticJournalState = {
   size: () => number;
 };
 
+// Modified 2026-09-14: native archive settings.
 export type ServerConfig = {
+  MAX_ARCHIVE_BYTES?: number;
+  SOURCE_URL?: string;
   RATE_LIMITS?: RateLimitConfig;
   TURNSTILE_SITE_KEY?: string;
   TURNSTILE_VALIDATION_WINDOW_MS?: number | string;

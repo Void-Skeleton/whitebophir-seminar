@@ -816,6 +816,9 @@ test.describe("single-page interactions", () => {
     await expect(boardPage.page.locator("#download-rect")).toBeVisible();
     await boardPage.installDownloadCapture();
     await boardPage.tool("download").click();
+    await boardPage.page
+      .getByRole("button", { name: "Export SVG", exact: true })
+      .click();
 
     await expect
       .poll(() => boardPage.readDownloadCapture())

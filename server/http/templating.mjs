@@ -338,6 +338,7 @@ class Template extends StaticTemplate {
       canonicalUrl: localizedUrl(baseUrl, language),
       translations,
       configuration,
+      sourceUrl: this.serverConfig.SOURCE_URL,
       moderator,
       htmlHeadSnippet: this.htmlHeadSnippet,
       ...extraParams,

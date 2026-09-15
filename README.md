@@ -5,6 +5,89 @@ The board is updated in real time for all connected users, and its state is alwa
 
 A demonstration server is available at [wbo.ophir.dev](https://wbo.ophir.dev)
 
+## Seminar fork modifications — 2026-09-15
+
+This modified version adds compressed native whiteboard export/import (feature 1
+in `seminar-mod-instructions.md`) and a Python command-line helper. Features 2–6
+are not implemented. See [NOTICE.md](NOTICE.md) for modification and license notices.
+
+Use the existing **Download** button (previously Save to SVG) to export an SVG or
+a **WBO backup**. Board moderators also see **Import WBO backup** in the same
+dialog, which opens a file picker to upload a saved board. Uploads require board
+moderator access on the server as well. Configured board moderators, board-scoped
+moderator JWTs, and active temporary moderators are supported, including on
+read-only boards. Reopening the menu reflects moderator grants and revocations.
+
+A `.wbo` file is gzip-compressed UTF-8 JSON containing WBO's internal
+item records, with string tool IDs, geometry, stroke points, text, opacity and
+affine transforms in paint order. Imported objects remain editable. Imports add
+objects with fresh IDs to the current board; use an empty board to restore only
+the backup's contents. Access settings, identities, cursor positions and the
+source board's mutation sequence are not transferred.
+
+Exports include accepted edits, saving a consistent snapshot before downloading.
+The server validates the complete import before adding anything. Existing board
+access, edit bans, blocked tools and geometry limits apply. Imports that would
+exceed the destination's item limit are rejected without removing existing
+objects. Bulk import has a separate admission limit of one attempt per IP every
+10 seconds, with at most 1,000,000 generated live mutations per archive.
+
+The default limits are **64 MiB compressed** and **256 MiB decompressed**. Set
+`WBO_MAX_ARCHIVE_BYTES` and `WBO_MAX_ARCHIVE_JSON_BYTES` to change them (byte
+counts, each between 1 and 1,073,741,824). For example:
+
+```sh
+WBO_MAX_ARCHIVE_BYTES=134217728 WBO_MAX_ARCHIVE_JSON_BYTES=536870912 npm start
+```
+
+The browser uses the configured compressed limit. Reverse proxies may also need
+their request-body limit increased. Destination `WBO_MAX_ITEM_COUNT`,
+`WBO_MAX_CHILDREN`, and the current drawing field limits still apply.
+
+### Python helper
+
+The helper requires Python 3.10 or newer and uses only the standard library:
+
+```sh
+python3 scripts/seminar_helper.py export seminar.wbo --server http://localhost:8080 --board seminar
+python3 scripts/seminar_helper.py import seminar.wbo --server http://localhost:8080 --board restored-seminar
+```
+
+For imports, supply a moderator identity for the destination board.
+`--server` accepts an installation base path, such as `https://example.org/wbo`.
+Use `--token` (or `WBO_TOKEN`) for an existing board JWT, and `--user-secret` (or
+`WBO_USER_SECRET`) for an existing `wbo-user-secret-v1` cookie. The helper does not
+overwrite existing export files. `--max-archive-bytes` and `--max-json-bytes`
+override its matching 64/256 MiB local limits when the server permits more.
+
+Moderators retain their normal Turnstile bypass on protected public boards.
+
+The HTTP interface is `GET /archive/{board}` for download and
+`POST /archive/{board}` for import, under `WBO_BASE_PATH` when configured. POST
+takes the gzip file directly with `Content-Type: application/gzip` and
+`X-WBO-Archive: 1`. POST requires a board moderator; GET requires board viewing
+access. The optional `token` query parameter carries the existing board JWT, or
+the request can carry the configured moderator's user-secret cookie. Success is
+JSON `{ "imported": <object count>, "seq": <latest sequence> }`; errors are JSON
+`{ "error": "<reason>" }`. The archive envelope is:
+
+```json
+{ "format": "whitebophir-board", "version": 1, "items": [] }
+```
+
+The archive, HTTP, and Python round-trip tests run in `npm run test-node` (Python
+3.10+ is therefore required for the full test suite). Browser coverage is in
+`playwright/tests/archive.spec.ts`.
+
+### Corresponding source
+
+This fork retains the project's AGPL-3.0-or-later license and upstream notices.
+When deploying the modified version, publish its complete corresponding source,
+including these changes, under the same license and set `WBO_SOURCE_URL` to that
+source URL. This updates the source links on the homepage and in the board's
+Download dialog. The default URL points to upstream and must be replaced for a
+deployment of this modified version.
+
 ## Screenshots
 
 <table>

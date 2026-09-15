@@ -1,3 +1,4 @@
+// Modified 2026-09-14: native archive limits and modified-source link.
 import path from "node:path";
 
 import {
@@ -45,6 +46,36 @@ export const WEBROOT = parseStringEnv("WBO_WEBROOT", DEFAULT_WEBROOT);
 
 /** External URL path prefix used when WBO is mounted behind a reverse proxy. */
 export const BASE_PATH = parseBasePathEnv("WBO_BASE_PATH");
+
+/** Compressed and expanded native backup limits, in bytes. */
+export const MAX_ARCHIVE_BYTES = parseIntegerEnv(
+  "WBO_MAX_ARCHIVE_BYTES",
+  64 * 1024 * 1024,
+);
+export const MAX_ARCHIVE_JSON_BYTES = parseIntegerEnv(
+  "WBO_MAX_ARCHIVE_JSON_BYTES",
+  256 * 1024 * 1024,
+);
+for (const [name, value] of [
+  ["WBO_MAX_ARCHIVE_BYTES", MAX_ARCHIVE_BYTES],
+  ["WBO_MAX_ARCHIVE_JSON_BYTES", MAX_ARCHIVE_JSON_BYTES],
+]) {
+  if (
+    !Number.isSafeInteger(value) ||
+    Number(value) <= 0 ||
+    Number(value) > 1024 * 1024 * 1024
+  ) {
+    throw new Error(`${name} must be between 1 and 1073741824 bytes`);
+  }
+}
+
+/** URL of the corresponding source for this deployed version. */
+export const SOURCE_URL = parseStringEnv(
+  "WBO_SOURCE_URL",
+  "https://github.com/lovasoa/whitebophir",
+);
+if (!/^https?:\/\//.test(SOURCE_URL))
+  throw new Error("WBO_SOURCE_URL must be an HTTP(S) URL");
 
 /** Optional HTML snippet inserted before `</head>` in rendered HTML pages. */
 export const HTML_HEAD_SNIPPET_PATH = parseStringEnv(

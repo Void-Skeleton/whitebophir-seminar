@@ -107,7 +107,15 @@
     "moderation_action_duration": "المدة",
     "moderation_action_rule": "القاعدة المخالفة",
     "make_temporary_moderator": "تعيين مشرف مؤقت",
-    "revoke_temporary_moderator": "إلغاء إشراف {name} المؤقت"
+    "revoke_temporary_moderator": "إلغاء إشراف {name} المؤقت",
+    "archive_export_svg": "تصدير SVG",
+    "archive_export_wbo": "تصدير نسخة احتياطية بصيغة WBO",
+    "archive_import_wbo": "استيراد نسخة احتياطية بصيغة WBO",
+    "archive_import_note": "نسخ WBO الاحتياطية مضغوطة وتبقى قابلة للتعديل. يضيف الاستيراد عناصر إلى هذه اللوحة.",
+    "archive_import_failed": "تعذّر الاستيراد. تحقّق من الملف وصلاحية التعديل، ثم انتظر 10 ثوانٍ قبل المحاولة مجددًا.",
+    "archive_import_success": "تم استيراد النسخة الاحتياطية.",
+    "archive_export_failed": "تعذّر التصدير. يُرجى المحاولة مجددًا.",
+    "source_code": "الشيفرة المصدرية"
   },
   "be": {
     "white-out": "Замазка",
@@ -217,7 +225,15 @@
     "moderation_action_duration": "Тэрмін",
     "moderation_action_rule": "Парушанае правіла",
     "make_temporary_moderator": "Прызначыць часовага мадэратара",
-    "revoke_temporary_moderator": "Скасаваць часовыя правы мадэратара для {name}"
+    "revoke_temporary_moderator": "Скасаваць часовыя правы мадэратара для {name}",
+    "archive_export_svg": "Экспартаваць SVG",
+    "archive_export_wbo": "Экспартаваць рэзервовую копію WBO",
+    "archive_import_wbo": "Імпартаваць рэзервовую копію WBO",
+    "archive_import_note": "Рэзервовыя копіі WBO сціснутыя і захоўваюць магчымасць рэдагавання. Пры імпарце аб’екты дадаюцца на гэтую дошку.",
+    "archive_import_failed": "Не ўдалося імпартаваць. Праверце файл і правы на рэдагаванне, затым пачакайце 10 секунд і паспрабуйце яшчэ раз.",
+    "archive_import_success": "Рэзервовая копія імпартаваная.",
+    "archive_export_failed": "Не ўдалося экспартаваць. Паспрабуйце яшчэ раз.",
+    "source_code": "Зыходны код"
   },
   "ca": {
     "white-out": "Corrector blanc",
@@ -327,7 +343,15 @@
     "moderation_action_duration": "Durada",
     "moderation_action_rule": "Norma infringida",
     "make_temporary_moderator": "Fes-lo moderador temporal",
-    "revoke_temporary_moderator": "Revoca la moderació temporal de {name}"
+    "revoke_temporary_moderator": "Revoca la moderació temporal de {name}",
+    "archive_export_svg": "Exporta SVG",
+    "archive_export_wbo": "Exporta una còpia de seguretat WBO",
+    "archive_import_wbo": "Importa una còpia de seguretat WBO",
+    "archive_import_note": "Les còpies WBO estan comprimides i es poden continuar editant. La importació afegeix objectes a aquesta pissarra.",
+    "archive_import_failed": "La importació ha fallat. Comprova el fitxer i els permisos d’edició i espera 10 segons abans de tornar-ho a provar.",
+    "archive_import_success": "S’ha importat la còpia de seguretat.",
+    "archive_export_failed": "L’exportació ha fallat. Torna-ho a provar.",
+    "source_code": "Codi font"
   },
   "de": {
     "board_name_placeholder": "Name des Whiteboards…",
@@ -437,7 +461,15 @@
     "moderation_action_duration": "Dauer",
     "moderation_action_rule": "Gebrochene Regel",
     "make_temporary_moderator": "Temporären Moderator ernennen",
-    "revoke_temporary_moderator": "Temporäre Moderationsrechte von {name} entziehen"
+    "revoke_temporary_moderator": "Temporäre Moderationsrechte von {name} entziehen",
+    "archive_export_svg": "SVG exportieren",
+    "archive_export_wbo": "WBO-Sicherung exportieren",
+    "archive_import_wbo": "WBO-Sicherung importieren",
+    "archive_import_note": "WBO-Sicherungen sind komprimiert und bleiben bearbeitbar. Beim Import werden Objekte zu dieser Tafel hinzugefügt.",
+    "archive_import_failed": "Import fehlgeschlagen. Prüfe die Datei und deine Bearbeitungsrechte. Warte dann 10 Sekunden und versuche es erneut.",
+    "archive_import_success": "Sicherung importiert.",
+    "archive_export_failed": "Export fehlgeschlagen. Bitte versuche es erneut.",
+    "source_code": "Quellcode"
   },
   "en": {
     "white-out": "White-out",
@@ -547,7 +579,15 @@
     "moderation_action_duration": "Duration",
     "moderation_action_rule": "Rule broken",
     "make_temporary_moderator": "Make temporary moderator",
-    "revoke_temporary_moderator": "Revoke temporary moderator access from {name}"
+    "revoke_temporary_moderator": "Revoke temporary moderator access from {name}",
+    "archive_export_svg": "Export SVG",
+    "archive_export_wbo": "Export WBO backup",
+    "archive_import_wbo": "Import WBO backup",
+    "archive_import_note": "WBO backups are compressed and editable. Import adds objects to this board.",
+    "archive_import_failed": "Import failed. Check the file and your editing access, then wait 10 seconds before retrying.",
+    "archive_import_success": "Backup imported.",
+    "archive_export_failed": "Export failed. Please try again.",
+    "source_code": "Source code"
   },
   "es": {
     "board_name_placeholder": "Nombre de la pizarra …",
@@ -657,7 +697,15 @@
     "moderation_action_duration": "Duración",
     "moderation_action_rule": "Norma infringida",
     "make_temporary_moderator": "Nombrar moderador temporal",
-    "revoke_temporary_moderator": "Revocar la moderación temporal de {name}"
+    "revoke_temporary_moderator": "Revocar la moderación temporal de {name}",
+    "archive_export_svg": "Exportar SVG",
+    "archive_export_wbo": "Exportar copia de seguridad WBO",
+    "archive_import_wbo": "Importar copia de seguridad WBO",
+    "archive_import_note": "Las copias WBO están comprimidas y se pueden seguir editando. Al importar, se añaden objetos a esta pizarra.",
+    "archive_import_failed": "Error al importar. Comprueba el archivo y tus permisos de edición y espera 10 segundos antes de volver a intentarlo.",
+    "archive_import_success": "Copia de seguridad importada.",
+    "archive_export_failed": "Error al exportar. Vuelve a intentarlo.",
+    "source_code": "Código fuente"
   },
   "fr": {
     "board_name_placeholder": "Nom du tableau…",
@@ -766,7 +814,15 @@
     "moderation_action_duration": "Durée",
     "moderation_action_rule": "Règle enfreinte",
     "make_temporary_moderator": "Nommer modérateur temporaire",
-    "revoke_temporary_moderator": "Retirer les droits de modération temporaires de {name}"
+    "revoke_temporary_moderator": "Retirer les droits de modération temporaires de {name}",
+    "archive_export_svg": "Exporter en SVG",
+    "archive_export_wbo": "Exporter une sauvegarde WBO",
+    "archive_import_wbo": "Importer une sauvegarde WBO",
+    "archive_import_note": "Les sauvegardes WBO sont compressées et restent modifiables. L’import ajoute des objets à ce tableau.",
+    "archive_import_failed": "Échec de l’import. Vérifiez le fichier et vos droits de modification, puis attendez 10 secondes avant de réessayer.",
+    "archive_import_success": "Sauvegarde importée.",
+    "archive_export_failed": "Échec de l’export. Veuillez réessayer.",
+    "source_code": "Code source"
   },
   "hu": {
     "white-out": "Lefedő",
@@ -876,7 +932,15 @@
     "moderation_action_duration": "Időtartam",
     "moderation_action_rule": "Megszegett szabály",
     "make_temporary_moderator": "Kinevezés ideiglenes moderátornak",
-    "revoke_temporary_moderator": "{name} ideiglenes moderátori jogainak visszavonása"
+    "revoke_temporary_moderator": "{name} ideiglenes moderátori jogainak visszavonása",
+    "archive_export_svg": "SVG exportálása",
+    "archive_export_wbo": "WBO biztonsági másolat exportálása",
+    "archive_import_wbo": "WBO biztonsági másolat importálása",
+    "archive_import_note": "A WBO biztonsági másolatok tömörítettek, és szerkeszthetők maradnak. Az importálás objektumokat ad ehhez a táblához.",
+    "archive_import_failed": "Az importálás sikertelen. Ellenőrizd a fájlt és a szerkesztési jogosultságodat, majd várj 10 másodpercet, és próbáld újra.",
+    "archive_import_success": "A biztonsági másolat importálva.",
+    "archive_export_failed": "Az exportálás sikertelen. Próbáld újra.",
+    "source_code": "Forráskód"
   },
   "id": {
     "white-out": "Cairan koreksi",
@@ -986,7 +1050,15 @@
     "moderation_action_duration": "Durasi",
     "moderation_action_rule": "Aturan yang dilanggar",
     "make_temporary_moderator": "Jadikan moderator sementara",
-    "revoke_temporary_moderator": "Cabut akses moderator sementara {name}"
+    "revoke_temporary_moderator": "Cabut akses moderator sementara {name}",
+    "archive_export_svg": "Ekspor SVG",
+    "archive_export_wbo": "Ekspor cadangan WBO",
+    "archive_import_wbo": "Impor cadangan WBO",
+    "archive_import_note": "Cadangan WBO dikompresi dan tetap dapat diedit. Impor akan menambahkan objek ke papan ini.",
+    "archive_import_failed": "Impor gagal. Periksa file dan izin edit Anda, lalu tunggu 10 detik sebelum mencoba lagi.",
+    "archive_import_success": "Cadangan berhasil diimpor.",
+    "archive_export_failed": "Ekspor gagal. Silakan coba lagi.",
+    "source_code": "Kode sumber"
   },
   "it": {
     "board_name_placeholder": "Nome della lavagna…",
@@ -1096,7 +1168,15 @@
     "moderation_action_duration": "Durata",
     "moderation_action_rule": "Regola infranta",
     "make_temporary_moderator": "Nomina moderatore temporaneo",
-    "revoke_temporary_moderator": "Revoca i permessi di moderatore temporaneo a {name}"
+    "revoke_temporary_moderator": "Revoca i permessi di moderatore temporaneo a {name}",
+    "archive_export_svg": "Esporta SVG",
+    "archive_export_wbo": "Esporta backup WBO",
+    "archive_import_wbo": "Importa backup WBO",
+    "archive_import_note": "I backup WBO sono compressi e restano modificabili. L’importazione aggiunge oggetti a questa lavagna.",
+    "archive_import_failed": "Importazione non riuscita. Controlla il file e i tuoi permessi di modifica, poi attendi 10 secondi prima di riprovare.",
+    "archive_import_success": "Backup importato.",
+    "archive_export_failed": "Esportazione non riuscita. Riprova.",
+    "source_code": "Codice sorgente"
   },
   "ja": {
     "board_name_placeholder": "ボードの名前",
@@ -1206,7 +1286,15 @@
     "moderation_action_duration": "期間",
     "moderation_action_rule": "違反されたルール",
     "make_temporary_moderator": "一時モデレーターにする",
-    "revoke_temporary_moderator": "{name} の一時モデレーター権限を取り消す"
+    "revoke_temporary_moderator": "{name} の一時モデレーター権限を取り消す",
+    "archive_export_svg": "SVG をエクスポート",
+    "archive_export_wbo": "WBO バックアップをエクスポート",
+    "archive_import_wbo": "WBO バックアップをインポート",
+    "archive_import_note": "WBO バックアップは圧縮され、編集可能な状態で保存されます。インポートすると、このボードにオブジェクトが追加されます。",
+    "archive_import_failed": "インポートできませんでした。ファイルと編集権限を確認し、10 秒待ってから再試行してください。",
+    "archive_import_success": "バックアップをインポートしました。",
+    "archive_export_failed": "エクスポートできませんでした。もう一度お試しください。",
+    "source_code": "ソースコード"
   },
   "my": {
     "board_name_placeholder": "ဝှိုက်ဘုတ်အမည် ... ",
@@ -1316,7 +1404,15 @@
     "moderation_action_duration": "ကြာချိန်",
     "moderation_action_rule": "ချိုးဖောက်ခံရသော စည်းမျဉ်း",
     "make_temporary_moderator": "ယာယီကြီးကြပ်သူ သတ်မှတ်ရန်",
-    "revoke_temporary_moderator": "{name} ၏ ယာယီကြီးကြပ်ခွင့်ကို ရုပ်သိမ်းရန်"
+    "revoke_temporary_moderator": "{name} ၏ ယာယီကြီးကြပ်ခွင့်ကို ရုပ်သိမ်းရန်",
+    "archive_export_svg": "SVG အဖြစ် ထုတ်ယူရန်",
+    "archive_export_wbo": "WBO အရန်ဖိုင် ထုတ်ယူရန်",
+    "archive_import_wbo": "WBO အရန်ဖိုင် ပြန်သွင်းရန်",
+    "archive_import_note": "WBO အရန်ဖိုင်များကို ချုံ့ထားပြီး ပြန်လည်တည်းဖြတ်နိုင်ပါသည်။ ဖိုင်ပြန်သွင်းပါက ဤဘုတ်ပေါ်သို့ အရာဝတ္ထုများ ထပ်ထည့်ပေးပါမည်။",
+    "archive_import_failed": "ဖိုင်ပြန်သွင်း၍ မရပါ။ ဖိုင်နှင့် တည်းဖြတ်ခွင့်ကို စစ်ဆေးပြီး ၁၀ စက္ကန့်စောင့်ကာ ထပ်ကြိုးစားပါ။",
+    "archive_import_success": "အရန်ဖိုင် ပြန်သွင်းပြီးပါပြီ။",
+    "archive_export_failed": "ဖိုင်ထုတ်ယူ၍ မရပါ။ ထပ်ကြိုးစားပါ။",
+    "source_code": "မူရင်းကုဒ်"
   },
   "pt": {
     "white-out": "Branquejar",
@@ -1426,7 +1522,15 @@
     "moderation_action_duration": "Duração",
     "moderation_action_rule": "Regra violada",
     "make_temporary_moderator": "Nomear moderador temporário",
-    "revoke_temporary_moderator": "Revogar a moderação temporária de {name}"
+    "revoke_temporary_moderator": "Revogar a moderação temporária de {name}",
+    "archive_export_svg": "Exportar SVG",
+    "archive_export_wbo": "Exportar cópia de segurança WBO",
+    "archive_import_wbo": "Importar cópia de segurança WBO",
+    "archive_import_note": "As cópias WBO são comprimidas e continuam editáveis. A importação adiciona objetos a este quadro.",
+    "archive_import_failed": "Falha ao importar. Verifique o ficheiro e as suas permissões de edição e aguarde 10 segundos antes de tentar novamente.",
+    "archive_import_success": "Cópia de segurança importada.",
+    "archive_export_failed": "Falha ao exportar. Tente novamente.",
+    "source_code": "Código-fonte"
   },
   "ru": {
     "board_name_placeholder": "Название доски",
@@ -1536,7 +1640,15 @@
     "moderation_action_duration": "Длительность",
     "moderation_action_rule": "Нарушенное правило",
     "make_temporary_moderator": "Назначить временным модератором",
-    "revoke_temporary_moderator": "Отозвать временные права модератора у {name}"
+    "revoke_temporary_moderator": "Отозвать временные права модератора у {name}",
+    "archive_export_svg": "Экспорт SVG",
+    "archive_export_wbo": "Экспорт резервной копии WBO",
+    "archive_import_wbo": "Импорт резервной копии WBO",
+    "archive_import_note": "Резервные копии WBO сжаты и сохраняют возможность редактирования. При импорте объекты добавляются на эту доску.",
+    "archive_import_failed": "Не удалось импортировать. Проверьте файл и права на редактирование, затем подождите 10 секунд и повторите попытку.",
+    "archive_import_success": "Резервная копия импортирована.",
+    "archive_export_failed": "Не удалось экспортировать. Повторите попытку.",
+    "source_code": "Исходный код"
   },
   "sw": {
     "board_name_placeholder": "Jina la ubao mweupe ...",
@@ -1646,7 +1758,15 @@
     "moderation_action_duration": "Muda",
     "moderation_action_rule": "Sheria iliyovunjwa",
     "make_temporary_moderator": "Teua msimamizi wa muda",
-    "revoke_temporary_moderator": "Ondoa ruhusa za muda za usimamizi za {name}"
+    "revoke_temporary_moderator": "Ondoa ruhusa za muda za usimamizi za {name}",
+    "archive_export_svg": "Hamisha kama SVG",
+    "archive_export_wbo": "Hamisha nakala rudufu ya WBO",
+    "archive_import_wbo": "Ingiza nakala rudufu ya WBO",
+    "archive_import_note": "Nakala rudufu za WBO zimebanwa na zinaweza kuhaririwa. Kuingiza nakala huongeza vitu kwenye ubao huu.",
+    "archive_import_failed": "Imeshindikana kuingiza nakala. Kagua faili na ruhusa yako ya kuhariri, kisha subiri sekunde 10 kabla ya kujaribu tena.",
+    "archive_import_success": "Nakala rudufu imeingizwa.",
+    "archive_export_failed": "Imeshindikana kuhamisha. Tafadhali jaribu tena.",
+    "source_code": "Msimbo chanzo"
   },
   "th": {
     "board_name_placeholder": "ชื่อไวท์บอร์ด ...",
@@ -1756,7 +1876,15 @@
     "moderation_action_duration": "ระยะเวลา",
     "moderation_action_rule": "กฎที่ถูกละเมิด",
     "make_temporary_moderator": "แต่งตั้งผู้ดูแลชั่วคราว",
-    "revoke_temporary_moderator": "ถอนสิทธิ์ผู้ดูแลชั่วคราวของ {name}"
+    "revoke_temporary_moderator": "ถอนสิทธิ์ผู้ดูแลชั่วคราวของ {name}",
+    "archive_export_svg": "ส่งออก SVG",
+    "archive_export_wbo": "ส่งออกข้อมูลสำรอง WBO",
+    "archive_import_wbo": "นำเข้าข้อมูลสำรอง WBO",
+    "archive_import_note": "ข้อมูลสำรอง WBO ถูกบีบอัดและยังแก้ไขได้ การนำเข้าจะเพิ่มวัตถุลงในกระดานนี้",
+    "archive_import_failed": "นำเข้าไม่สำเร็จ โปรดตรวจสอบไฟล์และสิทธิ์แก้ไข แล้วรอ 10 วินาทีก่อนลองอีกครั้ง",
+    "archive_import_success": "นำเข้าข้อมูลสำรองแล้ว",
+    "archive_export_failed": "ส่งออกไม่สำเร็จ โปรดลองอีกครั้ง",
+    "source_code": "ซอร์สโค้ด"
   },
   "uk": {
     "white-out": "Коректор",
@@ -1866,7 +1994,15 @@
     "moderation_action_duration": "Тривалість",
     "moderation_action_rule": "Порушене правило",
     "make_temporary_moderator": "Призначити тимчасовим модератором",
-    "revoke_temporary_moderator": "Відкликати тимчасові права модератора у {name}"
+    "revoke_temporary_moderator": "Відкликати тимчасові права модератора у {name}",
+    "archive_export_svg": "Експортувати SVG",
+    "archive_export_wbo": "Експортувати резервну копію WBO",
+    "archive_import_wbo": "Імпортувати резервну копію WBO",
+    "archive_import_note": "Резервні копії WBO стиснуті й зберігають можливість редагування. Імпорт додає об’єкти на цю дошку.",
+    "archive_import_failed": "Не вдалося імпортувати. Перевірте файл і права на редагування, потім зачекайте 10 секунд і спробуйте ще раз.",
+    "archive_import_success": "Резервну копію імпортовано.",
+    "archive_export_failed": "Не вдалося експортувати. Спробуйте ще раз.",
+    "source_code": "Вихідний код"
   },
   "vi": {
     "white-out": "Bút xóa",
@@ -1976,7 +2112,15 @@
     "moderation_action_duration": "Thời lượng",
     "moderation_action_rule": "Quy tắc bị vi phạm",
     "make_temporary_moderator": "Đặt làm người kiểm duyệt tạm thời",
-    "revoke_temporary_moderator": "Thu hồi quyền kiểm duyệt tạm thời của {name}"
+    "revoke_temporary_moderator": "Thu hồi quyền kiểm duyệt tạm thời của {name}",
+    "archive_export_svg": "Xuất SVG",
+    "archive_export_wbo": "Xuất bản sao lưu WBO",
+    "archive_import_wbo": "Nhập bản sao lưu WBO",
+    "archive_import_note": "Bản sao lưu WBO được nén và vẫn có thể chỉnh sửa. Khi nhập, các đối tượng sẽ được thêm vào bảng này.",
+    "archive_import_failed": "Nhập thất bại. Hãy kiểm tra tệp và quyền chỉnh sửa, rồi chờ 10 giây trước khi thử lại.",
+    "archive_import_success": "Đã nhập bản sao lưu.",
+    "archive_export_failed": "Xuất thất bại. Vui lòng thử lại.",
+    "source_code": "Mã nguồn"
   },
   "zh-CN": {
     "board_name_placeholder": "白板名称",
@@ -2086,7 +2230,15 @@
     "moderation_action_duration": "持续时间",
     "moderation_action_rule": "违反的规则",
     "make_temporary_moderator": "设为临时管理员",
-    "revoke_temporary_moderator": "撤销 {name} 的临时管理员权限"
+    "revoke_temporary_moderator": "撤销 {name} 的临时管理员权限",
+    "archive_export_svg": "导出 SVG",
+    "archive_export_wbo": "导出 WBO 备份",
+    "archive_import_wbo": "导入 WBO 备份",
+    "archive_import_note": "WBO 备份经过压缩，导入后仍可编辑。导入会将备份中的对象添加到当前白板。",
+    "archive_import_failed": "导入失败。请检查文件和编辑权限，等待 10 秒后重试。",
+    "archive_import_success": "备份已导入。",
+    "archive_export_failed": "导出失败，请重试。",
+    "source_code": "源代码"
   },
   "zh-TW": {
     "board_name_placeholder": "白板名稱",
@@ -2196,7 +2348,15 @@
     "moderation_action_duration": "持續時間",
     "moderation_action_rule": "違反的規則",
     "make_temporary_moderator": "設為臨時管理員",
-    "revoke_temporary_moderator": "撤銷 {name} 的臨時管理員權限"
+    "revoke_temporary_moderator": "撤銷 {name} 的臨時管理員權限",
+    "archive_export_svg": "匯出 SVG",
+    "archive_export_wbo": "匯出 WBO 備份",
+    "archive_import_wbo": "匯入 WBO 備份",
+    "archive_import_note": "WBO 備份經過壓縮，匯入後仍可編輯。匯入會將備份中的物件加入目前的白板。",
+    "archive_import_failed": "匯入失敗。請檢查檔案和編輯權限，等待 10 秒後重試。",
+    "archive_import_success": "備份已匯入。",
+    "archive_export_failed": "匯出失敗，請重試。",
+    "source_code": "原始碼"
   },
   "pl": {
     "board_name_placeholder": "Nazwa tablicy",
@@ -2306,6 +2466,14 @@
     "moderation_action_duration": "Czas trwania",
     "moderation_action_rule": "Złamana zasada",
     "make_temporary_moderator": "Nadaj tymczasowe uprawnienia",
-    "revoke_temporary_moderator": "Odbierz użytkownikowi {name} tymczasowe uprawnienia moderatora"
+    "revoke_temporary_moderator": "Odbierz użytkownikowi {name} tymczasowe uprawnienia moderatora",
+    "archive_export_svg": "Eksportuj SVG",
+    "archive_export_wbo": "Eksportuj kopię zapasową WBO",
+    "archive_import_wbo": "Importuj kopię zapasową WBO",
+    "archive_import_note": "Kopie WBO są skompresowane i zachowują możliwość edycji. Import dodaje obiekty do tej tablicy.",
+    "archive_import_failed": "Import nie powiódł się. Sprawdź plik i uprawnienia do edycji, a następnie odczekaj 10 sekund i spróbuj ponownie.",
+    "archive_import_success": "Kopia zapasowa została zaimportowana.",
+    "archive_export_failed": "Eksport nie powiódł się. Spróbuj ponownie.",
+    "source_code": "Kod źródłowy"
   }
 }
