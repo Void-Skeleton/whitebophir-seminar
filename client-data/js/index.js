@@ -1,5 +1,20 @@
 import { canonicalizeBoardName } from "./board_name.js";
 import { normalizeRecentBoards } from "./board_page_state.js";
+import { normalizeUserName } from "./user_name.js";
+
+function readEntryName() {
+  const input = document.getElementById("user-name");
+  if (!(input instanceof HTMLInputElement)) return "";
+  const name = normalizeUserName(input.value);
+  const invalid = input.value.trim() !== "" && name === null;
+  input.setCustomValidity(invalid ? input.dataset.invalidMessage || "" : "");
+  if (invalid) {
+    input.reportValidity();
+    return null;
+  }
+  input.value = name || "";
+  return name || "";
+}
 
 function setupNamedBoardForm() {
   const form = document.getElementById("named-board-form");
@@ -8,6 +23,10 @@ function setupNamedBoardForm() {
   if (!(input instanceof HTMLInputElement)) return;
 
   form.addEventListener("submit", (event) => {
+    if (readEntryName() === null) {
+      event.preventDefault();
+      return;
+    }
     input.value = canonicalizeBoardName(input.value);
     if (input.value !== "") return;
 
@@ -48,4 +67,31 @@ function showRecentBoards() {
 }
 
 setupNamedBoardForm();
+document.getElementById("user-name")?.addEventListener("input", (event) => {
+  if (event.target instanceof HTMLInputElement)
+    event.target.setCustomValidity("");
+});
+document.getElementById("actions")?.addEventListener("click", (event) => {
+  if (!(event.target instanceof Element)) return;
+  const link = event.target.closest("a");
+  if (!link) return;
+  const url = new URL(link.href);
+  const base = new URL(document.baseURI);
+  if (
+    url.origin !== base.origin ||
+    !(
+      url.pathname.startsWith(`${base.pathname}boards/`) ||
+      url.pathname === `${base.pathname}random`
+    )
+  )
+    return;
+  const name = readEntryName();
+  if (name === null) {
+    event.preventDefault();
+    return;
+  }
+  if (name) url.searchParams.set("name", name);
+  else url.searchParams.delete("name");
+  link.href = url.href;
+});
 window.addEventListener("pageshow", showRecentBoards);

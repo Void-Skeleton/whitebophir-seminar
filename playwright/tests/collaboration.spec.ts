@@ -236,7 +236,7 @@ test.describe("collaboration and rate limiting", () => {
       );
       await expect(lastRemote.locator(".connected-user-actions")).toHaveCSS(
         "width",
-        "49px",
+        "74px",
       );
       await expect(friendButton).toHaveAttribute(
         "aria-label",

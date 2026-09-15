@@ -8,8 +8,8 @@ A demonstration server is available at [wbo.ophir.dev](https://wbo.ophir.dev)
 ## Seminar fork modifications — 2026-09-15
 
 This modified version adds compressed native whiteboard export/import, a Python
-command-line helper, and Ed25519 moderator authentication (the new feature 1 in
-`seminar-mod-instructions.md`). Features 2–6
+command-line helper, Ed25519 moderator authentication, and per-board display
+names (the current feature 1 in `seminar-mod-instructions.md`). Features 2–6
 are not implemented. See [NOTICE.md](NOTICE.md) for modification and license notices.
 
 Use the existing **Download** button (previously Save to SVG) to export an SVG or
@@ -44,6 +44,39 @@ WBO_MAX_ARCHIVE_BYTES=134217728 WBO_MAX_ARCHIVE_JSON_BYTES=536870912 npm start
 The browser uses the configured compressed limit. Reverse proxies may also need
 their request-body limit increased. Destination `WBO_MAX_ITEM_COUNT`,
 `WBO_MAX_CHILDREN`, and the current drawing field limits still apply.
+
+### Display names
+
+Enter a display name on the homepage before opening a named, public, recent, or
+random board, or add `?name=Alice` to a board URL. Names support Unicode; URL
+values must be URL-encoded. The helper can generate the link:
+
+```sh
+python3 scripts/seminar_helper.py join-url --server http://localhost:8080 \
+  --board seminar --name '张三'
+```
+
+On your first visit without a supplied or saved name, a dialog proposes the old
+generated name. Save your preferred name, or dismiss the dialog to keep the
+proposed name. The `wbo-board-name-v1` cookie remembers the choice for one year;
+each board has its own cookie path, including the deployment's base path.
+Returning without `name` reuses the saved choice. A supplied URL name takes
+precedence and is removed from the address after acceptance, so later reloads
+retain edits made through the UI.
+
+Open **Users** and use the pencil button to change your own name. Permanent and
+temporary moderators can also rename any connected user, including moderators.
+Renames update every connected tab sharing that authenticated identity on the
+same board, including their saved cookies. Users remain free to change their own
+name afterward. Another board's name is unaffected. Clearing cookies resets the
+saved choice; disconnected clients cannot receive moderator changes.
+
+Names contain 1–64 UTF-16 code units (the browser's input-length convention).
+Control characters, directional overrides and unpaired surrogates are rejected;
+names are rendered as plain text. Names do not grant permissions or change the
+stable user identity used by friends, bans, or moderator grants. The server
+limits rename attempts to ten per socket per ten seconds. All name controls
+work over HTTP and HTTPS and are translated in every supported language.
 
 ### Moderator authentication over HTTP or HTTPS
 

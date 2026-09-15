@@ -6,6 +6,7 @@ import {
 } from "../../client-data/js/message_shape.js";
 import { getToolId } from "../../client-data/js/message_tool_metadata.js";
 import { SocketEvents } from "../../client-data/js/socket_events.js";
+import { normalizeUserName } from "../../client-data/js/user_name.js";
 import { Cursor } from "../../client-data/tools/index.js";
 import { buildPronounceableName } from "../shared/pronounceable_name.mjs";
 import {
@@ -15,7 +16,7 @@ import {
 } from "./request.mjs";
 
 /** @import { AppSocket, ConnectedUserPayload, NormalizedMessageData, ServerConfig } from "../../types/server-runtime.d.ts" */
-/** @typedef {{socketId: string, userId: string, userSecret: string, name: string, ip: string, userAgent: string, language: string, color: string, size: number, lastTool: string, lastSeen: number, joinedAt: number, position: {x: number, y: number}, canEdit: boolean, canClear: boolean, canBan: boolean, canGrantTemporaryModerator: boolean}} BoardUser */
+/** @typedef {{socketId: string, userId: string, userSecret: string, name: string, nameChosen: boolean, ip: string, userAgent: string, language: string, color: string, size: number, lastTool: string, lastSeen: number, joinedAt: number, position: {x: number, y: number}, canEdit: boolean, canClear: boolean, canBan: boolean, canGrantTemporaryModerator: boolean}} BoardUser */
 /** @typedef {(socket: AppSocket, boardName: string, config: ServerConfig) => string} ResolveClientIp */
 /** @typedef {{canEdit?: boolean, canClear?: boolean, canBan?: boolean, canGrantTemporaryModerator?: boolean}} UserCapabilities */
 
@@ -66,11 +67,13 @@ function buildBoardUserRecord(
   const color = WBOMessageCommon.normalizeColor(
     getSocketQueryValue(socket, "color"),
   );
+  const chosenName = normalizeUserName(getSocketQueryValue(socket, "name"));
   return {
     socketId: socket.id,
     userId: buildUserId(userSecret),
     userSecret,
-    name: buildUserName(ip, userSecret),
+    name: chosenName || buildUserName(ip, userSecret),
+    nameChosen: chosenName !== null,
     ip,
     userAgent: getSocketHeaderValue(socket, "user-agent"),
     language: getSocketHeaderValue(socket, "accept-language"),
@@ -129,6 +132,7 @@ function serializeBoardUser(user) {
     socketId: user.socketId,
     userId: user.userId,
     name: user.name,
+    nameChosen: user.nameChosen,
     color: user.color,
     size: user.size,
     lastTool: user.lastTool,
@@ -168,6 +172,21 @@ function ensureBoardUser(
     capabilities,
   );
   users.set(socket.id, user);
+  // Reconnecting tabs inherit the identity's current name. Explicit URL names
+  // are submitted by the browser as a rename after receiving this presence.
+  if (user.userSecret) {
+    for (const peer of users.values()) {
+      if (
+        peer === user ||
+        peer.userSecret !== user.userSecret ||
+        !peer.nameChosen
+      )
+        continue;
+      user.name = peer.name;
+      user.nameChosen = true;
+      break;
+    }
+  }
   return user;
 }
 

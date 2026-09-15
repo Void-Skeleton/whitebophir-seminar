@@ -313,6 +313,7 @@ export class ConnectionModule {
           tool: Tools.preferences.initial.tool,
           color: Tools.preferences.getColor(),
           size: String(Tools.preferences.getSize()),
+          name: Tools.presence.names.forConnection(),
         },
       );
 

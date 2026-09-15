@@ -110,6 +110,7 @@ type CursorState = {
   iconSrc: string;
 };
 type BoardUrlOptions = {
+  chooseDefaultName?: boolean;
   lang?: string;
   token?: string;
   tokenQuery?: string;
@@ -201,6 +202,11 @@ export class BoardPage {
       const phase = document.documentElement.dataset.boardPhase;
       return phase === "ready" || phase === "error";
     });
+    if (
+      options.chooseDefaultName !== false &&
+      (await this.page.locator("#board").count())
+    )
+      await this.waitForSocketConnected();
   }
 
   async gotoBoardShell(boardName: string, options: BoardUrlOptions = {}) {
@@ -307,7 +313,7 @@ window.turnstile = {
     });
   }
 
-  async waitForSocketConnected() {
+  async waitForSocketConnected(chooseDefaultName = true) {
     await expect
       .poll(() =>
         this.page.evaluate(
@@ -315,6 +321,24 @@ window.turnstile = {
         ),
       )
       .toBe(true);
+    if (chooseDefaultName) {
+      // Existing scenarios accept the generated name through the first-visit UI.
+      // Name-specific specs pass false and interact with the prompt themselves.
+      await expect
+        .poll(() =>
+          this.page.evaluate(() => {
+            const names = window.WBOApp.presence.names;
+            return names.resolved || names.dialogOpen;
+          }),
+        )
+        .toBe(true);
+      if (await this.page.locator(".user-name-dialog").isVisible()) {
+        await this.page
+          .locator(".user-name-dialog button[type=submit]")
+          .click();
+        await expect(this.page.locator(".user-name-dialog")).toHaveCount(0);
+      }
+    }
   }
 
   async waitForToolBooted(name: string) {
@@ -330,6 +354,7 @@ window.turnstile = {
   }
 
   async waitForBoardWritable() {
+    await this.waitForSocketConnected();
     await expect
       .poll(() =>
         this.page.evaluate(() => {

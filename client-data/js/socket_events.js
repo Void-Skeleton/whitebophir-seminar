@@ -10,6 +10,7 @@ export const SocketEvents = Object.freeze({
   RATE_LIMITED: "rate-limited",
   REPORT_USER: "report_user",
   SET_TEMPORARY_MODERATOR: "set_temporary_moderator",
+  SET_USER_NAME: "set_user_name",
   TURNSTILE_TOKEN: "turnstile_token",
   USER_REPORTED: "user_reported",
   USER_JOINED: "user_joined",

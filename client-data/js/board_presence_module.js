@@ -1,5 +1,6 @@
 import { TOOL_ID_BY_CODE } from "../tools/tool-order.js";
 import { FriendStore } from "./board_friend_store.js";
+import { UserNameController } from "./board_user_name.js";
 import { getRequiredElement } from "./board_page_state.js";
 import { VIEWPORT_HASH_SCALE_DECIMALS } from "./board_viewport.js";
 import { getMessageActivityPoint } from "./message_activity_point.js";
@@ -21,6 +22,7 @@ export class PresenceModule {
     this.getTools = getTools;
     this.users = /** @type {ConnectedUserMap} */ (new Map());
     this.friendStore = new FriendStore();
+    this.names = new UserNameController(getTools);
     this.friendStorageBound = false;
     this.panelOpen = false;
     this.renderScheduled = false;
@@ -135,6 +137,8 @@ export class PresenceModule {
     );
     this.syncFriendStates();
     this.schedulePresenceRender();
+    this.names.receive(user);
+    this.getTools().toolRegistry.notifyPresenceDisplayChange();
   }
 
   /** @param {string} userId */
@@ -187,7 +191,7 @@ export class PresenceModule {
     // Presence has three layers:
     // - `socketId`: one live browser tab/socket connection. This is the most precise activity target.
     // - `userId`: derived server-side from the shared user-secret cookie, so multiple tabs from one browser profile can share it.
-    // - displayed name: combines an IP-derived word with the `userId`, so it is human-readable but not a stable routing key.
+    // - displayed name: user-chosen or generated, never a stable routing key.
     // When a live message includes `socket`, update that exact row only. Falling back to `userId` keeps older/non-live paths working.
     const messageSocketId = message.socket || null;
     if (!userId && messageSocketId === null) return;
@@ -947,6 +951,16 @@ function updateConnectedUserRow(getTools, row, user) {
   const report = /** @type {HTMLButtonElement | null} */ (
     row.querySelector(".connected-user-report")
   );
+  const rename = /** @type {HTMLButtonElement | null} */ (
+    row.querySelector(".connected-user-rename")
+  );
+  if (rename) {
+    rename.hidden =
+      !!user.disconnectedAt ||
+      !(isCurrentSocketUser(Tools, user) || Tools.access.canBan);
+    rename.title = Tools.i18n.format("user_name_rename", { name: user.name });
+    rename.setAttribute("aria-label", rename.title);
+  }
   if (report) {
     const currentIdentityUser = isCurrentIdentityUser(
       Tools,
@@ -1110,6 +1124,17 @@ function createConnectedUserRow(getTools, user, presence) {
   const actions = document.createElement("span");
   actions.className = "connected-user-actions";
   actions.appendChild(friend);
+  const rename = document.createElement("button");
+  rename.type = "button";
+  rename.className = "connected-user-action connected-user-rename";
+  rename.textContent = "\u270e";
+  rename.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const current = presence.users.get(row.dataset.socketId || "");
+    if (current) void presence.names.edit(current);
+  });
+  actions.appendChild(rename);
 
   const report = document.createElement("button");
   report.type = "button";

@@ -116,7 +116,16 @@
     "archive_import_success": "تم استيراد النسخة الاحتياطية.",
     "archive_export_failed": "تعذّر التصدير. يُرجى المحاولة مجددًا.",
     "source_code": "الشيفرة المصدرية",
-    "auth_v2_failed": "فشلت المصادقة بالمفتاح. تحقق من مفتاحك الخاص المحلي وإعدادات مشرفي اللوحة، ثم أعد تحميل الصفحة."
+    "auth_v2_failed": "فشلت المصادقة بالمفتاح. تحقق من مفتاحك الخاص المحلي وإعدادات مشرفي اللوحة، ثم أعد تحميل الصفحة.",
+    "user_name_label": "الاسم المعروض",
+    "user_name_optional": "اختياري",
+    "user_name_choose": "اختر اسمك لهذه اللوحة",
+    "user_name_rename": "تغيير اسم {name}",
+    "user_name_save": "حفظ الاسم",
+    "user_name_invalid": "أدخل اسماً من 1 إلى 64 محرفاً دون محارف تحكم.",
+    "user_name_forbidden": "يمكنك تغيير اسمك فقط.",
+    "user_name_rate_limited": "غيّرت الاسم مرات كثيرة. حاول مجدداً بعد بضع ثوانٍ.",
+    "user_name_unavailable": "تعذّر تغيير الاسم. أعد الاتصال وحاول مجدداً."
   },
   "be": {
     "white-out": "Замазка",
@@ -235,7 +244,16 @@
     "archive_import_success": "Рэзервовая копія імпартаваная.",
     "archive_export_failed": "Не ўдалося экспартаваць. Паспрабуйце яшчэ раз.",
     "source_code": "Зыходны код",
-    "auth_v2_failed": "Не ўдалося выканаць аўтэнтыфікацыю ключом. Праверце лакальны прыватны ключ і налады мадэратараў дошкі, затым перазагрузіце старонку."
+    "auth_v2_failed": "Не ўдалося выканаць аўтэнтыфікацыю ключом. Праверце лакальны прыватны ключ і налады мадэратараў дошкі, затым перазагрузіце старонку.",
+    "user_name_label": "Імя для паказу",
+    "user_name_optional": "Неабавязкова",
+    "user_name_choose": "Выберыце сваё імя для гэтай дошкі",
+    "user_name_rename": "Змяніць імя {name}",
+    "user_name_save": "Захаваць імя",
+    "user_name_invalid": "Увядзіце імя ад 1 да 64 сімвалаў без кіравальных сімвалаў.",
+    "user_name_forbidden": "Вы можаце змяніць толькі сваё імя.",
+    "user_name_rate_limited": "Занадта шмат змен імя. Паўтарыце спробу праз некалькі секунд.",
+    "user_name_unavailable": "Не ўдалося змяніць імя. Падключыцеся зноў і паўтарыце спробу."
   },
   "ca": {
     "white-out": "Corrector blanc",
@@ -354,7 +372,16 @@
     "archive_import_success": "S’ha importat la còpia de seguretat.",
     "archive_export_failed": "L’exportació ha fallat. Torna-ho a provar.",
     "source_code": "Codi font",
-    "auth_v2_failed": "Ha fallat l’autenticació amb clau. Comproveu la clau privada local i la configuració dels moderadors de la pissarra i torneu a carregar la pàgina."
+    "auth_v2_failed": "Ha fallat l’autenticació amb clau. Comproveu la clau privada local i la configuració dels moderadors de la pissarra i torneu a carregar la pàgina.",
+    "user_name_label": "Nom visible",
+    "user_name_optional": "Opcional",
+    "user_name_choose": "Tria el teu nom per a aquesta pissarra",
+    "user_name_rename": "Canvia el nom de {name}",
+    "user_name_save": "Desa el nom",
+    "user_name_invalid": "Introdueix un nom d’1 a 64 caràcters sense caràcters de control.",
+    "user_name_forbidden": "Només pots canviar el teu propi nom.",
+    "user_name_rate_limited": "Has canviat el nom massa vegades. Torna-ho a provar d’aquí a uns segons.",
+    "user_name_unavailable": "No s’ha pogut canviar el nom. Torna a connectar-te i prova-ho de nou."
   },
   "de": {
     "board_name_placeholder": "Name des Whiteboards…",
@@ -473,7 +500,16 @@
     "archive_import_success": "Sicherung importiert.",
     "archive_export_failed": "Export fehlgeschlagen. Bitte versuche es erneut.",
     "source_code": "Quellcode",
-    "auth_v2_failed": "Die Schlüsselauthentifizierung ist fehlgeschlagen. Prüfe deinen lokal gespeicherten privaten Schlüssel und die Moderatoreinstellungen des Boards und lade die Seite neu."
+    "auth_v2_failed": "Die Schlüsselauthentifizierung ist fehlgeschlagen. Prüfe deinen lokal gespeicherten privaten Schlüssel und die Moderatoreinstellungen des Boards und lade die Seite neu.",
+    "user_name_label": "Anzeigename",
+    "user_name_optional": "Optional",
+    "user_name_choose": "Wähle deinen Namen für dieses Whiteboard",
+    "user_name_rename": "{name} umbenennen",
+    "user_name_save": "Namen speichern",
+    "user_name_invalid": "Gib einen Namen mit 1–64 Zeichen ohne Steuerzeichen ein.",
+    "user_name_forbidden": "Du kannst nur deinen eigenen Namen ändern.",
+    "user_name_rate_limited": "Zu viele Namensänderungen. Versuche es in ein paar Sekunden erneut.",
+    "user_name_unavailable": "Der Name konnte nicht geändert werden. Verbinde dich erneut und versuche es noch einmal."
   },
   "en": {
     "white-out": "White-out",
@@ -592,7 +628,16 @@
     "archive_import_success": "Backup imported.",
     "archive_export_failed": "Export failed. Please try again.",
     "source_code": "Source code",
-    "auth_v2_failed": "Key authentication failed. Check your local private key and the board’s moderator settings, then reload."
+    "auth_v2_failed": "Key authentication failed. Check your local private key and the board’s moderator settings, then reload.",
+    "user_name_label": "Display name",
+    "user_name_optional": "Optional",
+    "user_name_choose": "Choose your name for this board",
+    "user_name_rename": "Rename {name}",
+    "user_name_save": "Save name",
+    "user_name_invalid": "Enter a name of 1–64 characters without control characters.",
+    "user_name_forbidden": "You can only rename yourself.",
+    "user_name_rate_limited": "Too many name changes. Try again in a few seconds.",
+    "user_name_unavailable": "Could not change the name. Reconnect and try again."
   },
   "es": {
     "board_name_placeholder": "Nombre de la pizarra …",
@@ -711,7 +756,16 @@
     "archive_import_success": "Copia de seguridad importada.",
     "archive_export_failed": "Error al exportar. Vuelve a intentarlo.",
     "source_code": "Código fuente",
-    "auth_v2_failed": "La autenticación con clave ha fallado. Comprueba tu clave privada local y la configuración de moderadores de la pizarra y vuelve a cargar la página."
+    "auth_v2_failed": "La autenticación con clave ha fallado. Comprueba tu clave privada local y la configuración de moderadores de la pizarra y vuelve a cargar la página.",
+    "user_name_label": "Nombre visible",
+    "user_name_optional": "Opcional",
+    "user_name_choose": "Elige tu nombre para esta pizarra",
+    "user_name_rename": "Cambiar el nombre de {name}",
+    "user_name_save": "Guardar nombre",
+    "user_name_invalid": "Introduce un nombre de 1 a 64 caracteres sin caracteres de control.",
+    "user_name_forbidden": "Solo puedes cambiar tu propio nombre.",
+    "user_name_rate_limited": "Has cambiado el nombre demasiadas veces. Inténtalo de nuevo en unos segundos.",
+    "user_name_unavailable": "No se pudo cambiar el nombre. Vuelve a conectarte e inténtalo de nuevo."
   },
   "fr": {
     "board_name_placeholder": "Nom du tableau…",
@@ -829,7 +883,16 @@
     "archive_import_success": "Sauvegarde importée.",
     "archive_export_failed": "Échec de l’export. Veuillez réessayer.",
     "source_code": "Code source",
-    "auth_v2_failed": "L’authentification par clé a échoué. Vérifiez votre clé privée locale et les paramètres des modérateurs du tableau, puis rechargez la page."
+    "auth_v2_failed": "L’authentification par clé a échoué. Vérifiez votre clé privée locale et les paramètres des modérateurs du tableau, puis rechargez la page.",
+    "user_name_label": "Nom affiché",
+    "user_name_optional": "Facultatif",
+    "user_name_choose": "Choisissez votre nom pour ce tableau",
+    "user_name_rename": "Renommer {name}",
+    "user_name_save": "Enregistrer le nom",
+    "user_name_invalid": "Saisissez un nom de 1 à 64 caractères, sans caractères de contrôle.",
+    "user_name_forbidden": "Vous ne pouvez changer que votre propre nom.",
+    "user_name_rate_limited": "Trop de changements de nom. Réessayez dans quelques secondes.",
+    "user_name_unavailable": "Impossible de changer le nom. Reconnectez-vous et réessayez."
   },
   "hu": {
     "white-out": "Lefedő",
@@ -948,7 +1011,16 @@
     "archive_import_success": "A biztonsági másolat importálva.",
     "archive_export_failed": "Az exportálás sikertelen. Próbáld újra.",
     "source_code": "Forráskód",
-    "auth_v2_failed": "A kulcsalapú hitelesítés sikertelen. Ellenőrizd a helyben tárolt privát kulcsodat és a tábla moderátorbeállításait, majd töltsd újra az oldalt."
+    "auth_v2_failed": "A kulcsalapú hitelesítés sikertelen. Ellenőrizd a helyben tárolt privát kulcsodat és a tábla moderátorbeállításait, majd töltsd újra az oldalt.",
+    "user_name_label": "Megjelenített név",
+    "user_name_optional": "Nem kötelező",
+    "user_name_choose": "Válassz nevet ehhez a táblához",
+    "user_name_rename": "{name} átnevezése",
+    "user_name_save": "Név mentése",
+    "user_name_invalid": "Adj meg egy 1–64 karakteres nevet vezérlőkarakterek nélkül.",
+    "user_name_forbidden": "Csak a saját nevedet változtathatod meg.",
+    "user_name_rate_limited": "Túl sok névváltoztatás. Próbáld újra néhány másodperc múlva.",
+    "user_name_unavailable": "Nem sikerült megváltoztatni a nevet. Csatlakozz újra, majd próbáld meg ismét."
   },
   "id": {
     "white-out": "Cairan koreksi",
@@ -1067,7 +1139,16 @@
     "archive_import_success": "Cadangan berhasil diimpor.",
     "archive_export_failed": "Ekspor gagal. Silakan coba lagi.",
     "source_code": "Kode sumber",
-    "auth_v2_failed": "Autentikasi kunci gagal. Periksa kunci privat lokal Anda dan pengaturan moderator papan, lalu muat ulang halaman."
+    "auth_v2_failed": "Autentikasi kunci gagal. Periksa kunci privat lokal Anda dan pengaturan moderator papan, lalu muat ulang halaman.",
+    "user_name_label": "Nama tampilan",
+    "user_name_optional": "Opsional",
+    "user_name_choose": "Pilih nama Anda untuk papan ini",
+    "user_name_rename": "Ubah nama {name}",
+    "user_name_save": "Simpan nama",
+    "user_name_invalid": "Masukkan nama sepanjang 1–64 karakter tanpa karakter kontrol.",
+    "user_name_forbidden": "Anda hanya dapat mengubah nama sendiri.",
+    "user_name_rate_limited": "Terlalu sering mengubah nama. Coba lagi dalam beberapa detik.",
+    "user_name_unavailable": "Nama tidak dapat diubah. Hubungkan kembali lalu coba lagi."
   },
   "it": {
     "board_name_placeholder": "Nome della lavagna…",
@@ -1186,7 +1267,16 @@
     "archive_import_success": "Backup importato.",
     "archive_export_failed": "Esportazione non riuscita. Riprova.",
     "source_code": "Codice sorgente",
-    "auth_v2_failed": "Autenticazione tramite chiave non riuscita. Controlla la chiave privata locale e le impostazioni dei moderatori della lavagna, poi ricarica la pagina."
+    "auth_v2_failed": "Autenticazione tramite chiave non riuscita. Controlla la chiave privata locale e le impostazioni dei moderatori della lavagna, poi ricarica la pagina.",
+    "user_name_label": "Nome visualizzato",
+    "user_name_optional": "Facoltativo",
+    "user_name_choose": "Scegli il tuo nome per questa lavagna",
+    "user_name_rename": "Rinomina {name}",
+    "user_name_save": "Salva nome",
+    "user_name_invalid": "Inserisci un nome da 1 a 64 caratteri senza caratteri di controllo.",
+    "user_name_forbidden": "Puoi cambiare solo il tuo nome.",
+    "user_name_rate_limited": "Hai cambiato nome troppe volte. Riprova tra qualche secondo.",
+    "user_name_unavailable": "Impossibile cambiare il nome. Riconnettiti e riprova."
   },
   "ja": {
     "board_name_placeholder": "ボードの名前",
@@ -1305,7 +1395,16 @@
     "archive_import_success": "バックアップをインポートしました。",
     "archive_export_failed": "エクスポートできませんでした。もう一度お試しください。",
     "source_code": "ソースコード",
-    "auth_v2_failed": "鍵による認証に失敗しました。ローカルの秘密鍵とボードのモデレーター設定を確認してから、ページを再読み込みしてください。"
+    "auth_v2_failed": "鍵による認証に失敗しました。ローカルの秘密鍵とボードのモデレーター設定を確認してから、ページを再読み込みしてください。",
+    "user_name_label": "表示名",
+    "user_name_optional": "任意",
+    "user_name_choose": "このボードで使う名前を設定",
+    "user_name_rename": "{name} の名前を変更",
+    "user_name_save": "名前を保存",
+    "user_name_invalid": "制御文字を含まない1～64文字の名前を入力してください。",
+    "user_name_forbidden": "変更できるのは自分の名前だけです。",
+    "user_name_rate_limited": "名前の変更回数が多すぎます。数秒後にもう一度お試しください。",
+    "user_name_unavailable": "名前を変更できませんでした。再接続してお試しください。"
   },
   "my": {
     "board_name_placeholder": "ဝှိုက်ဘုတ်အမည် ... ",
@@ -1424,7 +1523,16 @@
     "archive_import_success": "အရန်ဖိုင် ပြန်သွင်းပြီးပါပြီ။",
     "archive_export_failed": "ဖိုင်ထုတ်ယူ၍ မရပါ။ ထပ်ကြိုးစားပါ။",
     "source_code": "မူရင်းကုဒ်",
-    "auth_v2_failed": "သော့ဖြင့် အထောက်အထားစစ်ဆေးမှု မအောင်မြင်ပါ။ စက်တွင်းရှိ လျှို့ဝှက်သော့နှင့် ဘုတ်၏ ကြီးကြပ်သူ ဆက်တင်များကို စစ်ဆေးပြီး စာမျက်နှာကို ပြန်ဖွင့်ပါ။"
+    "auth_v2_failed": "သော့ဖြင့် အထောက်အထားစစ်ဆေးမှု မအောင်မြင်ပါ။ စက်တွင်းရှိ လျှို့ဝှက်သော့နှင့် ဘုတ်၏ ကြီးကြပ်သူ ဆက်တင်များကို စစ်ဆေးပြီး စာမျက်နှာကို ပြန်ဖွင့်ပါ။",
+    "user_name_label": "ပြသမည့်အမည်",
+    "user_name_optional": "မဖြည့်လည်းရသည်",
+    "user_name_choose": "ဤဘုတ်အတွက် သင့်အမည်ကို ရွေးပါ",
+    "user_name_rename": "{name} ၏အမည်ကို ပြောင်းရန်",
+    "user_name_save": "အမည်သိမ်းရန်",
+    "user_name_invalid": "ထိန်းချုပ်စာလုံးများမပါဘဲ စာလုံးရေ ၁ မှ ၆၄ အတွင်းရှိ အမည်ကို ထည့်ပါ။",
+    "user_name_forbidden": "သင့်ကိုယ်ပိုင်အမည်ကိုသာ ပြောင်းနိုင်ပါသည်။",
+    "user_name_rate_limited": "အမည်ပြောင်းလဲမှု များလွန်းနေပါသည်။ စက္ကန့်အနည်းငယ်ကြာမှ ထပ်ကြိုးစားပါ။",
+    "user_name_unavailable": "အမည်ကို ပြောင်း၍မရပါ။ ပြန်လည်ချိတ်ဆက်ပြီး ထပ်ကြိုးစားပါ။"
   },
   "pt": {
     "white-out": "Branquejar",
@@ -1543,7 +1651,16 @@
     "archive_import_success": "Cópia de segurança importada.",
     "archive_export_failed": "Falha ao exportar. Tente novamente.",
     "source_code": "Código-fonte",
-    "auth_v2_failed": "A autenticação por chave falhou. Verifique a sua chave privada local e as definições dos moderadores do quadro e recarregue a página."
+    "auth_v2_failed": "A autenticação por chave falhou. Verifique a sua chave privada local e as definições dos moderadores do quadro e recarregue a página.",
+    "user_name_label": "Nome de exibição",
+    "user_name_optional": "Opcional",
+    "user_name_choose": "Escolha seu nome para este quadro",
+    "user_name_rename": "Renomear {name}",
+    "user_name_save": "Salvar nome",
+    "user_name_invalid": "Digite um nome de 1 a 64 caracteres, sem caracteres de controle.",
+    "user_name_forbidden": "Você só pode alterar seu próprio nome.",
+    "user_name_rate_limited": "Muitas alterações de nome. Tente novamente em alguns segundos.",
+    "user_name_unavailable": "Não foi possível alterar o nome. Reconecte-se e tente novamente."
   },
   "ru": {
     "board_name_placeholder": "Название доски",
@@ -1662,7 +1779,16 @@
     "archive_import_success": "Резервная копия импортирована.",
     "archive_export_failed": "Не удалось экспортировать. Повторите попытку.",
     "source_code": "Исходный код",
-    "auth_v2_failed": "Не удалось выполнить аутентификацию по ключу. Проверьте локальный закрытый ключ и настройки модераторов доски, затем перезагрузите страницу."
+    "auth_v2_failed": "Не удалось выполнить аутентификацию по ключу. Проверьте локальный закрытый ключ и настройки модераторов доски, затем перезагрузите страницу.",
+    "user_name_label": "Отображаемое имя",
+    "user_name_optional": "Необязательно",
+    "user_name_choose": "Выберите имя для этой доски",
+    "user_name_rename": "Переименовать {name}",
+    "user_name_save": "Сохранить имя",
+    "user_name_invalid": "Введите имя длиной от 1 до 64 символов без управляющих символов.",
+    "user_name_forbidden": "Вы можете менять только своё имя.",
+    "user_name_rate_limited": "Слишком много изменений имени. Повторите попытку через несколько секунд.",
+    "user_name_unavailable": "Не удалось изменить имя. Подключитесь заново и повторите попытку."
   },
   "sw": {
     "board_name_placeholder": "Jina la ubao mweupe ...",
@@ -1781,7 +1907,16 @@
     "archive_import_success": "Nakala rudufu imeingizwa.",
     "archive_export_failed": "Imeshindikana kuhamisha. Tafadhali jaribu tena.",
     "source_code": "Msimbo chanzo",
-    "auth_v2_failed": "Uthibitishaji kwa ufunguo umeshindikana. Kagua ufunguo wako binafsi uliohifadhiwa kwenye kifaa na mipangilio ya wasimamizi wa ubao, kisha pakia ukurasa upya."
+    "auth_v2_failed": "Uthibitishaji kwa ufunguo umeshindikana. Kagua ufunguo wako binafsi uliohifadhiwa kwenye kifaa na mipangilio ya wasimamizi wa ubao, kisha pakia ukurasa upya.",
+    "user_name_label": "Jina la kuonyesha",
+    "user_name_optional": "Si lazima",
+    "user_name_choose": "Chagua jina lako kwa ubao huu",
+    "user_name_rename": "Badilisha jina la {name}",
+    "user_name_save": "Hifadhi jina",
+    "user_name_invalid": "Weka jina lenye herufi 1–64 bila vibambo vya udhibiti.",
+    "user_name_forbidden": "Unaweza kubadilisha jina lako tu.",
+    "user_name_rate_limited": "Umebadilisha jina mara nyingi sana. Jaribu tena baada ya sekunde chache.",
+    "user_name_unavailable": "Jina halikuweza kubadilishwa. Unganisha tena kisha ujaribu tena."
   },
   "th": {
     "board_name_placeholder": "ชื่อไวท์บอร์ด ...",
@@ -1900,7 +2035,16 @@
     "archive_import_success": "นำเข้าข้อมูลสำรองแล้ว",
     "archive_export_failed": "ส่งออกไม่สำเร็จ โปรดลองอีกครั้ง",
     "source_code": "ซอร์สโค้ด",
-    "auth_v2_failed": "ยืนยันตัวตนด้วยกุญแจไม่สำเร็จ โปรดตรวจสอบกุญแจส่วนตัวที่เก็บไว้ในเครื่องและการตั้งค่าผู้ดูแลบอร์ด แล้วโหลดหน้าใหม่"
+    "auth_v2_failed": "ยืนยันตัวตนด้วยกุญแจไม่สำเร็จ โปรดตรวจสอบกุญแจส่วนตัวที่เก็บไว้ในเครื่องและการตั้งค่าผู้ดูแลบอร์ด แล้วโหลดหน้าใหม่",
+    "user_name_label": "ชื่อที่แสดง",
+    "user_name_optional": "ไม่จำเป็น",
+    "user_name_choose": "เลือกชื่อของคุณสำหรับกระดานนี้",
+    "user_name_rename": "เปลี่ยนชื่อ {name}",
+    "user_name_save": "บันทึกชื่อ",
+    "user_name_invalid": "กรุณาใส่ชื่อที่มีความยาว 1–64 อักขระ โดยไม่มีอักขระควบคุม",
+    "user_name_forbidden": "คุณเปลี่ยนได้เฉพาะชื่อของตัวเองเท่านั้น",
+    "user_name_rate_limited": "เปลี่ยนชื่อบ่อยเกินไป กรุณาลองอีกครั้งในอีกสักครู่",
+    "user_name_unavailable": "เปลี่ยนชื่อไม่สำเร็จ กรุณาเชื่อมต่อใหม่แล้วลองอีกครั้ง"
   },
   "uk": {
     "white-out": "Коректор",
@@ -2019,7 +2163,16 @@
     "archive_import_success": "Резервну копію імпортовано.",
     "archive_export_failed": "Не вдалося експортувати. Спробуйте ще раз.",
     "source_code": "Вихідний код",
-    "auth_v2_failed": "Не вдалося виконати автентифікацію за ключем. Перевірте локальний приватний ключ і налаштування модераторів дошки, а потім перезавантажте сторінку."
+    "auth_v2_failed": "Не вдалося виконати автентифікацію за ключем. Перевірте локальний приватний ключ і налаштування модераторів дошки, а потім перезавантажте сторінку.",
+    "user_name_label": "Відображуване ім’я",
+    "user_name_optional": "Необов’язково",
+    "user_name_choose": "Виберіть ім’я для цієї дошки",
+    "user_name_rename": "Перейменувати {name}",
+    "user_name_save": "Зберегти ім’я",
+    "user_name_invalid": "Введіть ім’я завдовжки від 1 до 64 символів без керувальних символів.",
+    "user_name_forbidden": "Ви можете змінювати лише власне ім’я.",
+    "user_name_rate_limited": "Забагато змін імені. Спробуйте ще раз за кілька секунд.",
+    "user_name_unavailable": "Не вдалося змінити ім’я. Підключіться знову та повторіть спробу."
   },
   "vi": {
     "white-out": "Bút xóa",
@@ -2138,7 +2291,16 @@
     "archive_import_success": "Đã nhập bản sao lưu.",
     "archive_export_failed": "Xuất thất bại. Vui lòng thử lại.",
     "source_code": "Mã nguồn",
-    "auth_v2_failed": "Xác thực bằng khóa không thành công. Hãy kiểm tra khóa riêng trên thiết bị và cài đặt người điều hành bảng, rồi tải lại trang."
+    "auth_v2_failed": "Xác thực bằng khóa không thành công. Hãy kiểm tra khóa riêng trên thiết bị và cài đặt người điều hành bảng, rồi tải lại trang.",
+    "user_name_label": "Tên hiển thị",
+    "user_name_optional": "Không bắt buộc",
+    "user_name_choose": "Chọn tên của bạn cho bảng này",
+    "user_name_rename": "Đổi tên {name}",
+    "user_name_save": "Lưu tên",
+    "user_name_invalid": "Nhập tên dài từ 1 đến 64 ký tự, không chứa ký tự điều khiển.",
+    "user_name_forbidden": "Bạn chỉ có thể đổi tên của chính mình.",
+    "user_name_rate_limited": "Bạn đã đổi tên quá nhiều lần. Hãy thử lại sau vài giây.",
+    "user_name_unavailable": "Không thể đổi tên. Hãy kết nối lại rồi thử lại."
   },
   "zh-CN": {
     "board_name_placeholder": "白板名称",
@@ -2257,7 +2419,16 @@
     "archive_import_success": "备份已导入。",
     "archive_export_failed": "导出失败，请重试。",
     "source_code": "源代码",
-    "auth_v2_failed": "密钥认证失败。请检查本地私钥及白板的主持人设置，然后重新加载。"
+    "auth_v2_failed": "密钥认证失败。请检查本地私钥及白板的主持人设置，然后重新加载。",
+    "user_name_label": "显示名称",
+    "user_name_optional": "可选",
+    "user_name_choose": "设置你在此白板上的名称",
+    "user_name_rename": "修改 {name} 的名称",
+    "user_name_save": "保存名称",
+    "user_name_invalid": "请输入 1–64 个字符的名称，且不含控制字符。",
+    "user_name_forbidden": "你只能修改自己的名称。",
+    "user_name_rate_limited": "修改名称过于频繁，请稍后再试。",
+    "user_name_unavailable": "无法修改名称，请重新连接后再试。"
   },
   "zh-TW": {
     "board_name_placeholder": "白板名稱",
@@ -2376,7 +2547,16 @@
     "archive_import_success": "備份已匯入。",
     "archive_export_failed": "匯出失敗，請重試。",
     "source_code": "原始碼",
-    "auth_v2_failed": "金鑰驗證失敗。請檢查本機私密金鑰及白板的主持人設定，然後重新載入。"
+    "auth_v2_failed": "金鑰驗證失敗。請檢查本機私密金鑰及白板的主持人設定，然後重新載入。",
+    "user_name_label": "顯示名稱",
+    "user_name_optional": "選填",
+    "user_name_choose": "設定你在此白板上的名稱",
+    "user_name_rename": "修改 {name} 的名稱",
+    "user_name_save": "儲存名稱",
+    "user_name_invalid": "請輸入 1–64 個字元的名稱，且不含控制字元。",
+    "user_name_forbidden": "你只能修改自己的名稱。",
+    "user_name_rate_limited": "修改名稱過於頻繁，請稍後再試。",
+    "user_name_unavailable": "無法修改名稱，請重新連線後再試。"
   },
   "pl": {
     "board_name_placeholder": "Nazwa tablicy",
@@ -2495,6 +2675,15 @@
     "archive_import_success": "Kopia zapasowa została zaimportowana.",
     "archive_export_failed": "Eksport nie powiódł się. Spróbuj ponownie.",
     "source_code": "Kod źródłowy",
-    "auth_v2_failed": "Uwierzytelnianie kluczem nie powiodło się. Sprawdź lokalny klucz prywatny i ustawienia moderatorów tablicy, a następnie odśwież stronę."
+    "auth_v2_failed": "Uwierzytelnianie kluczem nie powiodło się. Sprawdź lokalny klucz prywatny i ustawienia moderatorów tablicy, a następnie odśwież stronę.",
+    "user_name_label": "Wyświetlana nazwa",
+    "user_name_optional": "Opcjonalnie",
+    "user_name_choose": "Wybierz swoją nazwę na tej tablicy",
+    "user_name_rename": "Zmień nazwę {name}",
+    "user_name_save": "Zapisz nazwę",
+    "user_name_invalid": "Wpisz nazwę o długości od 1 do 64 znaków, bez znaków sterujących.",
+    "user_name_forbidden": "Możesz zmieniać tylko własną nazwę.",
+    "user_name_rate_limited": "Zbyt wiele zmian nazwy. Spróbuj ponownie za kilka sekund.",
+    "user_name_unavailable": "Nie udało się zmienić nazwy. Połącz się ponownie i spróbuj jeszcze raz."
   }
 }

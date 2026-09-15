@@ -55,8 +55,15 @@ function redirectBoardQuery(ctx) {
   const boardName = requireBoardQueryName(ctx.url);
   annotateBoardRequest(ctx.observed, boardName);
   boardPermissionsForRequest(ctx, boardName).requireOpen();
+  const query = new URLSearchParams(ctx.url.search);
+  query.delete("board");
+  if (query.get("name") === "") query.delete("name");
   ctx.response.writeHead(301, {
-    Location: boardDocumentLocation(config, boardName),
+    Location: boardDocumentLocation(
+      config,
+      boardName,
+      query.size ? `?${query}` : "",
+    ),
   });
   ctx.response.end();
 }

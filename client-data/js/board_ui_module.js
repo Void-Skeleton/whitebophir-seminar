@@ -55,6 +55,7 @@
  */
 
 /** @typedef {string | number} ActionDialogValue */
+/** @typedef {{title: string, label: string, value: string, maxLength: number, saveLabel: string, cancelLabel: string, submit: (value: string) => Promise<string | null>}} InputDialogOptions */
 /** @typedef {{label: string, value: ActionDialogValue, iconUrl?: string, variant?: "secondary" | "warning" | "danger"}} ActionDialogChoice */
 /** @typedef {{id: string, label?: string, layout: "stacked" | "segmented" | "grid", choices: ActionDialogChoice[], initialValue?: ActionDialogValue, submit?: boolean}} ActionDialogSection */
 /** @typedef {{title: string, message?: string, sections: ActionDialogSection[], cancelLabel: string, link?: {label: string, href: string}}} ActionDialogOptions */
@@ -852,7 +853,66 @@ export function showModerationDisconnectNotice(options) {
   });
 }
 
+/** @param {InputDialogOptions} options @returns {Promise<string | null>} */
+function showInputDialog(options) {
+  return showModalDialog(
+    /** @type {string | null} */ (null),
+    (dialog, settle) => {
+      dialog.classList.add("user-name-dialog");
+      const title = document.createElement("div");
+      title.className = "wbo-dialog-title";
+      title.textContent = options.title;
+      const form = document.createElement("form");
+      const label = document.createElement("label");
+      label.htmlFor = "user-name-input";
+      label.textContent = options.label;
+      const input = document.createElement("input");
+      input.id = "user-name-input";
+      input.type = "text";
+      input.value = options.value;
+      input.maxLength = options.maxLength;
+      input.setAttribute("autocomplete", "nickname");
+      input.dir = "auto";
+      input.autofocus = true;
+      input.required = true;
+      const error = document.createElement("p");
+      error.id = "user-name-error";
+      error.className = "user-name-error";
+      error.setAttribute("role", "alert");
+      input.setAttribute("aria-describedby", error.id);
+      const actions = document.createElement("div");
+      actions.className = "wbo-dialog-actions";
+      const cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.className = "wbo-dialog-button wbo-dialog-button-secondary";
+      cancel.textContent = options.cancelLabel;
+      cancel.addEventListener("click", () => settle(null));
+      const save = document.createElement("button");
+      save.type = "submit";
+      save.className = "wbo-dialog-button wbo-dialog-button-primary";
+      save.textContent = options.saveLabel;
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (save.disabled) return;
+        save.disabled = true;
+        error.textContent = (await options.submit(input.value)) || "";
+        save.disabled = false;
+        if (!error.textContent) settle(input.value);
+        else input.focus();
+      });
+      actions.append(cancel, save);
+      form.append(label, input, error, actions);
+      dialog.append(title, form);
+    },
+  );
+}
+
 export class UiModule {
+  /** @param {InputDialogOptions} options */
+  prompt(options) {
+    return showInputDialog(options);
+  }
+
   /** @param {AnchoredPanelPositionOptions} options */
   positionAnchoredPanel(options) {
     return positionAnchoredPanel(options);

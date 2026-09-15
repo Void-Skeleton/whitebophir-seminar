@@ -58,6 +58,13 @@
       </div>
 
       <div id="actions" class="home-section">
+        <div class="home-user-name">
+          <label for="user-name">{{translations.user_name_label}}</label>
+          <input id="user-name" name="name" form="named-board-form" type="text"
+            maxlength="64" autocomplete="nickname" dir="auto"
+            placeholder="{{translations.user_name_optional}}"
+            data-invalid-message="{{translations.user_name_invalid}}" />
+        </div>
         <div>
           <p>
               {{{translations.public_board_description}}}

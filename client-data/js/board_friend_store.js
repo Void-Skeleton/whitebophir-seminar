@@ -23,9 +23,9 @@ function hasWhitespaceOrControlCharacter(value) {
 }
 
 /**
- * The presence `userId` is the secret-derived final word shown in a user's
- * visible name. Friend state deliberately uses that public value rather than a
- * socket id, IP-derived first name, or private user secret.
+ * The presence `userId` is the stable secret-derived part of the generated name.
+ * Friend state keeps using it when users choose other display names, rather
+ * than depending on their current names, socket IDs or private credentials.
  *
  * @param {unknown} value
  * @returns {string}

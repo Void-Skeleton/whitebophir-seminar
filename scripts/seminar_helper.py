@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""WBO seminar helper: export/import compressed native board backups.
+"""WBO seminar helper: native backups, local keys and named board links.
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 Seminar modifications, 2026-09-15. Python 3.10+; v2 keys require cryptography.
@@ -12,7 +12,9 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import sys
+import unicodedata
 import zlib
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit, urlunsplit
@@ -117,13 +119,35 @@ def archive_url(server, board, token=None):
                        urlencode({"token": token}) if token else "", ""))
 
 
+def named_board_url(server, board, name, token=None):
+    """Build an entry URL without transmitting credentials or joining a socket."""
+    if (len(name.encode("utf-16-le", errors="surrogatepass")) > 128
+            or any(unicodedata.category(c) in ("Cc", "Cs")
+                   or c in "\u2028\u2029\u200e\u200f\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069" for c in name)):
+        raise ValueError("Name must be 1–64 characters without control characters")
+    name = re.sub(r"^[\s\ufeff]+|[\s\ufeff]+$", "", unicodedata.normalize("NFC", name))
+    if not name or len(name.encode("utf-16-le")) > 128:
+        raise ValueError("Name must be 1–64 characters after normalization")
+    parts = urlsplit(archive_url(server, board, token))
+    path = urlsplit(server).path.rstrip("/") + "/boards/" + quote(board, safe="")
+    query = {"name": name}
+    if token:
+        query["token"] = token
+    return urlunsplit((parts.scheme, parts.netloc, path, urlencode(query), ""))
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description="Export and import compressed native WBO board backups."
+        description="Manage WBO backups, local identities, and named board links."
     )
     subcommands = parser.add_subparsers(dest="command", required=True)
     keygen = subcommands.add_parser("keygen", help="Generate a local Ed25519 identity")
     keygen.add_argument("file", type=Path, help="New local key file (contains the private key)")
+    join = subcommands.add_parser("join-url", help="Print a board URL with a display name")
+    join.add_argument("--server", default="http://localhost:8080")
+    join.add_argument("--board", required=True)
+    join.add_argument("--name", required=True)
+    join.add_argument("--token", help="Optional board JWT to include in the URL")
     for name in ("export", "import"):
         command = subcommands.add_parser(name)
         command.add_argument("file", type=Path, help="Path to a .wbo archive")
@@ -139,6 +163,9 @@ def main(argv=None):
     try:
         if args.command == "keygen":
             generate_key_file(args.file)
+            return 0
+        if args.command == "join-url":
+            print(named_board_url(args.server, args.board, args.name, args.token))
             return 0
         if args.max_archive_bytes <= 0 or args.max_json_bytes <= 0:
             raise ValueError("Archive limits must be positive")

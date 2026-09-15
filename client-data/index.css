@@ -138,6 +138,21 @@ a {
   border-radius: var(--wbo-radius-panel);
   margin-bottom: 40px;
 }
+
+.home-user-name label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.home-user-name input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 7px;
+  border: 1px solid #b8c0cc;
+  border-radius: 2px;
+  background: #fff;
+  font: inherit;
+}
 #named-board-form input {
   line-height: 20px;
   border-radius: var(--wbo-radius-control);

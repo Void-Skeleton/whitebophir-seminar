@@ -36,6 +36,14 @@ preserving v1. Private seeds remain in browser-local storage or local CLI files.
 Browser startup automatically creates a random keypair when either stored half
 is missing or invalid, or when the halves do not match; valid pairs are retained.
 
+Changes dated 2026-09-15 add board-specific display names through URL parameters,
+the homepage and an entry dialog, remembered in cookies. The users panel allows
+self-renaming and moderator renaming, backed by validated socket messages and
+live updates across matching tabs. Shared name validation, browser name handling,
+socket presence and permissions, homepage redirects, dialogs, styles, runtime
+types, all translations, tests and documentation are updated. The Python helper
+adds `join-url` for generating named entry links.
+
 `client-data/vendor/tweetnacl` contains TweetNaCl.js 1.0.3, its upstream source,
 types, author list and public-domain license. See its README for provenance.
 The vendor files retain their upstream license; new WBO integration files use

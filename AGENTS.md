@@ -145,8 +145,9 @@ access, and presence are handled by
 [board_status_module.js](./client-data/js/board_status_module.js),
 [board_access_module.js](./client-data/js/board_access_module.js), and
 [board_presence_module.js](./client-data/js/board_presence_module.js). The
-frontend-only friend list is keyed by the visible, secret-derived presence
-`userId`; resilient local persistence and cross-tab synchronization belong to
+frontend-only friend list is keyed by the stable, secret-derived presence
+`userId`, independently of the chosen display name. Resilient local persistence
+and cross-tab synchronization belong to
 [board_friend_store.js](./client-data/js/board_friend_store.js), while presence
 owns friend decoration and display order. Socket
 connection, replay, received-message dispatch, optimistic state, and outgoing
@@ -233,6 +234,17 @@ Client `broadcast` messages enter
 [reports.mjs](./server/socket/reports.mjs) handles user reports,
 [ban store](./server/socket/bans.mjs) tracks moderator report-to-ban state, and
 [turnstile.mjs](./server/socket/turnstile.mjs) validates Turnstile tokens.
+Display-name validation is shared in
+[user_name.js](./client-data/js/user_name.js). The presence-owned
+[board_user_name.js](./client-data/js/board_user_name.js) handles `?name=`, entry
+prompts, rename dialogs, and `wbo-board-name-v1` cookies scoped to each public
+`/boards/{board}` path (one-year lifetime). Socket startup passes a saved name.
+The first-visit prompt waits for initial replay and a rendered frame so opening
+a modal does not block board startup.
+Explicit URL names override live names once and are then removed from the URL.
+The homepage field supplies names to named, public, recent and random boards;
+HTTP redirects preserve entry query parameters. The Python helper's `join-url`
+command builds a safely encoded named board URL without making a connection.
 Client and server share rate-limit math through
 [rate_limit_common.js](./client-data/js/rate_limit_common.js).
 
@@ -282,8 +294,8 @@ peer-visible erase benchmark is
 ## wire socket protocol
 
 WBO uses Socket.IO. Clients connect with query fields such as `board`,
-`baselineSeq`, `token`, `tool`, `color`, and `size`. The server immediately emits
-`boardstate`, then emits a `broadcast` replay batch from the requested
+`baselineSeq`, `token`, `tool`, `color`, `size`, and optional `name`. The server
+immediately emits `boardstate`, then a `broadcast` replay batch from the requested
 `baselineSeq`.
 
 V2 clients first obtain a challenge through HTTP, then connect with Socket.IO
@@ -310,6 +322,20 @@ and numeric mutation `type` codes from [client-data/js/mutation_type.js](./clien
 The server validates client messages, rejects malformed writes with
 `mutation_rejected`, and rebroadcasts accepted persistent writes as sequenced
 `broadcast` frames.
+
+Display-name changes use `set_user_name { name, socketId? }` with acknowledgement
+`{ok: true, name}` or `{ok: false, error}`. The omitted target means self;
+renaming another identity requires current `canBan` access. Validation and
+authorization belong to [user_names.mjs](./server/socket/user_names.mjs). Every
+matching live identity on that board receives ordinary `user_joined` updates
+with the new `name` and `nameChosen: true`. Authentication, stable `userId`,
+friends and bans remain independent of display names. Names are NFC-normalized,
+trimmed, and limited to 64 UTF-16 code units, with controls, directional overrides
+and unpaired surrogates rejected. Attempts are limited to ten per socket per
+ten seconds, independently of drawing permissions. The browser updates its own
+board cookie only from authoritative presence. Live names take precedence over
+stale cookies in reconnecting tabs; no server-side name history is retained
+after the last matching socket leaves.
 
 User reports are sent by clients on the `report_user` event with a payload of
 `{ "socketId": "<reported socket id>" }`. Moderator warning/ban actions add

@@ -65,6 +65,7 @@ import { getSocketUserSecret } from "./request.mjs";
 import { handleSetTemporaryModeratorMessage } from "./temporary_moderator_actions.mjs";
 import { resetTemporaryModerators } from "./temporary_moderators.mjs";
 import { handleTurnstileTokenMessage } from "./turnstile.mjs";
+import { setUserName } from "./user_names.mjs";
 
 const { Server } = socketIO;
 const { logger, metrics, tracing } = observability;
@@ -709,6 +710,18 @@ async function handleSocketConnection(socket, config) {
           });
         },
       );
+    },
+  );
+
+  onSocketEvent(
+    socket,
+    SocketEvents.SET_USER_NAME,
+    function onSetUserName(
+      /** @type {unknown} */ message,
+      /** @type {unknown} */ ack,
+    ) {
+      const result = setUserName(socket, boardName, message, config);
+      if (typeof ack === "function") ack(result);
     },
   );
 

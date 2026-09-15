@@ -1,4 +1,5 @@
 import { MutationType } from "../../client-data/js/message_tool_metadata.js";
+import { normalizeUserName } from "../../client-data/js/user_name.js";
 import observability from "../observability/index.mjs";
 import { readStoredSvgSeq } from "../persistence/svg_board_store.mjs";
 import { canAccessBoard, normalizeBoardName } from "./policy.mjs";
@@ -51,6 +52,9 @@ function bindSocketBoard(socket, config) {
   if (!canAccessBoard(config, boardName, socket)) {
     return { ok: false, reason: "access_forbidden" };
   }
+  const name = socket.handshake.query?.name;
+  if (name !== undefined && normalizeUserName(name) === null)
+    return { ok: false, reason: "user_name_invalid" };
 
   socket.boardName = boardName;
   return { ok: true, boardName };

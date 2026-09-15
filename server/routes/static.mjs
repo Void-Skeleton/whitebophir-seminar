@@ -74,7 +74,11 @@ async function redirectToRandomBoard(ctx) {
   const boardName = await allocateRandomBoardName(ctx.runtime.config);
   annotateBoardRequest(ctx.observed, boardName);
   ctx.response.writeHead(307, {
-    Location: boardDocumentLocation(ctx.runtime.config, boardName),
+    Location: boardDocumentLocation(
+      ctx.runtime.config,
+      boardName,
+      ctx.url.search,
+    ),
   });
   ctx.response.end(boardName);
 }

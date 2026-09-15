@@ -350,6 +350,7 @@ export type ConnectedUser = {
   socketId: string;
   userId: string;
   name: string;
+  nameChosen?: boolean;
   color: string;
   size: number;
   lastTool: string;
@@ -424,6 +425,10 @@ export type SetTemporaryModeratorPayload = {
   durationMs?: number;
 };
 
+export type UserNameAck =
+  | { ok: true; name: string }
+  | { ok: false; error: string };
+
 export type TurnstileSuccessAck = {
   success: true;
   validationWindowMs?: unknown;
@@ -437,6 +442,10 @@ export type TurnstileFailureAck = {
 export type TurnstileAck = TurnstileSuccessAck | TurnstileFailureAck;
 
 export type ClientSocketOutgoingEventArgs = {
+  [SocketEvents.SET_USER_NAME]: [
+    payload: { name: string; socketId?: string },
+    ack?: (result: UserNameAck) => void,
+  ];
   [SocketEvents.BROADCAST]: [message: LiveBoardMessage];
   [SocketEvents.REPORT_USER]: [payload: ReportUserPayload];
   [SocketEvents.SET_TEMPORARY_MODERATOR]: [

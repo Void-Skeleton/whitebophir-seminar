@@ -785,7 +785,7 @@ select {
 
 .connected-user-row {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 49px;
+  grid-template-columns: 36px minmax(0, 1fr) 74px;
   align-items: center;
   gap: 7px;
   min-height: 34px;
@@ -879,8 +879,8 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: end;
-  width: 49px;
-  min-width: 49px;
+  width: 74px;
+  min-width: 74px;
   justify-self: end;
   gap: 1px;
 }
@@ -941,8 +941,34 @@ select {
   color: #805866;
 }
 
-.connected-user-friend[hidden] {
+.connected-user-friend[hidden],
+.connected-user-rename[hidden] {
   display: none;
+}
+
+.connected-user-rename:hover,
+.connected-user-rename:focus-visible {
+  color: #59616d;
+  opacity: 1;
+}
+
+.user-name-dialog label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.user-name-dialog input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #b8c0cc;
+  border-radius: 2px;
+  font: inherit;
+}
+
+.user-name-error {
+  color: #9f3535;
+  font-size: 12px;
 }
 
 .connected-user-toolBadge {
