@@ -283,15 +283,21 @@ function createInitialState(Tools, assetUrl) {
 }
 
 /**
+ * @param {HandState} state
  * @param {{r:[number,number], b:[number,number]}} bbox
  * @param {number} buttonHeight
  * @param {number} scale
  * @returns {number}
  */
-function selectionActionButtonY(bbox, buttonHeight, scale) {
+function selectionActionButtonY(state, bbox, buttonHeight, scale) {
   const gap = 3 / scale;
   const preferred = bbox.r[1] - buttonHeight / scale - gap;
-  const visibleTop = (document.documentElement.scrollTop || 0) / scale;
+  const visibleTop = state.Tools.viewport.clientRectToBoardRect({
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+  }).y;
   if (preferred >= visibleTop) return preferred;
   return bbox.r[1] + bbox.b[1] + gap;
 }
@@ -341,7 +347,7 @@ function createState(Tools, assetUrl) {
         const x = selectionActionButtonX(state, bbox.r[0]);
         return {
           x,
-          y: selectionActionButtonY(bbox, me.origHeight, scale),
+          y: selectionActionButtonY(state, bbox, me.origHeight, scale),
           width: me.origWidth / scale,
           height: me.origHeight / scale,
         };
@@ -358,7 +364,7 @@ function createState(Tools, assetUrl) {
         const x = selectionActionButtonX(state, bbox.r[0]);
         return {
           x: x + (me.origWidth + 2) / scale,
-          y: selectionActionButtonY(bbox, me.origHeight, scale),
+          y: selectionActionButtonY(state, bbox, me.origHeight, scale),
           width: me.origWidth / scale,
           height: me.origHeight / scale,
         };

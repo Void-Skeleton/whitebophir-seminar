@@ -121,6 +121,7 @@ export class BoardShellModule {
   }
 
   bindPresencePanel() {
+    this.getTools().chunks.init();
     this.getTools().presence.initConnectedUsersUI();
   }
 

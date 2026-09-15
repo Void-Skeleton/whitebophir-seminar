@@ -188,6 +188,7 @@ export type BoardLike = {
 export type MutationLogEntry = {
   seq: number;
   acceptedAtMs: number;
+  activityPoint?: { x: number; y: number };
   mutation: NormalizedMessageData;
 };
 

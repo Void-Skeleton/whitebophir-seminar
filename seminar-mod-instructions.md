@@ -15,7 +15,7 @@ Don't add them all at once. Only add the ones that I asked you to add:
 
 <!-- 1. Allow users to set their names when entering a board, either through a URL parameter, or as an input box on the homepage. If the user first enter a board without a name, they should be prompted for a name that defaults to the old generated name. The names for a user that is used for each board should be stored in a Cookie, which can be used when the user logs into the same board a second time without a name set. A user can always modify their own name in the web UI, and a moderator can modify the names of everyone.  -->
   
-2. The moderator can modify a setting (in some interface) that divides the canvas into chunks of a specified size. Everyone can turn on a setting that locks their perspective to be centered on the last modified chunk (with margins to be configured by the moderator). The moderator can modify and lock this setting for everyone else. 
+<!-- 2. The moderator can modify a setting (in some interface) that divides the canvas into chunks of a specified size. Everyone can turn on a setting that locks their perspective to be centered on the last modified chunk (with margins to be configured by the moderator). The moderator can modify and lock this setting for everyone else.  -->
 
 3. The moderator can modify the background color of the board. 
   

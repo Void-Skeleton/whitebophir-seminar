@@ -8,9 +8,10 @@ A demonstration server is available at [wbo.ophir.dev](https://wbo.ophir.dev)
 ## Seminar fork modifications — 2026-09-15
 
 This modified version adds compressed native whiteboard export/import, a Python
-command-line helper, Ed25519 moderator authentication, and per-board display
-names (the current feature 1 in `seminar-mod-instructions.md`). Features 2–6
-are not implemented. See [NOTICE.md](NOTICE.md) for modification and license notices.
+command-line helper, Ed25519 moderator authentication, per-board display
+names, and moderator-controlled canvas chunks with activity following (feature 2
+in `seminar-mod-instructions.md`). Features 3–6 are not implemented.
+See [NOTICE.md](NOTICE.md) for modification and license notices.
 
 Use the existing **Download** button (previously Save to SVG) to export an SVG or
 a **WBO backup**. Board moderators also see **Import WBO backup** in the same
@@ -77,6 +78,61 @@ names are rendered as plain text. Names do not grant permissions or change the
 stable user identity used by friends, bans, or moderator grants. The server
 limits rename attempts to ten per socket per ten seconds. All name controls
 work over HTTP and HTTPS and are translated in every supported language.
+
+### Canvas chunks and following activity
+
+Use **Follow activity** beside the Users control to center and fit the most
+recently edited chunk. Following holds the camera in place: turn it off to pan
+or zoom freely. The choice is remembered in local storage for this board and
+browser. Cursor movement and rejected edits do not move the camera.
+
+Chunk changes ease into position. When your pencil stroke reaches another
+chunk, your camera waits until you finish the stroke. If another user's edit
+moves your camera, your current stroke ends first. Pencil input is blocked
+throughout the transition; release and press again to start a new stroke once
+the camera stops. Reduced-motion preferences disable the animation.
+
+Board moderators can open **Chunk settings** to set width, height, and the
+margin around each chunk, in unscaled board units. Width and height accept
+100–100,000; the margin accepts 0–100,000. Defaults are 10,000 × 7,000 with a
+500-unit margin. Chunk boundaries start at (0, 0); a light grid shows them once
+configured or while following. The Grid button emphasizes these borders with
+thicker, dark gray lines in both grid and dot modes. The camera fits the whole
+chunk plus the margin and leaves the tool rail clear, including on resize and
+near the canvas origin.
+
+**Follow for other users** switches following on or off for other users.
+**Lock other users’ choice** prevents them from changing that choice until a
+moderator unlocks it. This applies to ordinary viewers and editors; moderators
+can always control their own camera. Each saved moderator change resets other
+users to the chosen follow setting, even when unlocked. New and returning users
+receive the current settings; personal choices survive reconnects unless a new
+moderator revision overrides them. Temporary moderators can manage these
+settings while their grant is active.
+
+Activity uses the last accepted stroke point, or the center of the modified
+object's bounding box for shapes, text, transforms, copies, and erases. A batch
+uses its last spatial edit; clearing returns to the first chunk. Configured settings and
+the latest activity position are stored in the board SVG, including for empty
+boards. Native backup import preserves the destination's presentation settings.
+
+The Python helper reads settings with no options, or updates selected fields:
+
+```sh
+python3 scripts/seminar_helper.py chunks --server http://localhost:8080 --board seminar
+python3 scripts/seminar_helper.py chunks --server http://localhost:8080 \
+  --board seminar --private-key-file moderator.json \
+  --width 10000 --height 7000 --margin 500 --follow on --locked on
+```
+
+The API is `GET` / `POST /chunks/{board}`. POST requires moderator permission,
+`Content-Type: application/json`, `X-WBO-Chunks: 1`, and all five settings:
+`{"width":10000,"height":7000,"margin":500,"follow":true,"locked":true}`.
+The server assigns a revision and activity position; clients cannot supply them.
+Requests are limited to 2 KiB and ten updates per board per ten seconds.
+Existing JWT, v1, and v2 authentication work over HTTP and HTTPS; v2 signatures
+bind POSTs to their exact bodies. `--user-secret` / `WBO_USER_SECRET` and
+`--token` / `WBO_TOKEN` also work with the helper.
 
 ### Moderator authentication over HTTP or HTTPS
 

@@ -85,6 +85,7 @@ function buildSequencedMutationBroadcast(entry, liveSocketId = undefined) {
   return {
     seq: entry.seq,
     acceptedAtMs: entry.acceptedAtMs,
+    ...(entry.activityPoint ? { activityPoint: entry.activityPoint } : {}),
     mutation,
   };
 }

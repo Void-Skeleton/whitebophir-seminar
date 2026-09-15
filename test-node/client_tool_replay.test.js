@@ -542,6 +542,8 @@ function createHarness() {
       scale: 1,
       drawToolsAllowed: null,
       controller: {
+        holdFollowCamera: () => ({ release() {} }),
+        isFollowCameraMoving: () => false,
         ensuredBounds: /** @type {any[]} */ ([]),
         setScale: (/** @type {number} */ scale) => {
           globalAny.Tools.viewportState.scale = scale;
@@ -991,6 +993,9 @@ function createUnavailableCoordinateRuntime() {
  */
 function createUnavailableViewportRuntime() {
   return {
+    holdFollowCamera: () => ({ release() {} }),
+    isFollowCameraMoving: () => false,
+    setFollowFrame: () => unavailableCapability("viewport.setFollowFrame"),
     setScale: () => unavailableCapability("viewport.setScale"),
     getScale: () => unavailableCapability("viewport.getScale"),
     syncLayoutSize: () => unavailableCapability("viewport.syncLayoutSize"),

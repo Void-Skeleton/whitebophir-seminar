@@ -371,6 +371,9 @@ export class ConnectionModule {
       socket.on(SocketEvents.BROADCAST, (msg) => {
         Tools.replay.enqueueIncomingBroadcast(msg);
       });
+      socket.on(SocketEvents.CHUNK_STATE, (state) =>
+        Tools.chunks.receive(state),
+      );
       socket.on(SocketEvents.BOARDSTATE, (boardState) => {
         Tools.access.applyBoardState(normalizeBoardState(boardState));
       });

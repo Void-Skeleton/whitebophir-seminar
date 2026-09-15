@@ -123,6 +123,8 @@ export class ReplayModule {
    */
   finalizeIncomingBroadcast(msg, processed) {
     const Tools = this.getTools();
+    if (processed && BoardMessageReplay.isSequencedMutationBroadcast(msg))
+      Tools.chunks.activity(msg.activityPoint, msg.mutation.socket);
     if (processed && !BoardMessageReplay.isAuthoritativeReplayBatch(msg)) {
       const activityMessage =
         BoardMessageReplay.unwrapSequencedMutationBroadcast(msg);
@@ -143,6 +145,7 @@ export class ReplayModule {
     this.hasAuthoritativeSnapshot = true;
     this.authoritativeSeq = replayedToSeq;
     this.awaitingSnapshot = false;
+    Tools.chunks.syncFrame();
     this.refreshBaselineBeforeConnect = false;
     Tools.writes.pumpBufferedWrites();
     this.incomingBroadcastQueue =

@@ -202,7 +202,7 @@ function parseStoredSvgItems(drawingAreaContent) {
 
 /**
  * @param {string} prefix
- * @param {{readonly: boolean}} metadata
+ * @param {import("../board/data.mjs").BoardMetadata} metadata
  * @param {number} seq
  * @param {{width: number, height: number}=} [svgExtent]
  * @returns {string}
@@ -216,6 +216,9 @@ function updateRootMetadata(prefix, metadata, seq, svgExtent) {
     "data-wbo-format": STORED_SVG_FORMAT,
     "data-wbo-seq": String(seq),
     "data-wbo-readonly": metadata.readonly ? "true" : "false",
+    ...(metadata.chunks
+      ? { "data-wbo-chunks": JSON.stringify(metadata.chunks) }
+      : {}),
   };
   if (svgExtent) {
     const extent = normalizeSvgExtent(svgExtent);
@@ -253,7 +256,7 @@ function serializeStoredSvgEnvelope(prefix, itemTags, suffix) {
 }
 
 /**
- * @param {{readonly: boolean}} metadata
+ * @param {import("../board/data.mjs").BoardMetadata} metadata
  * @param {number} seq
  * @param {{width: number, height: number}=} [svgExtent]
  * @returns {{prefix: string, suffix: string}}
@@ -264,7 +267,11 @@ function createDefaultStoredSvgEnvelope(metadata, seq, svgExtent) {
     prefix:
       `<svg id="canvas" xmlns="http://www.w3.org/2000/svg" version="1.1" ` +
       `width="${extent.width}" height="${extent.height}" data-wbo-format="${STORED_SVG_FORMAT}" ` +
-      `data-wbo-seq="${seq}" data-wbo-readonly="${metadata.readonly ? "true" : "false"}">` +
+      `data-wbo-seq="${seq}" data-wbo-readonly="${metadata.readonly ? "true" : "false"}"` +
+      (metadata.chunks
+        ? ` data-wbo-chunks="${escapeHtml(JSON.stringify(metadata.chunks))}"`
+        : "") +
+      ">" +
       `<defs id="defs"></defs><g id="drawingArea">`,
     suffix: `</g><g id="cursors"></g></svg>`,
   };

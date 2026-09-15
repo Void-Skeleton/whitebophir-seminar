@@ -733,8 +733,8 @@ function getLineById(state, lineId) {
 
 /**
  * Releases the short-lived interaction lease used while Pencil owns the
- * pointer stream. The lease suppresses the local cursor while a stroke is
- * active without touching the dense board SVG subtree.
+ * pointer stream. It suppresses the local cursor and defers the drawer's own
+ * follow-camera move without touching the dense board SVG subtree.
  * @param {PencilState} state
  */
 function releaseInteractionLease(state) {
@@ -743,14 +743,23 @@ function releaseInteractionLease(state) {
 }
 
 /**
- * Claims the active drawing interaction so the local cursor does not repaint
- * over Pencil's own overlay feedback.
+ * Holds the camera for this stroke's own edits. Other camera changes finish
+ * the stroke before moving, so a held pointer cannot extend it across chunks.
+ * The local cursor also stays out of Pencil's overlay feedback.
  * @param {PencilState} state
  */
 function acquireInteractionLease(state) {
   releaseInteractionLease(state);
-  if (typeof state.interaction.suppressOwnCursor !== "function") return;
-  state.activeInteractionLease = state.interaction.suppressOwnCursor();
+  const camera = state.viewport.holdFollowCamera(() =>
+    finishActiveStroke(state),
+  );
+  const cursor = state.interaction.suppressOwnCursor?.();
+  state.activeInteractionLease = {
+    release() {
+      cursor?.release();
+      camera.release();
+    },
+  };
 }
 
 /** @param {PencilState} state */
@@ -1027,6 +1036,7 @@ export function draw(state, data, isLocal = false) {
  */
 export function press(state, x, y, evt) {
   evt.preventDefault();
+  if (state.viewport.isFollowCameraMoving()) return;
   if (
     state.AUTO_FINGER_WHITEOUT &&
     typeof TouchEvent !== "undefined" &&
@@ -1055,6 +1065,10 @@ export function press(state, x, y, evt) {
  * @param {MouseEvent | TouchEvent | undefined} evt
  */
 export function move(state, x, y, evt) {
+  if (state.viewport.isFollowCameraMoving()) {
+    evt?.preventDefault();
+    return;
+  }
   const effect = createPencilMoveEffect(state, x, y, performance.now());
   if (effect.stopBefore) {
     finishActiveStroke(state);

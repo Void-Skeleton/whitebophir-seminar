@@ -82,6 +82,7 @@ import {
   processMessageBatch as processBoardMessageBatch,
   trimOverflowItems as trimBoardOverflowItems,
 } from "./message_processing.mjs";
+import { mutationActivityPoint } from "./chunks.mjs";
 import { createMutationLog } from "./mutation_log.mjs";
 import {
   createDefaultSvgExtent,
@@ -98,7 +99,7 @@ function defaultBoardMetadata() {
 
 let boardInstanceSequence = 0;
 /** @typedef {{minX: number, minY: number, maxX: number, maxY: number}} Bounds */
-/** @typedef {{readonly: boolean}} BoardMetadata */
+/** @typedef {{readonly: boolean, chunks?: import("../../client-data/js/board_chunks.js").ChunkState}} BoardMetadata */
 /** @typedef {{ok: false, reason: string}} ValidationFailure */
 /** @typedef {{ok: true}} ValidationSuccess */
 /** @typedef {ValidationSuccess | ValidationFailure} BoardMutationResult */
@@ -206,6 +207,8 @@ class BoardData {
     this.saveTimeoutId = undefined;
     this.users = new Set();
     this.mutationLog = createMutationLog(0);
+    this.activityPoint = { x: 0, y: 0 };
+    this.persistedMetadata = this.metadata;
     /** @type {PendingMutationEffect[]} */
     this.pendingRejectedMutationEffects = [];
     /** @type {PendingMutationEffect[]} */
@@ -299,9 +302,18 @@ class BoardData {
    * @returns {MutationLogEntry}
    */
   recordPersistentMutation(mutation, acceptedAtMs = Date.now()) {
+    const activityPoint =
+      mutationActivityPoint(this, mutation) || this.activityPoint;
+    this.activityPoint = activityPoint;
+    if (this.metadata.chunks)
+      this.metadata = {
+        ...this.metadata,
+        chunks: { ...this.metadata.chunks, point: activityPoint },
+      };
     return this.mutationLog.append({
       acceptedAtMs,
       mutation,
+      activityPoint,
     });
   }
 

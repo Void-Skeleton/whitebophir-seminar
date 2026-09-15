@@ -48,6 +48,11 @@
 				<ul id="connectedUsersList" class="connected-users-list"></ul>
 			</div>
 		</div>
+		<div class="chunk-controls">
+			<button id="chunkFollowToggle" type="button" aria-pressed="false">{{translations.chunk_follow_activity}}</button>
+			<span id="chunkFollowLocked" hidden>{{translations.chunk_locked_notice}}</span>
+			<button id="chunkSettingsToggle" type="button" hidden>{{translations.chunk_settings}}</button>
+		</div>
 		<div id="boardStatusIndicator" class="board-status-card board-status-reconnecting" role="status"
 			aria-live="polite" data-state="reconnecting">
 			<span class="board-status-icon" aria-hidden="true"></span>

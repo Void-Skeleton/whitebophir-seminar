@@ -168,6 +168,7 @@ export type PencilChildPoint = RequiredPointMessageFields;
 export type SequencedMutationBroadcast = {
   seq: number;
   acceptedAtMs: number;
+  activityPoint?: { x: number; y: number };
   mutation: LiveBoardMessage;
 };
 
@@ -388,6 +389,7 @@ export type UserReportedPayload = {
 
 export type ClientSocketIncomingEventMap = {
   [SocketEvents.BOARDSTATE]: AppBoardState;
+  [SocketEvents.CHUNK_STATE]: import("../client-data/js/board_chunks.js").ChunkState;
   [SocketEvents.BROADCAST]: IncomingBroadcast;
   [SocketEvents.CONNECT]: undefined;
   [SocketEvents.CONNECT_ERROR]: {
@@ -646,6 +648,18 @@ export type ToolModule<T = unknown> = {
 };
 
 export type ViewportController = {
+  holdFollowCamera(interrupt: () => void): { release(): void };
+  isFollowCameraMoving(): boolean;
+  setFollowFrame(
+    frame: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      margin: number;
+    } | null,
+    deferUntilStrokeEnd?: boolean,
+  ): void;
   setScale: (scale: number) => number;
   getScale: () => number;
   syncLayoutSize: () => void;
@@ -852,6 +866,7 @@ export type AppToolsState = {
   viewportState: AppViewportModule;
   coordinates: AppCoordinateModule;
   access: AppAccessModule;
+  chunks: import("../client-data/js/board_chunks_module.js").ChunksModule;
   dom: BoardDomModule;
   interaction: AppInteractionModule;
   presence: AppPresenceModule;

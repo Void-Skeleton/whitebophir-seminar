@@ -1,3 +1,4 @@
+import { parseStoredChunks } from "../board/chunks.mjs";
 import { once } from "node:events";
 import fs from "node:fs";
 import { readFile, rename, stat, writeFile } from "node:fs/promises";
@@ -50,7 +51,7 @@ import { unescapeHtml } from "./xml_escape.mjs";
 
 const { logger } = observability;
 
-/** @typedef {{readonly: boolean, seq?: number}} BoardMetadata */
+/** @typedef {import("../board/data.mjs").BoardMetadata & {seq?: number}} BoardMetadata */
 /** @typedef {import("../board/svg_extent.mjs").SvgExtent} SvgExtent */
 /** @import { ServerConfig } from "../../types/server-runtime.d.ts" */
 
@@ -64,7 +65,7 @@ function defaultBoardMetadata() {
 
 /**
  * @param {string} prefix
- * @returns {{readonly: boolean, seq: number, svgExtent: SvgExtent}}
+ * @returns {BoardMetadata & {seq: number, svgExtent: SvgExtent}}
  */
 function readStoredSvgRootMetadata(prefix) {
   const openTagStart = prefix.indexOf("<svg");
@@ -73,8 +74,12 @@ function readStoredSvgRootMetadata(prefix) {
     openTagStart === -1 || openTagEnd === -1
       ? ""
       : prefix.slice(openTagStart + 4, openTagEnd);
+  const chunks = parseStoredChunks(
+    readRawAttribute(rawAttributes, "data-wbo-chunks"),
+  );
   return {
     readonly: readRawAttribute(rawAttributes, "data-wbo-readonly") === "true",
+    ...(chunks ? { chunks } : {}),
     seq: normalizeStoredSeq(readRawAttribute(rawAttributes, "data-wbo-seq")),
     svgExtent: createSvgExtent(
       readRawAttribute(rawAttributes, "width"),
@@ -253,6 +258,7 @@ async function readStoredSvgMetadata(boardName, options) {
           seq = rootMetadata.seq;
           metadata = {
             readonly: rootMetadata.readonly,
+            ...(rootMetadata.chunks ? { chunks: rootMetadata.chunks } : {}),
             seq,
           };
           break;
@@ -443,6 +449,7 @@ async function readCanonicalBoardState(boardName, options) {
             const rootMetadata = readStoredSvgRootMetadata(event.prefix);
             metadata = {
               readonly: rootMetadata.readonly,
+              ...(rootMetadata.chunks ? { chunks: rootMetadata.chunks } : {}),
             };
             seq = rootMetadata.seq;
             svgExtent.width = rootMetadata.svgExtent.width;
@@ -539,7 +546,7 @@ async function writeBoardState(boardName, board, metadata, seq, options) {
     "wbo.svg.item_count": Object.keys(board).length,
     "wbo.svg.seq": seq,
   });
-  if (Object.keys(board).length === 0) {
+  if (Object.keys(board).length === 0 && !metadata.chunks) {
     for (const emptyPath of [
       file,
       backupFile,

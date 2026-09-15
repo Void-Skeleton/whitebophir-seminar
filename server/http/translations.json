@@ -125,7 +125,17 @@
     "user_name_invalid": "أدخل اسماً من 1 إلى 64 محرفاً دون محارف تحكم.",
     "user_name_forbidden": "يمكنك تغيير اسمك فقط.",
     "user_name_rate_limited": "غيّرت الاسم مرات كثيرة. حاول مجدداً بعد بضع ثوانٍ.",
-    "user_name_unavailable": "تعذّر تغيير الاسم. أعد الاتصال وحاول مجدداً."
+    "user_name_unavailable": "تعذّر تغيير الاسم. أعد الاتصال وحاول مجدداً.",
+    "chunk_settings": "إعدادات أجزاء اللوحة",
+    "chunk_follow_activity": "متابعة التعديلات",
+    "chunk_width": "العرض (بوحدات اللوحة)",
+    "chunk_height": "الارتفاع (بوحدات اللوحة)",
+    "chunk_margin": "الهامش (بوحدات اللوحة)",
+    "chunk_follow": "تفعيل المتابعة للمستخدمين الآخرين",
+    "chunk_locked": "قفل خيار المستخدمين الآخرين",
+    "chunk_locked_notice": "حدده المشرف",
+    "chunk_save": "حفظ الإعدادات",
+    "chunk_save_failed": "تعذر حفظ الإعدادات. تحقق من الاتصال وصلاحيات الإشراف، ثم حاول مجددًا."
   },
   "be": {
     "white-out": "Замазка",
@@ -253,7 +263,17 @@
     "user_name_invalid": "Увядзіце імя ад 1 да 64 сімвалаў без кіравальных сімвалаў.",
     "user_name_forbidden": "Вы можаце змяніць толькі сваё імя.",
     "user_name_rate_limited": "Занадта шмат змен імя. Паўтарыце спробу праз некалькі секунд.",
-    "user_name_unavailable": "Не ўдалося змяніць імя. Падключыцеся зноў і паўтарыце спробу."
+    "user_name_unavailable": "Не ўдалося змяніць імя. Падключыцеся зноў і паўтарыце спробу.",
+    "chunk_settings": "Налады абласцей",
+    "chunk_follow_activity": "Сачыць за зменамі",
+    "chunk_width": "Шырыня (адзінкі дошкі)",
+    "chunk_height": "Вышыня (адзінкі дошкі)",
+    "chunk_margin": "Поле (адзінкі дошкі)",
+    "chunk_follow": "Уключыць сачэнне для іншых",
+    "chunk_locked": "Заблакіраваць выбар іншых",
+    "chunk_locked_notice": "Зададзена мадэратарам",
+    "chunk_save": "Захаваць налады",
+    "chunk_save_failed": "Не ўдалося захаваць налады. Праверце злучэнне і правы мадэратара ды паўтарыце спробу."
   },
   "ca": {
     "white-out": "Corrector blanc",
@@ -381,7 +401,17 @@
     "user_name_invalid": "Introdueix un nom d’1 a 64 caràcters sense caràcters de control.",
     "user_name_forbidden": "Només pots canviar el teu propi nom.",
     "user_name_rate_limited": "Has canviat el nom massa vegades. Torna-ho a provar d’aquí a uns segons.",
-    "user_name_unavailable": "No s’ha pogut canviar el nom. Torna a connectar-te i prova-ho de nou."
+    "user_name_unavailable": "No s’ha pogut canviar el nom. Torna a connectar-te i prova-ho de nou.",
+    "chunk_settings": "Configuració de les zones",
+    "chunk_follow_activity": "Segueix els canvis",
+    "chunk_width": "Amplada (unitats de la pissarra)",
+    "chunk_height": "Alçada (unitats de la pissarra)",
+    "chunk_margin": "Marge (unitats de la pissarra)",
+    "chunk_follow": "Activa el seguiment per als altres",
+    "chunk_locked": "Bloqueja la tria dels altres",
+    "chunk_locked_notice": "Fixat pel moderador",
+    "chunk_save": "Desa la configuració",
+    "chunk_save_failed": "No s’ha pogut desar la configuració. Comprova la connexió i els permisos de moderació i torna-ho a provar."
   },
   "de": {
     "board_name_placeholder": "Name des Whiteboards…",
@@ -509,7 +539,17 @@
     "user_name_invalid": "Gib einen Namen mit 1–64 Zeichen ohne Steuerzeichen ein.",
     "user_name_forbidden": "Du kannst nur deinen eigenen Namen ändern.",
     "user_name_rate_limited": "Zu viele Namensänderungen. Versuche es in ein paar Sekunden erneut.",
-    "user_name_unavailable": "Der Name konnte nicht geändert werden. Verbinde dich erneut und versuche es noch einmal."
+    "user_name_unavailable": "Der Name konnte nicht geändert werden. Verbinde dich erneut und versuche es noch einmal.",
+    "chunk_settings": "Bereiche einstellen",
+    "chunk_follow_activity": "Änderungen folgen",
+    "chunk_width": "Breite (Tafeleinheiten)",
+    "chunk_height": "Höhe (Tafeleinheiten)",
+    "chunk_margin": "Rand (Tafeleinheiten)",
+    "chunk_follow": "Folgen für andere aktivieren",
+    "chunk_locked": "Auswahl für andere sperren",
+    "chunk_locked_notice": "Vom Moderator festgelegt",
+    "chunk_save": "Einstellungen speichern",
+    "chunk_save_failed": "Einstellungen konnten nicht gespeichert werden. Prüfe Verbindung und Moderationsrechte und versuche es erneut."
   },
   "en": {
     "white-out": "White-out",
@@ -637,7 +677,17 @@
     "user_name_invalid": "Enter a name of 1–64 characters without control characters.",
     "user_name_forbidden": "You can only rename yourself.",
     "user_name_rate_limited": "Too many name changes. Try again in a few seconds.",
-    "user_name_unavailable": "Could not change the name. Reconnect and try again."
+    "user_name_unavailable": "Could not change the name. Reconnect and try again.",
+    "chunk_settings": "Chunk settings",
+    "chunk_follow_activity": "Follow activity",
+    "chunk_width": "Width (board units)",
+    "chunk_height": "Height (board units)",
+    "chunk_margin": "Margin (board units)",
+    "chunk_follow": "Follow for other users",
+    "chunk_locked": "Lock other users’ choice",
+    "chunk_locked_notice": "Set by moderator",
+    "chunk_save": "Save settings",
+    "chunk_save_failed": "Could not save settings. Check your connection and moderator permissions, then try again."
   },
   "es": {
     "board_name_placeholder": "Nombre de la pizarra …",
@@ -765,7 +815,17 @@
     "user_name_invalid": "Introduce un nombre de 1 a 64 caracteres sin caracteres de control.",
     "user_name_forbidden": "Solo puedes cambiar tu propio nombre.",
     "user_name_rate_limited": "Has cambiado el nombre demasiadas veces. Inténtalo de nuevo en unos segundos.",
-    "user_name_unavailable": "No se pudo cambiar el nombre. Vuelve a conectarte e inténtalo de nuevo."
+    "user_name_unavailable": "No se pudo cambiar el nombre. Vuelve a conectarte e inténtalo de nuevo.",
+    "chunk_settings": "Configuración de zonas",
+    "chunk_follow_activity": "Seguir los cambios",
+    "chunk_width": "Ancho (unidades del lienzo)",
+    "chunk_height": "Alto (unidades del lienzo)",
+    "chunk_margin": "Margen (unidades del lienzo)",
+    "chunk_follow": "Activar seguimiento para los demás",
+    "chunk_locked": "Bloquear la elección de los demás",
+    "chunk_locked_notice": "Fijado por el moderador",
+    "chunk_save": "Guardar ajustes",
+    "chunk_save_failed": "No se pudieron guardar los ajustes. Comprueba la conexión y los permisos de moderación e inténtalo de nuevo."
   },
   "fr": {
     "board_name_placeholder": "Nom du tableau…",
@@ -892,7 +952,17 @@
     "user_name_invalid": "Saisissez un nom de 1 à 64 caractères, sans caractères de contrôle.",
     "user_name_forbidden": "Vous ne pouvez changer que votre propre nom.",
     "user_name_rate_limited": "Trop de changements de nom. Réessayez dans quelques secondes.",
-    "user_name_unavailable": "Impossible de changer le nom. Reconnectez-vous et réessayez."
+    "user_name_unavailable": "Impossible de changer le nom. Reconnectez-vous et réessayez.",
+    "chunk_settings": "Réglage des zones",
+    "chunk_follow_activity": "Suivre les modifications",
+    "chunk_width": "Largeur (unités du tableau)",
+    "chunk_height": "Hauteur (unités du tableau)",
+    "chunk_margin": "Marge (unités du tableau)",
+    "chunk_follow": "Activer le suivi pour les autres",
+    "chunk_locked": "Verrouiller le choix des autres",
+    "chunk_locked_notice": "Imposé par le modérateur",
+    "chunk_save": "Enregistrer les réglages",
+    "chunk_save_failed": "Impossible d’enregistrer les réglages. Vérifiez la connexion et vos droits de modération, puis réessayez."
   },
   "hu": {
     "white-out": "Lefedő",
@@ -1020,7 +1090,17 @@
     "user_name_invalid": "Adj meg egy 1–64 karakteres nevet vezérlőkarakterek nélkül.",
     "user_name_forbidden": "Csak a saját nevedet változtathatod meg.",
     "user_name_rate_limited": "Túl sok névváltoztatás. Próbáld újra néhány másodperc múlva.",
-    "user_name_unavailable": "Nem sikerült megváltoztatni a nevet. Csatlakozz újra, majd próbáld meg ismét."
+    "user_name_unavailable": "Nem sikerült megváltoztatni a nevet. Csatlakozz újra, majd próbáld meg ismét.",
+    "chunk_settings": "Területek beállításai",
+    "chunk_follow_activity": "Változások követése",
+    "chunk_width": "Szélesség (táblaegység)",
+    "chunk_height": "Magasság (táblaegység)",
+    "chunk_margin": "Margó (táblaegység)",
+    "chunk_follow": "Követés bekapcsolása másoknak",
+    "chunk_locked": "Mások választásának zárolása",
+    "chunk_locked_notice": "A moderátor állította be",
+    "chunk_save": "Beállítások mentése",
+    "chunk_save_failed": "Nem sikerült menteni a beállításokat. Ellenőrizd a kapcsolatot és a moderátori jogosultságot, majd próbáld újra."
   },
   "id": {
     "white-out": "Cairan koreksi",
@@ -1148,7 +1228,17 @@
     "user_name_invalid": "Masukkan nama sepanjang 1–64 karakter tanpa karakter kontrol.",
     "user_name_forbidden": "Anda hanya dapat mengubah nama sendiri.",
     "user_name_rate_limited": "Terlalu sering mengubah nama. Coba lagi dalam beberapa detik.",
-    "user_name_unavailable": "Nama tidak dapat diubah. Hubungkan kembali lalu coba lagi."
+    "user_name_unavailable": "Nama tidak dapat diubah. Hubungkan kembali lalu coba lagi.",
+    "chunk_settings": "Pengaturan area",
+    "chunk_follow_activity": "Ikuti perubahan",
+    "chunk_width": "Lebar (satuan papan)",
+    "chunk_height": "Tinggi (satuan papan)",
+    "chunk_margin": "Margin (satuan papan)",
+    "chunk_follow": "Aktifkan mengikuti untuk pengguna lain",
+    "chunk_locked": "Kunci pilihan pengguna lain",
+    "chunk_locked_notice": "Diatur moderator",
+    "chunk_save": "Simpan pengaturan",
+    "chunk_save_failed": "Pengaturan tidak dapat disimpan. Periksa koneksi dan izin moderator, lalu coba lagi."
   },
   "it": {
     "board_name_placeholder": "Nome della lavagna…",
@@ -1276,7 +1366,17 @@
     "user_name_invalid": "Inserisci un nome da 1 a 64 caratteri senza caratteri di controllo.",
     "user_name_forbidden": "Puoi cambiare solo il tuo nome.",
     "user_name_rate_limited": "Hai cambiato nome troppe volte. Riprova tra qualche secondo.",
-    "user_name_unavailable": "Impossibile cambiare il nome. Riconnettiti e riprova."
+    "user_name_unavailable": "Impossibile cambiare il nome. Riconnettiti e riprova.",
+    "chunk_settings": "Impostazioni delle aree",
+    "chunk_follow_activity": "Segui le modifiche",
+    "chunk_width": "Larghezza (unità della lavagna)",
+    "chunk_height": "Altezza (unità della lavagna)",
+    "chunk_margin": "Margine (unità della lavagna)",
+    "chunk_follow": "Attiva il seguito per gli altri",
+    "chunk_locked": "Blocca la scelta degli altri",
+    "chunk_locked_notice": "Impostato dal moderatore",
+    "chunk_save": "Salva impostazioni",
+    "chunk_save_failed": "Impossibile salvare le impostazioni. Controlla la connessione e i permessi di moderazione, poi riprova."
   },
   "ja": {
     "board_name_placeholder": "ボードの名前",
@@ -1404,7 +1504,17 @@
     "user_name_invalid": "制御文字を含まない1～64文字の名前を入力してください。",
     "user_name_forbidden": "変更できるのは自分の名前だけです。",
     "user_name_rate_limited": "名前の変更回数が多すぎます。数秒後にもう一度お試しください。",
-    "user_name_unavailable": "名前を変更できませんでした。再接続してお試しください。"
+    "user_name_unavailable": "名前を変更できませんでした。再接続してお試しください。",
+    "chunk_settings": "区画の設定",
+    "chunk_follow_activity": "最新の編集を追従",
+    "chunk_width": "幅（ボード単位）",
+    "chunk_height": "高さ（ボード単位）",
+    "chunk_margin": "余白（ボード単位）",
+    "chunk_follow": "他のユーザーの追従を有効にする",
+    "chunk_locked": "他のユーザーの追従設定を固定する",
+    "chunk_locked_notice": "モデレーターが固定",
+    "chunk_save": "設定を保存",
+    "chunk_save_failed": "設定を保存できませんでした。接続とモデレーター権限を確認して、もう一度お試しください。"
   },
   "my": {
     "board_name_placeholder": "ဝှိုက်ဘုတ်အမည် ... ",
@@ -1532,7 +1642,17 @@
     "user_name_invalid": "ထိန်းချုပ်စာလုံးများမပါဘဲ စာလုံးရေ ၁ မှ ၆၄ အတွင်းရှိ အမည်ကို ထည့်ပါ။",
     "user_name_forbidden": "သင့်ကိုယ်ပိုင်အမည်ကိုသာ ပြောင်းနိုင်ပါသည်။",
     "user_name_rate_limited": "အမည်ပြောင်းလဲမှု များလွန်းနေပါသည်။ စက္ကန့်အနည်းငယ်ကြာမှ ထပ်ကြိုးစားပါ။",
-    "user_name_unavailable": "အမည်ကို ပြောင်း၍မရပါ။ ပြန်လည်ချိတ်ဆက်ပြီး ထပ်ကြိုးစားပါ။"
+    "user_name_unavailable": "အမည်ကို ပြောင်း၍မရပါ။ ပြန်လည်ချိတ်ဆက်ပြီး ထပ်ကြိုးစားပါ။",
+    "chunk_settings": "ဧရိယာအပိုင်းများ သတ်မှတ်ရန်",
+    "chunk_follow_activity": "နောက်ဆုံးပြင်ဆင်မှုကို လိုက်ကြည့်ရန်",
+    "chunk_width": "အကျယ် (ဘုတ်ယူနစ်)",
+    "chunk_height": "အမြင့် (ဘုတ်ယူနစ်)",
+    "chunk_margin": "ဘေးလွတ်အကွာ (ဘုတ်ယူနစ်)",
+    "chunk_follow": "အခြားအသုံးပြုသူများအတွက် လိုက်ကြည့်မှု ဖွင့်ရန်",
+    "chunk_locked": "အခြားအသုံးပြုသူများ၏ ရွေးချယ်မှုကို လော့ခ်ချရန်",
+    "chunk_locked_notice": "ကြီးကြပ်သူက သတ်မှတ်ထားသည်",
+    "chunk_save": "ဆက်တင်များ သိမ်းရန်",
+    "chunk_save_failed": "ဆက်တင်များကို မသိမ်းနိုင်ပါ။ ချိတ်ဆက်မှုနှင့် ကြီးကြပ်သူခွင့်ပြုချက်များကို စစ်ဆေးပြီး ထပ်ကြိုးစားပါ။"
   },
   "pt": {
     "white-out": "Branquejar",
@@ -1660,7 +1780,17 @@
     "user_name_invalid": "Digite um nome de 1 a 64 caracteres, sem caracteres de controle.",
     "user_name_forbidden": "Você só pode alterar seu próprio nome.",
     "user_name_rate_limited": "Muitas alterações de nome. Tente novamente em alguns segundos.",
-    "user_name_unavailable": "Não foi possível alterar o nome. Reconecte-se e tente novamente."
+    "user_name_unavailable": "Não foi possível alterar o nome. Reconecte-se e tente novamente.",
+    "chunk_settings": "Configuração das áreas",
+    "chunk_follow_activity": "Seguir alterações",
+    "chunk_width": "Largura (unidades do quadro)",
+    "chunk_height": "Altura (unidades do quadro)",
+    "chunk_margin": "Margem (unidades do quadro)",
+    "chunk_follow": "Ativar seguimento para os outros",
+    "chunk_locked": "Bloquear a escolha dos outros",
+    "chunk_locked_notice": "Definido pelo moderador",
+    "chunk_save": "Guardar configurações",
+    "chunk_save_failed": "Não foi possível guardar as configurações. Verifique a ligação e as permissões de moderação e tente novamente."
   },
   "ru": {
     "board_name_placeholder": "Название доски",
@@ -1788,7 +1918,17 @@
     "user_name_invalid": "Введите имя длиной от 1 до 64 символов без управляющих символов.",
     "user_name_forbidden": "Вы можете менять только своё имя.",
     "user_name_rate_limited": "Слишком много изменений имени. Повторите попытку через несколько секунд.",
-    "user_name_unavailable": "Не удалось изменить имя. Подключитесь заново и повторите попытку."
+    "user_name_unavailable": "Не удалось изменить имя. Подключитесь заново и повторите попытку.",
+    "chunk_settings": "Настройки областей",
+    "chunk_follow_activity": "Следить за изменениями",
+    "chunk_width": "Ширина (единицы доски)",
+    "chunk_height": "Высота (единицы доски)",
+    "chunk_margin": "Отступ (единицы доски)",
+    "chunk_follow": "Включить слежение для остальных",
+    "chunk_locked": "Заблокировать выбор остальных",
+    "chunk_locked_notice": "Задано модератором",
+    "chunk_save": "Сохранить настройки",
+    "chunk_save_failed": "Не удалось сохранить настройки. Проверьте соединение и права модератора, затем повторите попытку."
   },
   "sw": {
     "board_name_placeholder": "Jina la ubao mweupe ...",
@@ -1916,7 +2056,17 @@
     "user_name_invalid": "Weka jina lenye herufi 1–64 bila vibambo vya udhibiti.",
     "user_name_forbidden": "Unaweza kubadilisha jina lako tu.",
     "user_name_rate_limited": "Umebadilisha jina mara nyingi sana. Jaribu tena baada ya sekunde chache.",
-    "user_name_unavailable": "Jina halikuweza kubadilishwa. Unganisha tena kisha ujaribu tena."
+    "user_name_unavailable": "Jina halikuweza kubadilishwa. Unganisha tena kisha ujaribu tena.",
+    "chunk_settings": "Mipangilio ya maeneo",
+    "chunk_follow_activity": "Fuata mabadiliko",
+    "chunk_width": "Upana (vipimo vya ubao)",
+    "chunk_height": "Urefu (vipimo vya ubao)",
+    "chunk_margin": "Pambizo (vipimo vya ubao)",
+    "chunk_follow": "Washa ufuatiliaji kwa wengine",
+    "chunk_locked": "Funga chaguo la wengine",
+    "chunk_locked_notice": "Imewekwa na msimamizi",
+    "chunk_save": "Hifadhi mipangilio",
+    "chunk_save_failed": "Mipangilio haikuweza kuhifadhiwa. Angalia muunganisho na ruhusa za msimamizi, kisha ujaribu tena."
   },
   "th": {
     "board_name_placeholder": "ชื่อไวท์บอร์ด ...",
@@ -2044,7 +2194,17 @@
     "user_name_invalid": "กรุณาใส่ชื่อที่มีความยาว 1–64 อักขระ โดยไม่มีอักขระควบคุม",
     "user_name_forbidden": "คุณเปลี่ยนได้เฉพาะชื่อของตัวเองเท่านั้น",
     "user_name_rate_limited": "เปลี่ยนชื่อบ่อยเกินไป กรุณาลองอีกครั้งในอีกสักครู่",
-    "user_name_unavailable": "เปลี่ยนชื่อไม่สำเร็จ กรุณาเชื่อมต่อใหม่แล้วลองอีกครั้ง"
+    "user_name_unavailable": "เปลี่ยนชื่อไม่สำเร็จ กรุณาเชื่อมต่อใหม่แล้วลองอีกครั้ง",
+    "chunk_settings": "ตั้งค่าพื้นที่ย่อย",
+    "chunk_follow_activity": "ติดตามการแก้ไขล่าสุด",
+    "chunk_width": "ความกว้าง (หน่วยกระดาน)",
+    "chunk_height": "ความสูง (หน่วยกระดาน)",
+    "chunk_margin": "ระยะขอบ (หน่วยกระดาน)",
+    "chunk_follow": "เปิดการติดตามให้ผู้ใช้อื่น",
+    "chunk_locked": "ล็อกตัวเลือกของผู้ใช้อื่น",
+    "chunk_locked_notice": "กำหนดโดยผู้ดูแล",
+    "chunk_save": "บันทึกการตั้งค่า",
+    "chunk_save_failed": "บันทึกการตั้งค่าไม่ได้ โปรดตรวจสอบการเชื่อมต่อและสิทธิ์ผู้ดูแล แล้วลองอีกครั้ง"
   },
   "uk": {
     "white-out": "Коректор",
@@ -2172,7 +2332,17 @@
     "user_name_invalid": "Введіть ім’я завдовжки від 1 до 64 символів без керувальних символів.",
     "user_name_forbidden": "Ви можете змінювати лише власне ім’я.",
     "user_name_rate_limited": "Забагато змін імені. Спробуйте ще раз за кілька секунд.",
-    "user_name_unavailable": "Не вдалося змінити ім’я. Підключіться знову та повторіть спробу."
+    "user_name_unavailable": "Не вдалося змінити ім’я. Підключіться знову та повторіть спробу.",
+    "chunk_settings": "Налаштування областей",
+    "chunk_follow_activity": "Стежити за змінами",
+    "chunk_width": "Ширина (одиниці дошки)",
+    "chunk_height": "Висота (одиниці дошки)",
+    "chunk_margin": "Відступ (одиниці дошки)",
+    "chunk_follow": "Увімкнути стеження для інших",
+    "chunk_locked": "Заблокувати вибір інших",
+    "chunk_locked_notice": "Задано модератором",
+    "chunk_save": "Зберегти налаштування",
+    "chunk_save_failed": "Не вдалося зберегти налаштування. Перевірте з’єднання та права модератора й повторіть спробу."
   },
   "vi": {
     "white-out": "Bút xóa",
@@ -2300,7 +2470,17 @@
     "user_name_invalid": "Nhập tên dài từ 1 đến 64 ký tự, không chứa ký tự điều khiển.",
     "user_name_forbidden": "Bạn chỉ có thể đổi tên của chính mình.",
     "user_name_rate_limited": "Bạn đã đổi tên quá nhiều lần. Hãy thử lại sau vài giây.",
-    "user_name_unavailable": "Không thể đổi tên. Hãy kết nối lại rồi thử lại."
+    "user_name_unavailable": "Không thể đổi tên. Hãy kết nối lại rồi thử lại.",
+    "chunk_settings": "Cài đặt các vùng",
+    "chunk_follow_activity": "Theo dõi chỉnh sửa",
+    "chunk_width": "Chiều rộng (đơn vị bảng)",
+    "chunk_height": "Chiều cao (đơn vị bảng)",
+    "chunk_margin": "Lề (đơn vị bảng)",
+    "chunk_follow": "Bật theo dõi cho người khác",
+    "chunk_locked": "Khóa lựa chọn của người khác",
+    "chunk_locked_notice": "Do người điều hành đặt",
+    "chunk_save": "Lưu cài đặt",
+    "chunk_save_failed": "Không thể lưu cài đặt. Hãy kiểm tra kết nối và quyền điều hành rồi thử lại."
   },
   "zh-CN": {
     "board_name_placeholder": "白板名称",
@@ -2428,7 +2608,17 @@
     "user_name_invalid": "请输入 1–64 个字符的名称，且不含控制字符。",
     "user_name_forbidden": "你只能修改自己的名称。",
     "user_name_rate_limited": "修改名称过于频繁，请稍后再试。",
-    "user_name_unavailable": "无法修改名称，请重新连接后再试。"
+    "user_name_unavailable": "无法修改名称，请重新连接后再试。",
+    "chunk_settings": "分块设置",
+    "chunk_follow_activity": "跟随最新编辑",
+    "chunk_width": "宽度（画布单位）",
+    "chunk_height": "高度（画布单位）",
+    "chunk_margin": "边距（画布单位）",
+    "chunk_follow": "让其他用户跟随最新编辑",
+    "chunk_locked": "锁定其他用户的跟随设置",
+    "chunk_locked_notice": "由管理员锁定",
+    "chunk_save": "保存设置",
+    "chunk_save_failed": "无法保存设置。请检查网络连接和管理员权限，然后重试。"
   },
   "zh-TW": {
     "board_name_placeholder": "白板名稱",
@@ -2556,7 +2746,17 @@
     "user_name_invalid": "請輸入 1–64 個字元的名稱，且不含控制字元。",
     "user_name_forbidden": "你只能修改自己的名稱。",
     "user_name_rate_limited": "修改名稱過於頻繁，請稍後再試。",
-    "user_name_unavailable": "無法修改名稱，請重新連線後再試。"
+    "user_name_unavailable": "無法修改名稱，請重新連線後再試。",
+    "chunk_settings": "分塊設定",
+    "chunk_follow_activity": "跟隨最新編輯",
+    "chunk_width": "寬度（畫布單位）",
+    "chunk_height": "高度（畫布單位）",
+    "chunk_margin": "邊距（畫布單位）",
+    "chunk_follow": "讓其他使用者跟隨最新編輯",
+    "chunk_locked": "鎖定其他使用者的跟隨設定",
+    "chunk_locked_notice": "由管理員鎖定",
+    "chunk_save": "儲存設定",
+    "chunk_save_failed": "無法儲存設定。請檢查網路連線及管理員權限，然後再試一次。"
   },
   "pl": {
     "board_name_placeholder": "Nazwa tablicy",
@@ -2684,6 +2884,16 @@
     "user_name_invalid": "Wpisz nazwę o długości od 1 do 64 znaków, bez znaków sterujących.",
     "user_name_forbidden": "Możesz zmieniać tylko własną nazwę.",
     "user_name_rate_limited": "Zbyt wiele zmian nazwy. Spróbuj ponownie za kilka sekund.",
-    "user_name_unavailable": "Nie udało się zmienić nazwy. Połącz się ponownie i spróbuj jeszcze raz."
+    "user_name_unavailable": "Nie udało się zmienić nazwy. Połącz się ponownie i spróbuj jeszcze raz.",
+    "chunk_settings": "Ustawienia obszarów",
+    "chunk_follow_activity": "Śledź zmiany",
+    "chunk_width": "Szerokość (jednostki tablicy)",
+    "chunk_height": "Wysokość (jednostki tablicy)",
+    "chunk_margin": "Margines (jednostki tablicy)",
+    "chunk_follow": "Włącz śledzenie dla innych",
+    "chunk_locked": "Zablokuj wybór innych",
+    "chunk_locked_notice": "Ustawione przez moderatora",
+    "chunk_save": "Zapisz ustawienia",
+    "chunk_save_failed": "Nie udało się zapisać ustawień. Sprawdź połączenie i uprawnienia moderatora, a następnie spróbuj ponownie."
   }
 }

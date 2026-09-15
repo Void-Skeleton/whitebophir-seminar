@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""WBO seminar helper: native backups, local keys and named board links.
+"""WBO seminar helper: native backups, local keys, names and presentation settings.
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 Seminar modifications, 2026-09-15. Python 3.10+; v2 keys require cryptography.
@@ -136,9 +136,20 @@ def named_board_url(server, board, name, token=None):
     return urlunsplit((parts.scheme, parts.netloc, path, urlencode(query), ""))
 
 
+def validate_chunk_response(value):
+    if not isinstance(value, dict):
+        raise ValueError("Invalid chunk settings response")
+    for key in ("width", "height", "margin"):
+        number = value.get(key)
+        if type(number) is not int or not (0 if key == "margin" else 100) <= number <= 100000:
+            raise ValueError("Invalid chunk settings response")
+    if any(type(value.get(key)) is not bool for key in ("follow", "locked")):
+        raise ValueError("Invalid chunk settings response")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description="Manage WBO backups, local identities, and named board links."
+        description="Manage WBO backups, local identities, names, and presentation settings."
     )
     subcommands = parser.add_subparsers(dest="command", required=True)
     keygen = subcommands.add_parser("keygen", help="Generate a local Ed25519 identity")
@@ -148,9 +159,16 @@ def main(argv=None):
     join.add_argument("--board", required=True)
     join.add_argument("--name", required=True)
     join.add_argument("--token", help="Optional board JWT to include in the URL")
-    for name in ("export", "import"):
+    for name in ("export", "import", "chunks"):
         command = subcommands.add_parser(name)
-        command.add_argument("file", type=Path, help="Path to a .wbo archive")
+        if name == "chunks":
+            command.add_argument("--width", type=int, help="Chunk width in board units")
+            command.add_argument("--height", type=int, help="Chunk height in board units")
+            command.add_argument("--margin", type=int, help="Margin in board units")
+            command.add_argument("--follow", choices=("on", "off"))
+            command.add_argument("--locked", choices=("on", "off"))
+        else:
+            command.add_argument("file", type=Path, help="Path to a .wbo archive")
         command.add_argument("--server", default="http://localhost:8080")
         command.add_argument("--board", required=True)
         command.add_argument("--max-archive-bytes", type=int, default=MAX_ARCHIVE_BYTES)
@@ -177,6 +195,31 @@ def main(argv=None):
             headers["Cookie"] = "wbo-user-secret-v1=" + args.user_secret
         if args.socket_id:
             headers["X-WBO-Socket-Id"] = args.socket_id
+        if args.command == "chunks":
+            parts = urlsplit(url)
+            path = urlsplit(args.server).path.rstrip("/") + "/chunks/" + quote(args.board, safe="")
+            url = urlunsplit((parts.scheme, parts.netloc, path, parts.query, ""))
+            read_headers = dict(headers)
+            if args.private_key_file:
+                read_headers.update(authentication_v2(args, url))
+            with urlopen(Request(url, headers=read_headers), timeout=60) as response:
+                result = json.loads(response.read(4096))
+            validate_chunk_response(result)
+            values = {key: getattr(args, key) for key in ("width", "height", "margin", "follow", "locked")}
+            if any(value is not None for value in values.values()):
+                settings = {key: result[key] for key in values}
+                for key, value in values.items():
+                    if value is not None:
+                        settings[key] = value == "on" if key in ("follow", "locked") else value
+                data = json.dumps(settings).encode()
+                headers.update({"Content-Type": "application/json", "X-WBO-Chunks": "1"})
+                if args.private_key_file:
+                    headers.update(authentication_v2(args, url, data))
+                with urlopen(Request(url, data=data, headers=headers, method="POST"), timeout=60) as response:
+                    result = json.loads(response.read(4096))
+            validate_chunk_response(result)
+            print(json.dumps(result, ensure_ascii=False))
+            return 0
         if args.command == "export":
             if args.file.exists():
                 raise ValueError("Output file already exists; choose a new path")

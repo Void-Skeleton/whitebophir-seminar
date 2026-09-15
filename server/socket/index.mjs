@@ -1,3 +1,4 @@
+import { chunkState } from "../board/chunks.mjs";
 // Modified 2026-09-14: publish validated archive imports to synced viewers.
 import * as socketIO from "socket.io";
 import { verifyProof } from "../auth/user_key_v2.mjs";
@@ -557,6 +558,7 @@ async function bootstrapSocketBoard(socket, replay, config) {
       socket.emit(SocketEvents.BOARDSTATE, boardState);
       syncedPersistentSockets.delete(socket.id);
       socket.emit(SocketEvents.BROADCAST, replay.replayBatch);
+      socket.emit(SocketEvents.CHUNK_STATE, chunkState(board));
       syncedPersistentSockets.add(socket.id);
       tracing.setActiveSpanAttributes({
         "wbo.socket.replay.outcome": replay.outcome,
@@ -1023,3 +1025,9 @@ export {
   getActiveSocket,
   emitArchiveMutations,
 };
+
+/** @param {import("../board/data.mjs").BoardData} board */
+export function emitChunkState(board) {
+  for (const id of board.users)
+    getActiveSocket(id)?.emit(SocketEvents.CHUNK_STATE, chunkState(board));
+}

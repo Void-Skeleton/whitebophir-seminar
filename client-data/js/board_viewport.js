@@ -16,6 +16,7 @@ const WHEEL_ZOOM_SENSITIVITY = 0.01;
 const WHEEL_MAX_FRAME_DELTA = 30;
 const SCALE_WILL_CHANGE_TIMEOUT_MS = 1000;
 const VIEWPORT_HASH_SYNC_DELAY_MS = 200;
+const FOLLOW_TRANSITION_MS = 240;
 const VIEWPORT_HASH_PUSH_INTERVAL_MS = 5000;
 const PINCH_MIN_DISTANCE = 16;
 const BOARD_EXTENT_MARGIN = 20000;
@@ -104,6 +105,9 @@ const TOUCH_EVENT_NAMES = [
 
 /**
  * @typedef {{
+ *   holdFollowCamera(interrupt: () => void): {release(): void},
+ *   isFollowCameraMoving(): boolean,
+ *   setFollowFrame(frame: (BoardRect & {margin: number}) | null, deferUntilStrokeEnd?: boolean): void,
  *   setScale(scale: number): number,
  *   getScale(): number,
  *   syncLayoutSize(): void,
@@ -428,6 +432,18 @@ export function createViewportController(Tools) {
   /** @type {number | null} */
   let viewportHashScrollTimeout = null;
   let lastViewportHashStateUpdate = Date.now();
+  /** @type {(BoardRect & {margin: number}) | null} */
+  let followFrame = null;
+  let followPadding = 0;
+  let applyingFollowFrame = false;
+  /** @type {{left: number, top: number, scale: number} | null} */
+  let followCamera = null;
+  /** @type {number | null} */
+  let followAnimationFrame = null;
+  /** @type {Set<() => void>} */
+  const followHolds = new Set();
+  let interruptingFollowStroke = false;
+  let followPending = false;
   let installed = false;
   let hashObserversInstalled = false;
   /** @type {ViewportTouchPolicy} */
@@ -493,6 +509,7 @@ export function createViewportController(Tools) {
    * @returns {void}
    */
   function panTo(left, top) {
+    if ((followFrame || followCamera) && !applyingFollowFrame) return;
     window.scrollTo(left, top);
     scheduleViewportHashSync();
   }
@@ -617,7 +634,7 @@ export function createViewportController(Tools) {
     // Hand mode uses document scrolling as board panning. Other tools own
     // touch input themselves, so browser panning and browser zoom stay off.
     const touchAction =
-      touchPolicy === "native-pan"
+      !followFrame && !followCamera && touchPolicy === "native-pan"
         ? BROWSER_SCROLL_WITHOUT_ZOOM_TOUCH_ACTION
         : APP_TOOL_TOUCH_ACTION;
     dom.board.style.touchAction = touchAction;
@@ -711,12 +728,13 @@ export function createViewportController(Tools) {
    * @returns {number}
    */
   function setScale(scale) {
+    if ((followFrame || followCamera) && !applyingFollowFrame)
+      return getScale();
     const scaleLimits = getScaleLimits(currentScaleLimits());
     const value = finiteOr(scale, scaleLimits.defaultScale);
-    const appliedScale = Math.max(
-      scaleLimits.minScale,
-      Math.min(scaleLimits.maxScale, value),
-    );
+    const appliedScale = applyingFollowFrame
+      ? value
+      : Math.max(scaleLimits.minScale, Math.min(scaleLimits.maxScale, value));
     const dom = getAttachedDom();
     if (!dom) {
       Tools.viewportState.scale = appliedScale;
@@ -899,6 +917,7 @@ export function createViewportController(Tools) {
    * @returns {void}
    */
   function startPinchPan(event) {
+    if (followFrame) return;
     const touches = getPinchTouches(event);
     if (!touches) return;
     const distance = distanceBetween(touches[0], touches[1]);
@@ -924,6 +943,7 @@ export function createViewportController(Tools) {
    * @returns {void}
    */
   function updatePinchPan(event) {
+    if (followFrame) return;
     if (event.touches.length !== 2) return;
     const touches = getPinchTouches(event);
     if (!touches) return;
@@ -971,8 +991,8 @@ export function createViewportController(Tools) {
    */
   function currentViewportHash() {
     const scale = getScale();
-    const x = document.documentElement.scrollLeft / scale;
-    const y = document.documentElement.scrollTop / scale;
+    const x = (document.documentElement.scrollLeft - followPadding) / scale;
+    const y = (document.documentElement.scrollTop - followPadding) / scale;
 
     return `#${x | 0},${y | 0},${scale.toFixed(VIEWPORT_HASH_SCALE_DECIMALS)}`;
   }
@@ -1002,11 +1022,162 @@ export function createViewportController(Tools) {
   }
 
   function syncViewportHashFromScroll() {
+    // Enforce the displayed camera, including during easing and a held stroke.
+    // Snapping to the destination here would bypass the animation on each scroll.
+    if (followCamera) window.scrollTo(followCamera.left, followCamera.top);
     scheduleViewportHashSync();
+  }
+
+  function stopFollowAnimation() {
+    if (followAnimationFrame === null) return;
+    window.cancelAnimationFrame(followAnimationFrame);
+    followAnimationFrame = null;
+  }
+
+  /** @param {{left: number, top: number, scale: number}} camera */
+  function renderFollowCamera(camera) {
+    applyingFollowFrame = true;
+    followCamera = camera;
+    if (getScale() !== camera.scale) setScale(camera.scale);
+    panTo(camera.left, camera.top);
+    applyingFollowFrame = false;
+  }
+
+  // A uniform page inset allows negative board-space margins at the origin.
+  // Own edits wait for stroke completion; other camera changes finish the stroke.
+  /** @param {boolean} [interruptDrawing] */
+  function applyFollowFrame(interruptDrawing = false) {
+    const dom = getAttachedDom();
+    if (!dom) return;
+    if (interruptDrawing && followHolds.size > 0) {
+      interruptingFollowStroke = true;
+      try {
+        for (const interrupt of [...followHolds]) interrupt();
+      } finally {
+        interruptingFollowStroke = false;
+      }
+    }
+    if (followHolds.size > 0) {
+      followPending = true;
+      return;
+    }
+    followPending = false;
+    stopFollowAnimation();
+    const oldPadding = followPadding;
+    const left = document.documentElement.scrollLeft;
+    const top = document.documentElement.scrollTop;
+    if (!followFrame) {
+      followCamera = null;
+      followPadding = 0;
+      dom.board.style.margin = "";
+      applyTouchPolicy();
+      panTo(left - oldPadding, top - oldPadding);
+      return;
+    }
+    const wasFollowing = followCamera !== null;
+    const menu = document.getElementById("menu");
+    const inset =
+      menu && menu.getClientRects().length
+        ? menu.getBoundingClientRect().right + 8
+        : 0;
+    const availableWidth = Math.max(1, window.innerWidth - inset);
+    const frame = followFrame;
+    const scale = Math.min(
+      MAX_BOARD_SCALE,
+      availableWidth / (frame.width + 2 * frame.margin),
+      window.innerHeight / (frame.height + 2 * frame.margin),
+    );
+    followPadding = Math.max(window.innerWidth, window.innerHeight);
+    dom.board.style.margin = `${followPadding}px`;
+    ensureBoardExtentForPoint(frame.x + frame.width, frame.y + frame.height);
+    syncLayoutSize();
+    const target = {
+      left:
+        followPadding +
+        (frame.x + frame.width / 2) * scale -
+        (inset + availableWidth / 2),
+      top:
+        followPadding +
+        (frame.y + frame.height / 2) * scale -
+        window.innerHeight / 2,
+      scale,
+    };
+    if (
+      !wasFollowing ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      renderFollowCamera(target);
+      return;
+    }
+    const start = {
+      left: left + followPadding - oldPadding,
+      top: top + followPadding - oldPadding,
+      scale: getScale(),
+    };
+    const startedAt = performance.now();
+    renderFollowCamera(start);
+    /** @param {number} now */
+    const advance = (now) => {
+      followAnimationFrame = null;
+      const progress = Math.min(
+        1,
+        Math.max(0, (now - startedAt) / FOLLOW_TRANSITION_MS),
+      );
+      const eased = progress * progress * (3 - 2 * progress);
+      renderFollowCamera({
+        left: start.left + (target.left - start.left) * eased,
+        top: start.top + (target.top - start.top) * eased,
+        scale: start.scale + (target.scale - start.scale) * eased,
+      });
+      if (progress < 1)
+        followAnimationFrame = window.requestAnimationFrame(advance);
+    };
+    followAnimationFrame = window.requestAnimationFrame(advance);
   }
 
   /** @type {ViewportController} */
   const controller = {
+    holdFollowCamera(interrupt) {
+      followHolds.add(interrupt);
+      if (followAnimationFrame !== null) {
+        stopFollowAnimation();
+        followPending = true;
+      }
+      let released = false;
+      return {
+        release() {
+          if (released) return;
+          released = true;
+          followHolds.delete(interrupt);
+          if (
+            followHolds.size === 0 &&
+            followPending &&
+            !interruptingFollowStroke
+          )
+            applyFollowFrame();
+        },
+      };
+    },
+    isFollowCameraMoving() {
+      return followAnimationFrame !== null || applyingFollowFrame;
+    },
+    setFollowFrame(frame, deferUntilStrokeEnd = false) {
+      const current = followFrame;
+      const unchanged =
+        frame === current ||
+        (!!frame &&
+          !!current &&
+          frame.x === current.x &&
+          frame.y === current.y &&
+          frame.width === current.width &&
+          frame.height === current.height &&
+          frame.margin === current.margin);
+      if (unchanged && !followPending) return;
+      followFrame = frame;
+      activePan = null;
+      activePinchPan = null;
+      applyFollowFrame(!deferUntilStrokeEnd);
+    },
     setScale,
     getScale,
     syncLayoutSize,
@@ -1020,7 +1191,7 @@ export function createViewportController(Tools) {
     boardCoordinateToLayout,
     pageCoordinateToBoard(value) {
       return Tools.coordinates.toBoardCoordinate(
-        screenToBoard(value, getScale()),
+        screenToBoard(Number(value) - followPadding, getScale()),
       );
     },
     boardRectToLayoutRect,
@@ -1040,6 +1211,7 @@ export function createViewportController(Tools) {
       return zoomAtPagePoint(getScale() * factor, pageX, pageY);
     },
     beginPan(clientX, clientY) {
+      if (followFrame) return;
       clearViewportHashSync();
       activePan = {
         x: clientX,
@@ -1064,7 +1236,10 @@ export function createViewportController(Tools) {
       const dom = getAttachedDom();
       if (installed || !dom) return;
       installed = true;
-      window.addEventListener("resize", syncLayoutSize);
+      window.addEventListener("resize", () => {
+        syncLayoutSize();
+        if (followFrame || followCamera) applyFollowFrame(true);
+      });
       window.addEventListener("keydown", onStyleWheelModifierKeydown, true);
       window.addEventListener("keyup", onStyleWheelModifierKeyup, true);
       window.addEventListener("blur", resetStyleWheelModifierKeys);
@@ -1126,6 +1301,10 @@ export function createViewportController(Tools) {
       window.addEventListener("popstate", controller.applyFromHash, false);
     },
     applyFromHash() {
+      if (followFrame || followCamera) {
+        if (followCamera) window.scrollTo(followCamera.left, followCamera.top);
+        return;
+      }
       const coords = window.location.hash.slice(1).split(",");
       const x = Tools.coordinates.toBoardCoordinate(coords[0]);
       const y = Tools.coordinates.toBoardCoordinate(coords[1]);

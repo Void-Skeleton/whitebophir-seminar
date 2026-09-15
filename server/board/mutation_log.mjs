@@ -44,6 +44,7 @@ function createMutationLog(initialSeq = 0) {
         seq: latestSeq + 1,
         acceptedAtMs: entry.acceptedAtMs,
         mutation: entry.mutation,
+        ...(entry.activityPoint ? { activityPoint: entry.activityPoint } : {}),
       };
       entries.push(nextEntry);
       latestSeq = nextEntry.seq;

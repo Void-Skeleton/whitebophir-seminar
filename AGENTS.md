@@ -158,6 +158,43 @@ writes are handled by
 [board_optimistic_module.js](./client-data/js/board_optimistic_module.js), and
 [board_write_module.js](./client-data/js/board_write_module.js).
 
+Canvas chunk settings and personal following are owned by
+[board_chunks_module.js](./client-data/js/board_chunks_module.js), loaded with the
+full runtime. Shared validation and chunk geometry live in
+[board_chunks.js](./client-data/js/board_chunks.js). The viewport controller alone
+fits and locks the camera, using a uniform page inset while following so the
+origin can have margins; page-to-board conversion subtracts that inset. The
+chunk grid stays outside drawingArea and is never a persistent board item.
+The Grid tool emits `wbo:grid-change`; the chunks module uses its current fill
+mode to emphasize chunk borders in grid and dot modes. Focus changes ease over
+240 ms, honoring reduced-motion preferences. Pencil holds a viewport lease to
+defer camera movement from its own accepted edits until the stroke ends. Other
+camera changes interrupt and commit the active stroke before moving. Pencil
+ignores input while the follow camera moves and requires a fresh press after an
+interruption; a held pointer must never restart drawing. The chunks module uses
+the accepted frame's authoritative `mutation.socket` to identify the drawer.
+
+Moderator settings use `GET` / `POST /chunks/{board}` in
+[board_chunks.mjs](./server/routes/board_chunks.mjs). POST checks `canBan`, requires
+`X-WBO-Chunks: 1` plus JSON, and accepts only `{width,height,margin,follow,locked}`.
+Dimensions are integer board units 100–100000; margin is 0–100000. Bodies are
+bounded to 2 KiB, v2 proofs bind the exact body, and updates are limited to ten per
+board per ten seconds. Changes save under the board session queue before publishing.
+Settings use a server-generated revision; each change resets non-moderators’
+follow choice, and `locked` prevents personal overrides. Moderators are exempt.
+Personal choices are stored per board pathname and revision in localStorage.
+The Python helper exposes `chunks` to read settings or update selected fields.
+
+[server/board/chunks.mjs](./server/board/chunks.mjs) derives activity from accepted
+mutations and cached canonical bounds without hydrating pencil payloads or
+reading SVG. Stroke appends use their final point; other edits use the object
+bounds center, batches their last spatial edit, and clear the origin. Configured
+settings and activity persist in root `data-wbo-chunks` JSON, including empty
+boards. Metadata is snapshotted with items during save and has its own dirty
+identity so settings-only updates are written. Archives retain destination
+settings. `test-node/board_chunks.test.js` and `playwright/tests/chunks.spec.ts`
+cover this feature; broadcast throughput is the relevant benchmark.
+
 ### tools and client messages
 
 [manifest.js](./client-data/tools/manifest.js) defines tool identity, stable
@@ -296,7 +333,11 @@ peer-visible erase benchmark is
 WBO uses Socket.IO. Clients connect with query fields such as `board`,
 `baselineSeq`, `token`, `tool`, `color`, `size`, and optional `name`. The server
 immediately emits `boardstate`, then a `broadcast` replay batch from the requested
-`baselineSeq`.
+`baselineSeq`, followed by
+`chunk_state {width,height,margin,follow,locked,revision,point}`. Settings changes
+also emit `chunk_state`. Accepted live frames optionally include
+`activityPoint: {x,y}`; the client follows it only after processing the frame in
+sequence. Replay uses the final chunk snapshot instead of moving through old edits.
 
 V2 clients first obtain a challenge through HTTP, then connect with Socket.IO
 handshake `auth: {v2: "<nonce>.<signature>"}` over WebSocket (`ws` or `wss`). V2
@@ -435,6 +476,8 @@ Server `broadcast` payload examples:
   // Server-assigned persistent sequence.
   "seq": 42,
   "acceptedAtMs": 1710000000000,
+  // Optional server-derived activity position for chunk following.
+  "activityPoint": { "x": 180, "y": 160 },
   "mutation": {
     "tool": 3,
     "type": 1,

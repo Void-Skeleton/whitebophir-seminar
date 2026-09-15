@@ -51,3 +51,17 @@ AGPL-3.0-or-later.
 
 New implementation files are licensed AGPL-3.0-or-later. See README.md for the
 deployment setting that links users to the corresponding modified source.
+
+Changes dated 2026-09-15 implement seminar feature 2: configurable canvas chunks,
+activity-following cameras, and moderator control and locking of others’ follow
+settings. Shared chunk geometry, the browser controls and viewport, accepted
+mutation tracking, SVG metadata persistence, the HTTP settings API, socket
+snapshots, and the Python `chunks` command are added or extended. All supported
+translations, runtime types, tests, README and AGENTS documentation are updated.
+Follow-up changes on the same date emphasize chunk borders through the Grid
+button, ease camera transitions, defer the drawer's camera until stroke
+completion, and interrupt pencil strokes before other follow-camera moves.
+Pencil input is blocked during camera transitions to prevent stray segments and
+repeated chunk switching.
+Chunk border emphasis is further increased with double the highlighted stroke
+width and a darker gray for stronger contrast against the regular grid.

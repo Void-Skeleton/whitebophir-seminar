@@ -310,6 +310,7 @@ async function unsafeSaveBoard(board) {
       try {
         if (board.disposed) return { status: "skipped" };
         if (
+          board.metadata === board.persistedMetadata &&
           hasDirtyItems(board) !== true &&
           board.getSeq() === board.getPersistedSeq()
         ) {
@@ -333,6 +334,7 @@ async function unsafeSaveBoard(board) {
         const savedItemsById = new Map(board.itemsById);
         const savedPaintOrder = [...board.paintOrder];
         const savedSvgExtent = { ...board.svgExtent };
+        const savedMetadata = board.metadata;
         const file = board.file;
         const authoritativeItemCount = savedPaintOrder.filter(
           (id) => savedItemsById.get(id)?.deleted !== true,
@@ -357,7 +359,7 @@ async function unsafeSaveBoard(board) {
                       board.name,
                       savedItemsById,
                       savedPaintOrder,
-                      board.metadata,
+                      savedMetadata,
                       board.persistedItemIds,
                       board.getPersistedSeq(),
                       saveTargetSeq,
@@ -371,7 +373,7 @@ async function unsafeSaveBoard(board) {
                         board.name,
                         savedItemsById,
                         savedPaintOrder,
-                        board.metadata,
+                        savedMetadata,
                         saveTargetSeq,
                         {
                           historyDir: board.historyDir,
@@ -396,6 +398,7 @@ async function unsafeSaveBoard(board) {
           );
           board.persistedItemIds = new Set(persistedIds);
           board.markPersistedSeq(saveTargetSeq);
+          board.persistedMetadata = savedMetadata;
           finalizePersistedItems(board, savedItemsById, persistedIds);
           finishSuccessfulSaveSchedulingWindow(board);
           board.trimPersistedMutationLog(startedAt);
@@ -626,6 +629,11 @@ async function loadBoardData(BoardDataClass, name, config) {
         boardData.saveTargetSeq = null;
         boardData.loadSource = storedBoard.source;
         boardData.metadata = storedBoard.metadata;
+        boardData.persistedMetadata = boardData.metadata;
+        boardData.activityPoint = boardData.metadata.chunks?.point || {
+          x: 0,
+          y: 0,
+        };
         boardData.mutationLog = createMutationLog(storedBoard.seq);
         if (logger.isEnabled("debug")) {
           logger.debug(

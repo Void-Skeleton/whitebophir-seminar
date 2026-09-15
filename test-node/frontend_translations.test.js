@@ -19,6 +19,16 @@ function i18nKey(raw) {
 test("frontend translation catalog covers rendered and runtime UI keys", () => {
   const translations = JSON.parse(fs.readFileSync(TRANSLATIONS_PATH, "utf8"));
   const requiredKeys = [
+    "chunk_settings",
+    "chunk_follow_activity",
+    "chunk_width",
+    "chunk_height",
+    "chunk_margin",
+    "chunk_follow",
+    "chunk_locked",
+    "chunk_locked_notice",
+    "chunk_save",
+    "chunk_save_failed",
     "board_name_placeholder",
     "ban",
     "ban_user",
