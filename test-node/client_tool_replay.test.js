@@ -993,6 +993,8 @@ function createUnavailableCoordinateRuntime() {
  */
 function createUnavailableViewportRuntime() {
   return {
+    panByKeyboard: () => unavailableCapability("viewport.panByKeyboard"),
+    getViewCenter: () => unavailableCapability("viewport.getViewCenter"),
     holdFollowCamera: () => ({ release() {} }),
     isFollowCameraMoving: () => false,
     setFollowFrame: () => unavailableCapability("viewport.setFollowFrame"),

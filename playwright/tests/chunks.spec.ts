@@ -13,8 +13,10 @@ async function camera(page: Page) {
   return page.evaluate(() => {
     const app = window.WBOApp;
     const state = app.chunks.state;
-    const x = Math.floor(state.point.x / state.width) * state.width;
-    const y = Math.floor(state.point.y / state.height) * state.height;
+    const point =
+      app.chunks.mode === "chunk" ? app.chunks.focusedPoint : state.point;
+    const x = Math.floor(point.x / state.width) * state.width;
+    const y = Math.floor(point.y / state.height) * state.height;
     const rect = app.viewportState.controller.boardRectToViewportRect({
       x,
       y,
@@ -69,7 +71,114 @@ async function configureChunks(page: Page) {
   await expect(page.locator(".chunk-settings-dialog")).toHaveCount(0);
 }
 
-test("the grid button emphasizes configured chunk borders in grid and dot modes", async ({
+async function settledScroll(page: Page) {
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.WBOApp.viewportState.controller.isFollowCameraMoving(),
+      ),
+    )
+    .toBe(false);
+  return page.evaluate(() => ({ x: scrollX, y: scrollY }));
+}
+
+test("Ctrl+Arrow pans one chunk at the current zoom, easing and accumulating repeated keys", async ({
+  page,
+  context,
+  server,
+  boardPage,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await context.addCookies([
+    { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
+  ]);
+  await boardPage.gotoBoard("chunks");
+  await configureChunks(page);
+  await page.evaluate(() => {
+    const viewport = window.WBOApp.viewportState.controller;
+    viewport.setScale(0.2);
+    viewport.panTo(1000, 900);
+  });
+  const before = await page.evaluate(() => ({
+    point: window.WBOApp.chunks.state.point,
+    seq: window.WBOApp.replay.authoritativeSeq,
+  }));
+  const positions = await page.evaluate(
+    () =>
+      new Promise<number[]>((resolve) => {
+        const positions = [scrollX];
+        document.body.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key: "ArrowRight",
+            ctrlKey: true,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+        const sample = () => {
+          positions.push(scrollX);
+          if (!window.WBOApp.viewportState.controller.isFollowCameraMoving())
+            resolve(positions);
+          else requestAnimationFrame(sample);
+        };
+        requestAnimationFrame(sample);
+      }),
+  );
+  expect(positions.some((x) => x > 1000 && x < 1800)).toBe(true);
+  expect(await settledScroll(page)).toEqual({ x: 1800, y: 900 });
+  for (const [key, x, y] of [
+    ["ArrowDown", 1800, 1500],
+    ["ArrowLeft", 1000, 1500],
+    ["ArrowUp", 1000, 900],
+  ] as const) {
+    await page.keyboard.press(`Control+${key}`);
+    expect(await settledScroll(page)).toEqual({ x, y });
+  }
+  await page.evaluate(() => {
+    for (const repeat of [false, true])
+      document.body.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "ArrowRight",
+          ctrlKey: true,
+          repeat,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+  });
+  expect(await settledScroll(page)).toEqual({ x: 2600, y: 900 });
+  expect(await page.evaluate(() => window.WBOApp.viewportState.scale)).toBe(
+    0.2,
+  );
+  expect(
+    await page.evaluate(() => ({
+      point: window.WBOApp.chunks.state.point,
+      seq: window.WBOApp.replay.authoritativeSeq,
+    })),
+  ).toEqual(before);
+  // A manual pan cancels an in-flight shortcut rather than fighting its frames.
+  await page.evaluate(() => {
+    document.body.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "ArrowDown",
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    window.WBOApp.viewportState.controller.panTo(0, 0);
+  });
+  expect(await settledScroll(page)).toEqual({ x: 0, y: 0 });
+  await page.keyboard.press("Control+ArrowLeft");
+  await page.keyboard.press("Control+ArrowUp");
+  expect(await settledScroll(page)).toEqual({ x: 0, y: 0 });
+  await page.keyboard.press("ArrowRight");
+  expect(await settledScroll(page)).toEqual({ x: 64, y: 0 });
+  await page.keyboard.press("ArrowDown");
+  expect(await settledScroll(page)).toEqual({ x: 64, y: 64 });
+});
+
+test("chunk focus stays on its selected chunk through editing, resize and reload", async ({
   page,
   context,
   server,
@@ -79,12 +188,238 @@ test("the grid button emphasizes configured chunk borders in grid and dot modes"
     { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
   ]);
   await boardPage.gotoBoard("chunks");
-  // The grid can be enabled before a moderator configures chunks.
+  await configureChunks(page);
+  await page.locator("#chunkViewMode").selectOption("chunk");
+  await boardPage.selectTool("hand");
+  await settledScroll(page);
+  const before = await page.evaluate(() => window.WBOApp.chunks.focusedPoint);
+  await page.keyboard.press("ArrowRight");
+  await settledScroll(page);
+  await page.keyboard.press("Control+ArrowDown");
+  await settledScroll(page);
+  const point = await page.evaluate(() => window.WBOApp.chunks.focusedPoint);
+  expect(point).toEqual({
+    x: Math.floor(before.x / 4000) * 4000 + 4000,
+    y: Math.floor(before.y / 3000) * 3000 + 3000,
+  });
+  expect((await camera(page)).centerErrorX).toBeLessThan(2);
+  expect((await camera(page)).centerErrorY).toBeLessThan(2);
+  const scale = (await camera(page)).scale;
+  await page.evaluate(() => {
+    window.WBOApp.viewportState.controller.panBy(300, 300);
+    window.WBOApp.viewportState.controller.setScale(1);
+  });
+  expect((await camera(page)).scale).toBe(scale);
+  await rectangle(page, "outside-focus", 60100, 50100);
+  await expect
+    .poll(() => page.evaluate(() => window.WBOApp.chunks.state.point.x))
+    .toBe(60200);
+  expect(await page.evaluate(() => window.WBOApp.chunks.focusedPoint)).toEqual(
+    point,
+  );
+  await page.setViewportSize({ width: 700, height: 500 });
+  // Resizing the browser can return before its resize event starts the camera.
+  await expect
+    .poll(async () => {
+      const view = await camera(page);
+      return view.centerErrorX < 2 && view.centerErrorY < 2 && view.fits;
+    })
+    .toBe(true);
+  await page.reload();
+  await boardPage.waitForSocketConnected();
+  await expect(page.locator("#chunkViewMode")).toHaveValue("chunk");
+  expect(await page.evaluate(() => window.WBOApp.chunks.focusedPoint)).toEqual(
+    point,
+  );
+});
+
+test("leaving latest-edit focus requires a matching fresh press within two seconds", async ({
+  page,
+  context,
+  server,
+  boardPage,
+}) => {
+  await page.clock.install();
+  await context.addCookies([
+    { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
+  ]);
+  await boardPage.gotoBoard("chunks");
+  await configureChunks(page);
+  await rectangle(page, "latest-point", 12100, 9100);
+  await expect
+    .poll(() => page.evaluate(() => window.WBOApp.chunks.state.point.x))
+    .toBe(12200);
+  await page.locator("#chunkViewMode").selectOption("latest");
+  await boardPage.selectTool("hand");
+  const before = await settledScroll(page);
+  await page.keyboard.press("ArrowRight");
+  expect(await settledScroll(page)).toEqual(before);
+  await expect(page.locator("#boardStatusNotice")).toContainText("2 seconds");
+  await page.clock.fastForward(2100);
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("latest");
+  await page.keyboard.press("ArrowDown");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("latest");
+  await page.keyboard.press("Control+ArrowDown");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("latest");
+  await page.keyboard.press("Control+ArrowDown");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("chunk");
+  await settledScroll(page);
+  expect(await page.evaluate(() => window.WBOApp.chunks.focusedPoint)).toEqual({
+    x: 12000,
+    y: 12000,
+  });
+  await page.locator("#chunkViewMode").selectOption("latest");
+  await boardPage.selectTool("hand");
+  await settledScroll(page);
+  await page.keyboard.down("ArrowRight");
+  await page.keyboard.down("ArrowRight");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("latest");
+  await page.keyboard.up("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("chunk");
+});
+
+test("chunk shortcuts require configuration and leave form and text editing alone", async ({
+  page,
+  context,
+  server,
+  boardPage,
+}) => {
+  await context.addCookies([
+    { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
+  ]);
+  await boardPage.gotoBoard("chunks");
+  expect(
+    await page.evaluate(() => {
+      const event = new KeyboardEvent("keydown", {
+        key: "ArrowRight",
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      document.body.dispatchEvent(event);
+      return event.defaultPrevented;
+    }),
+  ).toBe(false);
+  await configureChunks(page);
+  await page.locator("#chunkSettingsToggle").click();
+  await page.locator("#chunk-width").focus();
+  const before = await settledScroll(page);
+  await page.keyboard.press("Control+ArrowRight");
+  expect(await settledScroll(page)).toEqual(before);
+  await page.keyboard.press("Escape");
+  expect(
+    await page.evaluate(() => {
+      const editor = document.createElement("div");
+      editor.contentEditable = "true";
+      document.body.append(editor);
+      const event = new KeyboardEvent("keydown", {
+        key: "ArrowDown",
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      editor.dispatchEvent(event);
+      editor.remove();
+      return event.defaultPrevented;
+    }),
+  ).toBe(false);
+  await page.keyboard.press("Control+Shift+ArrowRight");
+  expect(await settledScroll(page)).toEqual(before);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(
+    await page.evaluate(() => {
+      const start = scrollX;
+      document.body.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "ArrowRight",
+          ctrlKey: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      return {
+        moving: window.WBOApp.viewportState.controller.isFollowCameraMoving(),
+        delta: scrollX - start,
+        scale: window.WBOApp.viewportState.scale,
+      };
+    }),
+  ).toEqual({ moving: false, delta: 400, scale: 0.1 });
+});
+
+test("chunk navigation pauses personal following and interrupts a held pencil stroke", async ({
+  page,
+  context,
+  server,
+  boardPage,
+}) => {
+  await context.addCookies([
+    { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
+  ]);
+  await boardPage.gotoBoard("chunks");
+  await configureChunks(page);
+  await page.locator("#chunkViewMode").selectOption("latest");
+  await boardPage.selectTool("pencil");
+  await page.mouse.move(500, 300);
+  await page.mouse.down();
+  await expect(
+    page.locator(".wbo-pencil-live-path[d]:not([d=''])"),
+  ).toHaveCount(1);
+  await expect
+    .poll(() => page.evaluate(() => window.WBOApp.replay.authoritativeSeq))
+    .toBe(2);
+  await page.keyboard.press("Control+ArrowRight");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("latest");
+  await page.keyboard.press("Control+ArrowRight");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("chunk");
+  await expect(
+    page.locator(".wbo-pencil-live-path[d]:not([d=''])"),
+  ).toHaveCount(0);
+  await settledScroll(page);
+  await page.mouse.move(520, 310);
+  await page.mouse.up();
+  const response = await page.request.get(`${server.serverUrl}/archive/chunks`);
+  expect(response.ok()).toBe(true);
+  const archive = JSON.parse(gunzipSync(await response.body()).toString());
+  expect(archive.items).toHaveLength(1);
+  expect(archive.items[0]._children).toHaveLength(1);
+  expect(await page.evaluate(() => window.WBOApp.replay.authoritativeSeq)).toBe(
+    2,
+  );
+  // Fresh presses work after movement, including with following already off.
+  await page.mouse.down();
+  await expect(
+    page.locator(".wbo-pencil-live-path[d]:not([d=''])"),
+  ).toHaveCount(1);
+  await page.keyboard.press("Control+ArrowDown");
+  await expect(
+    page.locator(".wbo-pencil-live-path[d]:not([d=''])"),
+  ).toHaveCount(0);
+  await settledScroll(page);
+  await page.mouse.up();
+  await expect(page.locator("#drawingArea path")).toHaveCount(2);
+});
+
+test("saved chunk borders remain highlighted with the grid off, on, or dotted", async ({
+  page,
+  context,
+  server,
+  boardPage,
+  browser,
+}) => {
+  await context.addCookies([
+    { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
+  ]);
+  await boardPage.gotoBoard("chunks");
   await boardPage.waitForToolBooted("grid");
-  await boardPage.tool("grid").click();
+  await expect(page.locator("#gridContainer")).toHaveAttribute("fill", "none");
   await configureChunks(page);
   const border = page.locator("#activityChunkGrid path");
+  await expect(page.locator("#chunkViewMode")).toHaveValue("free");
+  await expect(page.locator("#activityChunkGridContainer")).toBeVisible();
   await expect(border).toHaveAttribute("stroke-width", "8");
+  await expect(border).toHaveAttribute("stroke", "#475569");
   await expect(page.locator("#activityChunkGrid")).toHaveAttribute(
     "width",
     "4000",
@@ -93,12 +428,48 @@ test("the grid button emphasizes configured chunk borders in grid and dot modes"
   await boardPage.tool("grid").click();
   await expect(page.locator("#gridContainer")).toHaveAttribute(
     "fill",
+    "url(#grid)",
+  );
+  await expect(border).toHaveAttribute("stroke-width", "8");
+  await boardPage.tool("grid").click();
+  await expect(page.locator("#gridContainer")).toHaveAttribute(
+    "fill",
     "url(#dots)",
   );
   await expect(border).toHaveAttribute("stroke-width", "8");
   await boardPage.waitForToolBooted("grid");
   await boardPage.tool("grid").click();
-  await expect(border).toHaveAttribute("stroke-width", "1");
+  await expect(page.locator("#gridContainer")).toHaveAttribute("fill", "none");
+  await expect(border).toHaveAttribute("stroke-width", "8");
+
+  // A new browser has no local settings and must recover them from board data.
+  const freshContext = await browser.newContext();
+  try {
+    const freshPage = await freshContext.newPage();
+    await createBoardPage(freshPage, server).gotoBoard("chunks");
+    await expect(freshPage.locator("#chunkViewMode")).toHaveValue("free");
+    await expect(freshPage.locator("#gridContainer")).toHaveAttribute(
+      "fill",
+      "none",
+    );
+    await expect(
+      freshPage.locator("#activityChunkGridContainer"),
+    ).toBeVisible();
+    await expect(freshPage.locator("#activityChunkGrid")).toHaveAttribute(
+      "width",
+      "4000",
+    );
+    await expect(freshPage.locator("#activityChunkGrid")).toHaveAttribute(
+      "height",
+      "3000",
+    );
+    await expect(freshPage.locator("#activityChunkGrid path")).toHaveAttribute(
+      "stroke-width",
+      "8",
+    );
+  } finally {
+    await freshContext.close();
+  }
 });
 
 test("following holds the camera during a pencil stroke in another chunk and then eases to it", async ({
@@ -112,7 +483,7 @@ test("following holds the camera during a pencil stroke in another chunk and the
   ]);
   await boardPage.gotoBoard("chunks");
   await configureChunks(page);
-  await page.locator("#chunkFollowToggle").click();
+  await page.locator("#chunkViewMode").selectOption("latest");
   await expect
     .poll(async () => (await camera(page)).centerErrorX)
     .toBeLessThan(2);
@@ -179,7 +550,7 @@ test("chunk transitions ease through intermediate positions and block pencil inp
   ]);
   await boardPage.gotoBoard("chunks");
   await configureChunks(page);
-  await page.locator("#chunkFollowToggle").click();
+  await page.locator("#chunkViewMode").selectOption("latest");
   await boardPage.selectTool("pencil");
   const samples = await page.evaluate(
     () =>
@@ -280,7 +651,7 @@ test("a peer's camera move finishes the pencil stroke and a held pointer cannot 
   ]);
   await boardPage.gotoBoard("chunks");
   await configureChunks(page);
-  await page.locator("#chunkFollowToggle").click();
+  await page.locator("#chunkViewMode").selectOption("latest");
   await boardPage.selectTool("pencil");
   const peer = await context.newPage();
   try {
@@ -347,7 +718,7 @@ test("a peer's camera move finishes the pencil stroke and a held pointer cannot 
   }
 });
 
-test("moderators configure chunks, lock viewers on activity, and release the camera", async ({
+test("moderators apply view modes once and users can override them", async ({
   page,
   context,
   browser,
@@ -368,83 +739,50 @@ test("moderators configure chunks, lock viewers on activity, and release the cam
     await page.locator("#chunk-width").fill("4000");
     await page.locator("#chunk-height").fill("3000");
     await page.locator("#chunk-margin").fill("300");
-    await page.locator("#chunk-follow").check();
-    await page.locator("#chunk-locked").check();
+    await page.locator("#chunk-view-mode").selectOption("latest");
     await page.locator(".chunk-settings-dialog button[type=submit]").click();
     await expect(page.locator(".chunk-settings-dialog")).toHaveCount(0);
-    await expect(viewer.locator("#chunkFollowToggle")).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    await expect(viewer.locator("#chunkFollowToggle")).toBeDisabled();
-    await expect(page.locator("#chunkFollowToggle")).toBeEnabled();
-    await expect
-      .poll(async () => (await camera(viewer)).centerErrorX)
-      .toBeLessThan(2);
-    await expect
-      .poll(async () => (await camera(viewer)).centerErrorY)
-      .toBeLessThan(2);
-    expect((await camera(viewer)).fits).toBe(true);
+    await expect(viewer.locator("#chunkViewMode")).toHaveValue("latest");
+    await expect(viewer.locator("#chunkViewMode")).toBeEnabled();
+    await expect(page.locator("#chunkViewMode")).toHaveValue("free");
     await rectangle(page, "r1", 12000, 9000);
     await expect
       .poll(() => viewer.evaluate(() => window.WBOApp.chunks.state.point))
       .toEqual({ x: 12100, y: 9100 });
-    await expect
-      .poll(async () => (await camera(viewer)).centerErrorX)
-      .toBeLessThan(2);
-    await expect
-      .poll(async () => (await camera(viewer)).centerErrorY)
-      .toBeLessThan(2);
-    const before = await camera(viewer);
-    await viewer.mouse.move(600, 400);
-    await viewer.mouse.wheel(0, -300);
-    await viewer.evaluate(() => {
-      window.WBOApp.viewportState.controller.panBy(300, 300);
-      window.WBOApp.viewportState.controller.setScale(1);
-      window.scrollTo(0, 0);
-    });
-    await expect
-      .poll(async () => (await camera(viewer)).centerErrorX)
-      .toBeLessThan(2);
-    expect((await camera(viewer)).scale).toBe(before.scale);
-    await viewer.setViewportSize({ width: 700, height: 500 });
-    await expect
-      .poll(async () => (await camera(viewer)).centerErrorY)
-      .toBeLessThan(2);
+    await settledScroll(viewer);
+    expect((await camera(viewer)).centerErrorX).toBeLessThan(2);
     expect((await camera(viewer)).fits).toBe(true);
+    await viewer.keyboard.press("Control+ArrowRight");
+    await expect(viewer.locator("#boardStatusNotice")).toContainText(
+      "2 seconds",
+    );
+    await viewer.keyboard.press("Control+ArrowRight");
+    await expect(viewer.locator("#chunkViewMode")).toHaveValue("chunk");
+    await settledScroll(viewer);
+    const point = await viewer.evaluate(
+      () => window.WBOApp.chunks.focusedPoint,
+    );
+    expect(point).toEqual({ x: 16000, y: 9000 });
     await viewer.reload();
     await viewerBoard.waitForSocketConnected();
-    await expect(viewer.locator("#chunkFollowToggle")).toBeDisabled();
-    await expect
-      .poll(async () => (await camera(viewer)).centerErrorX)
-      .toBeLessThan(2);
+    await expect(viewer.locator("#chunkViewMode")).toHaveValue("chunk");
+    expect(
+      await viewer.evaluate(() => window.WBOApp.chunks.focusedPoint),
+    ).toEqual(point);
+    // A new moderator revision applies once again, without changing their own mode.
     await page.locator("#chunkSettingsToggle").click();
-    await page.locator("#chunk-follow").uncheck();
-    await page.locator("#chunk-locked").uncheck();
+    await page.locator("#chunk-view-mode").selectOption("free");
     await page.locator(".chunk-settings-dialog button[type=submit]").click();
-    await expect(page.locator(".chunk-settings-dialog")).toHaveCount(0);
-    await expect(viewer.locator("#chunkFollowToggle")).toBeEnabled();
-    await expect(viewer.locator("#chunkFollowToggle")).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    );
-    await viewer.locator("#chunkFollowToggle").click();
-    await expect
-      .poll(async () => (await camera(viewer)).centerErrorX)
-      .toBeLessThan(2);
+    await expect(viewer.locator("#chunkViewMode")).toHaveValue("free");
+    await viewer.locator("#chunkViewMode").selectOption("latest");
+    await page.locator("#chunkSettingsToggle").click();
+    await page.locator("#chunk-view-mode").selectOption("chunk");
+    await page.locator(".chunk-settings-dialog button[type=submit]").click();
+    await expect(viewer.locator("#chunkViewMode")).toHaveValue("chunk");
+    await viewer.locator("#chunkViewMode").selectOption("free");
     await viewer.reload();
     await viewerBoard.waitForSocketConnected();
-    await expect(viewer.locator("#chunkFollowToggle")).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    await viewer.locator("#chunkFollowToggle").click();
-    await viewer.evaluate(() =>
-      window.WBOApp.viewportState.controller.panTo(100, 200),
-    );
-    await expect
-      .poll(() => viewer.evaluate(() => ({ x: scrollX, y: scrollY })))
-      .toEqual({ x: 100, y: 200 });
+    await expect(viewer.locator("#chunkViewMode")).toHaveValue("free");
   } finally {
     await viewerContext.close();
   }
@@ -455,8 +793,10 @@ test("personal following ignores cursor movement and rejected edits and keeps dr
   boardPage,
 }) => {
   await boardPage.gotoBoard("personal-chunks", { lang: "zh-CN" });
-  await expect(page.locator("#chunkFollowToggle")).toHaveText("跟随最新编辑");
-  await page.locator("#chunkFollowToggle").click();
+  await expect(page.locator("#chunkViewMode option[value=latest]")).toHaveText(
+    "聚焦最新编辑分块",
+  );
+  await page.locator("#chunkViewMode").selectOption("latest");
   await rectangle(page, "r1", 20100, 14100);
   await expect
     .poll(() => page.evaluate(() => window.WBOApp.chunks.state.point))

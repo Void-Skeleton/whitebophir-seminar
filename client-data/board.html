@@ -49,8 +49,11 @@
 			</div>
 		</div>
 		<div class="chunk-controls">
-			<button id="chunkFollowToggle" type="button" aria-pressed="false">{{translations.chunk_follow_activity}}</button>
-			<span id="chunkFollowLocked" hidden>{{translations.chunk_locked_notice}}</span>
+			<select id="chunkViewMode" aria-label="{{translations.chunk_view_mode}}">
+				<option value="free">{{translations.chunk_view_free}}</option>
+				<option value="chunk">{{translations.chunk_view_chunk}}</option>
+				<option value="latest">{{translations.chunk_view_latest}}</option>
+			</select>
 			<button id="chunkSettingsToggle" type="button" hidden>{{translations.chunk_settings}}</button>
 		</div>
 		<div id="boardStatusIndicator" class="board-status-card board-status-reconnecting" role="status"

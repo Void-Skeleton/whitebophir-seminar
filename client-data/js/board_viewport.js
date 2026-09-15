@@ -108,6 +108,8 @@ const TOUCH_EVENT_NAMES = [
  *   holdFollowCamera(interrupt: () => void): {release(): void},
  *   isFollowCameraMoving(): boolean,
  *   setFollowFrame(frame: (BoardRect & {margin: number}) | null, deferUntilStrokeEnd?: boolean): void,
+ *   panByKeyboard(dx: number, dy: number, width?: number, height?: number): void,
+ *   getViewCenter(): {x: number, y: number},
  *   setScale(scale: number): number,
  *   getScale(): number,
  *   syncLayoutSize(): void,
@@ -440,6 +442,8 @@ export function createViewportController(Tools) {
   let followCamera = null;
   /** @type {number | null} */
   let followAnimationFrame = null;
+  /** @type {{left: number, top: number} | null} */
+  let chunkPanTarget = null;
   /** @type {Set<() => void>} */
   const followHolds = new Set();
   let interruptingFollowStroke = false;
@@ -510,6 +514,7 @@ export function createViewportController(Tools) {
    */
   function panTo(left, top) {
     if ((followFrame || followCamera) && !applyingFollowFrame) return;
+    if (!applyingFollowFrame) stopFollowAnimation();
     window.scrollTo(left, top);
     scheduleViewportHashSync();
   }
@@ -730,6 +735,7 @@ export function createViewportController(Tools) {
   function setScale(scale) {
     if ((followFrame || followCamera) && !applyingFollowFrame)
       return getScale();
+    if (!applyingFollowFrame) stopFollowAnimation();
     const scaleLimits = getScaleLimits(currentScaleLimits());
     const value = finiteOr(scale, scaleLimits.defaultScale);
     const appliedScale = applyingFollowFrame
@@ -1029,18 +1035,63 @@ export function createViewportController(Tools) {
   }
 
   function stopFollowAnimation() {
+    chunkPanTarget = null;
     if (followAnimationFrame === null) return;
     window.cancelAnimationFrame(followAnimationFrame);
     followAnimationFrame = null;
   }
 
   /** @param {{left: number, top: number, scale: number}} camera */
-  function renderFollowCamera(camera) {
+  function renderCamera(camera) {
     applyingFollowFrame = true;
-    followCamera = camera;
+    if (followFrame) followCamera = camera;
     if (getScale() !== camera.scale) setScale(camera.scale);
     panTo(camera.left, camera.top);
     applyingFollowFrame = false;
+  }
+
+  /**
+   * Shared by activity following and manual chunk navigation. Both block Pencil
+   * until the last animation frame and honor reduced-motion preferences.
+   * @param {{left: number, top: number, scale: number}} start
+   * @param {{left: number, top: number, scale: number}} target
+   */
+  function animateCamera(start, target) {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      renderCamera(target);
+      chunkPanTarget = null;
+      return;
+    }
+    const startedAt = performance.now();
+    renderCamera(start);
+    /** @param {number} now */
+    const advance = (now) => {
+      followAnimationFrame = null;
+      const progress = Math.min(
+        1,
+        Math.max(0, (now - startedAt) / FOLLOW_TRANSITION_MS),
+      );
+      const eased = progress * progress * (3 - 2 * progress);
+      renderCamera({
+        left: start.left + (target.left - start.left) * eased,
+        top: start.top + (target.top - start.top) * eased,
+        scale: start.scale + (target.scale - start.scale) * eased,
+      });
+      if (progress < 1)
+        followAnimationFrame = window.requestAnimationFrame(advance);
+      else chunkPanTarget = null;
+    };
+    followAnimationFrame = window.requestAnimationFrame(advance);
+  }
+
+  function interruptStroke() {
+    if (followHolds.size === 0) return;
+    interruptingFollowStroke = true;
+    try {
+      for (const interrupt of [...followHolds]) interrupt();
+    } finally {
+      interruptingFollowStroke = false;
+    }
   }
 
   // A uniform page inset allows negative board-space margins at the origin.
@@ -1049,14 +1100,7 @@ export function createViewportController(Tools) {
   function applyFollowFrame(interruptDrawing = false) {
     const dom = getAttachedDom();
     if (!dom) return;
-    if (interruptDrawing && followHolds.size > 0) {
-      interruptingFollowStroke = true;
-      try {
-        for (const interrupt of [...followHolds]) interrupt();
-      } finally {
-        interruptingFollowStroke = false;
-      }
-    }
+    if (interruptDrawing) interruptStroke();
     if (followHolds.size > 0) {
       followPending = true;
       return;
@@ -1102,11 +1146,8 @@ export function createViewportController(Tools) {
         window.innerHeight / 2,
       scale,
     };
-    if (
-      !wasFollowing ||
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-    ) {
-      renderFollowCamera(target);
+    if (!wasFollowing) {
+      renderCamera(target);
       return;
     }
     const start = {
@@ -1114,29 +1155,69 @@ export function createViewportController(Tools) {
       top: top + followPadding - oldPadding,
       scale: getScale(),
     };
-    const startedAt = performance.now();
-    renderFollowCamera(start);
-    /** @param {number} now */
-    const advance = (now) => {
-      followAnimationFrame = null;
-      const progress = Math.min(
-        1,
-        Math.max(0, (now - startedAt) / FOLLOW_TRANSITION_MS),
-      );
-      const eased = progress * progress * (3 - 2 * progress);
-      renderFollowCamera({
-        left: start.left + (target.left - start.left) * eased,
-        top: start.top + (target.top - start.top) * eased,
-        scale: start.scale + (target.scale - start.scale) * eased,
-      });
-      if (progress < 1)
-        followAnimationFrame = window.requestAnimationFrame(advance);
-    };
-    followAnimationFrame = window.requestAnimationFrame(advance);
+    animateCamera(start, target);
   }
 
   /** @type {ViewportController} */
   const controller = {
+    getViewCenter() {
+      const menu = document.getElementById("menu");
+      const inset =
+        menu && menu.getClientRects().length
+          ? menu.getBoundingClientRect().right + 8
+          : 0;
+      const center = clientRectToBoardRect({
+        left: (inset + window.innerWidth) / 2,
+        top: window.innerHeight / 2,
+        width: 0,
+        height: 0,
+      });
+      return {
+        x: Tools.coordinates.toBoardCoordinate(center.x),
+        y: Tools.coordinates.toBoardCoordinate(center.y),
+      };
+    },
+    panByKeyboard(dx, dy, width, height) {
+      if (followFrame || followCamera || !getAttachedDom()) return;
+      const scale = getScale();
+      const stepX = width === undefined ? 64 : width * scale;
+      const stepY = height === undefined ? 64 : height * scale;
+      const start = {
+        left: document.documentElement.scrollLeft,
+        top: document.documentElement.scrollTop,
+        scale,
+      };
+      // Key repeats advance from the destination, never a partial frame.
+      const previous = chunkPanTarget || start;
+      const target = {
+        left: Math.max(
+          0,
+          Math.min(
+            Math.max(0, currentMaxBoardSize() * scale - window.innerWidth),
+            previous.left + dx * stepX,
+          ),
+        ),
+        top: Math.max(
+          0,
+          Math.min(
+            Math.max(0, currentMaxBoardSize() * scale - window.innerHeight),
+            previous.top + dy * stepY,
+          ),
+        ),
+        scale,
+      };
+      if (target.left === previous.left && target.top === previous.top) return;
+      interruptStroke();
+      stopFollowAnimation();
+      activePan = null;
+      activePinchPan = null;
+      ensureBoardExtentForPoint(
+        (target.left + window.innerWidth) / scale,
+        (target.top + window.innerHeight) / scale,
+      );
+      chunkPanTarget = target;
+      animateCamera(start, target);
+    },
     holdFollowCamera(interrupt) {
       followHolds.add(interrupt);
       if (followAnimationFrame !== null) {

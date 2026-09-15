@@ -1,18 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Seminar modifications, 2026-09-15: shared chunk settings and geometry.
 /** @typedef {{x: number, y: number}} ActivityPoint */
-/** @typedef {{width: number, height: number, margin: number, follow: boolean, locked: boolean}} ChunkSettings */
+/** @typedef {"free" | "chunk" | "latest"} ViewMode */
+/** @typedef {{width: number, height: number, margin: number, viewMode: ViewMode}} ChunkSettings */
 /** @typedef {ChunkSettings & {revision: string, point: ActivityPoint}} ChunkState */
-export const GRID_CHANGE_EVENT = "wbo:grid-change";
 export const DEFAULT_CHUNKS = Object.freeze({
   width: 10000,
   height: 7000,
   margin: 500,
-  follow: false,
-  locked: false,
+  viewMode: /** @type {ViewMode} */ ("free"),
   revision: "",
   point: Object.freeze({ x: 0, y: 0 }),
 });
+
+/** @param {unknown} value @returns {value is ViewMode} */
+export function isViewMode(value) {
+  return value === "free" || value === "chunk" || value === "latest";
+}
 
 /** @param {unknown} value @returns {ChunkSettings | null} */
 export function validateChunkSettings(value) {
@@ -28,14 +32,12 @@ export function validateChunkSettings(value) {
     )
       return null;
   }
-  if (typeof v.follow !== "boolean" || typeof v.locked !== "boolean")
-    return null;
+  if (!isViewMode(v.viewMode)) return null;
   return /** @type {ChunkSettings} */ ({
     width: v.width,
     height: v.height,
     margin: v.margin,
-    follow: v.follow,
-    locked: v.locked,
+    viewMode: v.viewMode,
   });
 }
 

@@ -106,6 +106,10 @@ def validate_archive(data, max_archive_bytes=MAX_ARCHIVE_BYTES, max_json_bytes=M
             or archive["version"] != 1
             or not isinstance(archive.get("items"), list)):
         raise ValueError("Unsupported WBO archive format or version")
+    if "chunks" in archive:
+        validate_chunk_response(archive["chunks"])
+        if set(archive["chunks"]) != {"width", "height", "margin", "viewMode"}:
+            raise ValueError("Invalid archive chunk settings")
     return archive
 
 
@@ -143,7 +147,7 @@ def validate_chunk_response(value):
         number = value.get(key)
         if type(number) is not int or not (0 if key == "margin" else 100) <= number <= 100000:
             raise ValueError("Invalid chunk settings response")
-    if any(type(value.get(key)) is not bool for key in ("follow", "locked")):
+    if value.get("viewMode") not in ("free", "chunk", "latest"):
         raise ValueError("Invalid chunk settings response")
 
 
@@ -165,8 +169,7 @@ def main(argv=None):
             command.add_argument("--width", type=int, help="Chunk width in board units")
             command.add_argument("--height", type=int, help="Chunk height in board units")
             command.add_argument("--margin", type=int, help="Margin in board units")
-            command.add_argument("--follow", choices=("on", "off"))
-            command.add_argument("--locked", choices=("on", "off"))
+            command.add_argument("--view-mode", choices=("free", "chunk", "latest"), help="Apply a view mode to other users; they may change it afterwards")
         else:
             command.add_argument("file", type=Path, help="Path to a .wbo archive")
         command.add_argument("--server", default="http://localhost:8080")
@@ -205,12 +208,13 @@ def main(argv=None):
             with urlopen(Request(url, headers=read_headers), timeout=60) as response:
                 result = json.loads(response.read(4096))
             validate_chunk_response(result)
-            values = {key: getattr(args, key) for key in ("width", "height", "margin", "follow", "locked")}
+            values = {key: getattr(args, key) for key in ("width", "height", "margin")}
+            values["viewMode"] = args.view_mode
             if any(value is not None for value in values.values()):
                 settings = {key: result[key] for key in values}
                 for key, value in values.items():
                     if value is not None:
-                        settings[key] = value == "on" if key in ("follow", "locked") else value
+                        settings[key] = value
                 data = json.dumps(settings).encode()
                 headers.update({"Content-Type": "application/json", "X-WBO-Chunks": "1"})
                 if args.private_key_file:

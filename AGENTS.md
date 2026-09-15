@@ -81,6 +81,11 @@ supported. Its separate bulk admission limit is one attempt per IP every
 Archives are bounded to 1,000,000 generated live mutations. Native `.wbo`
 files are gzip-compressed JSON `{format: "whitebophir-board", version: 1,
 items: [...]}` using string tool IDs and complete item payloads in paint order.
+The optional `chunks: {width,height,margin,viewMode}` field snapshots configured
+board settings alongside items. Import validates it before any mutation, restores
+it with a fresh revision and destination activity point, and emits `chunk_state`
+to connected viewers. Settings-only archives also persist on empty boards.
+Older archives without `chunks` retain the destination's current settings.
 Archive metadata never grants access or replaces destination permissions.
 V2 archive requests carry a one-use signature through `X-WBO-Auth-V2`; imports
 also verify the SHA-512 digest of the exact compressed body before validation
@@ -158,32 +163,45 @@ writes are handled by
 [board_optimistic_module.js](./client-data/js/board_optimistic_module.js), and
 [board_write_module.js](./client-data/js/board_write_module.js).
 
-Canvas chunk settings and personal following are owned by
+Canvas chunk settings, view modes, and arrow shortcuts are owned by
 [board_chunks_module.js](./client-data/js/board_chunks_module.js), loaded with the
 full runtime. Shared validation and chunk geometry live in
 [board_chunks.js](./client-data/js/board_chunks.js). The viewport controller alone
 fits and locks the camera, using a uniform page inset while following so the
 origin can have margins; page-to-board conversion subtracts that inset. The
 chunk grid stays outside drawingArea and is never a persistent board item.
-The Grid tool emits `wbo:grid-change`; the chunks module uses its current fill
-mode to emphasize chunk borders in grid and dot modes. Focus changes ease over
+Configured chunk borders stay prominent regardless of the Grid tool's fill mode
+or the user's view mode. Focus changes ease over
 240 ms, honoring reduced-motion preferences. Pencil holds a viewport lease to
 defer camera movement from its own accepted edits until the stroke ends. Other
 camera changes interrupt and commit the active stroke before moving. Pencil
 ignores input while the follow camera moves and requires a fresh press after an
 interruption; a held pointer must never restart drawing. The chunks module uses
 the accepted frame's authoritative `mutation.socket` to identify the drawer.
+The view modes are `free`, `chunk`, and `latest`. Free-mode arrows move 64 screen
+pixels; Ctrl+Arrow moves one configured chunk without changing zoom. Both arrow
+forms move one chunk in chunk focus. Latest-edit focus shows a status reminder
+on the first press; the same direction and Ctrl modifier pressed again within
+two seconds switches to chunk focus and moves. Auto-repeat does not confirm the
+mode change. Inputs, editable content, dialogs and extra modifiers are excluded.
+The viewport owns keyboard movement, easing, bounds and cancellation; all
+keyboard camera moves interrupt Pencil and block it throughout the transition.
+Chunk focus retains its chosen chunk through edits, resize and reconnect.
 
 Moderator settings use `GET` / `POST /chunks/{board}` in
 [board_chunks.mjs](./server/routes/board_chunks.mjs). POST checks `canBan`, requires
-`X-WBO-Chunks: 1` plus JSON, and accepts only `{width,height,margin,follow,locked}`.
+`X-WBO-Chunks: 1` plus JSON, and accepts only `{width,height,margin,viewMode}`.
 Dimensions are integer board units 100–100000; margin is 0–100000. Bodies are
 bounded to 2 KiB, v2 proofs bind the exact body, and updates are limited to ten per
 board per ten seconds. Changes save under the board session queue before publishing.
-Settings use a server-generated revision; each change resets non-moderators’
-follow choice, and `locked` prevents personal overrides. Moderators are exempt.
-Personal choices are stored per board pathname and revision in localStorage.
-The Python helper exposes `chunks` to read settings or update selected fields.
+Settings use a server-generated revision; each change applies `viewMode` to
+non-moderators once. All users remain free to change modes or double-press out
+of latest-edit focus; moderator locks no longer exist. Moderators retain their
+own mode. Personal mode and focused point are stored per board pathname and
+revision in localStorage, migrating the previous local follow boolean.
+The Python helper exposes `chunks --view-mode free|chunk|latest` and dimension
+options. Stored legacy `follow`/`locked` metadata is migrated by
+`parseStoredChunks`; HTTP updates reject those obsolete fields.
 
 [server/board/chunks.mjs](./server/board/chunks.mjs) derives activity from accepted
 mutations and cached canonical bounds without hydrating pencil payloads or
@@ -191,8 +209,9 @@ reading SVG. Stroke appends use their final point; other edits use the object
 bounds center, batches their last spatial edit, and clear the origin. Configured
 settings and activity persist in root `data-wbo-chunks` JSON, including empty
 boards. Metadata is snapshotted with items during save and has its own dirty
-identity so settings-only updates are written. Archives retain destination
-settings. `test-node/board_chunks.test.js` and `playwright/tests/chunks.spec.ts`
+identity so settings-only updates are written. Native archives include configured
+chunk settings and restore them on upload. `test-node/board_chunks.test.js` and
+`playwright/tests/chunks.spec.ts`
 cover this feature; broadcast throughput is the relevant benchmark.
 
 ### tools and client messages
@@ -334,7 +353,7 @@ WBO uses Socket.IO. Clients connect with query fields such as `board`,
 `baselineSeq`, `token`, `tool`, `color`, `size`, and optional `name`. The server
 immediately emits `boardstate`, then a `broadcast` replay batch from the requested
 `baselineSeq`, followed by
-`chunk_state {width,height,margin,follow,locked,revision,point}`. Settings changes
+`chunk_state {width,height,margin,viewMode,revision,point}`. Settings changes
 also emit `chunk_state`. Accepted live frames optionally include
 `activityPoint: {x,y}`; the client follows it only after processing the frame in
 sequence. Replay uses the final chunk snapshot instead of moving through old edits.

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// Seminar modifications, 2026-09-14: compressed native board backups.
-import { randomBytes } from "node:crypto";
+// Seminar modifications, 2026-09-16: compressed backups with chunk settings.
+import { randomBytes, randomUUID } from "node:crypto";
 import { Readable } from "node:stream";
 import { promisify } from "node:util";
 import { gunzip, gzip } from "node:zlib";
+import { validateChunkSettings } from "../../client-data/js/board_chunks.js";
 import MessageCommon from "../../client-data/js/message_common.js";
 import { MutationType } from "../../client-data/js/mutation_type.js";
 import { TOOL_BY_ID } from "../../client-data/tools/index.js";
@@ -34,6 +35,7 @@ const ITEM_FIELDS = new Set([
 ]);
 
 /** @import { ServerConfig, NormalizedMessageData } from "../../types/server-runtime.d.ts" */
+/** @import { ChunkSettings } from "../../client-data/js/board_chunks.js" */
 /** @typedef {Record<string, any>} ArchiveItem */
 /** @typedef {Pick<ServerConfig, "MAX_ARCHIVE_BYTES" | "MAX_ARCHIVE_JSON_BYTES">} ArchiveLimits */
 
@@ -70,10 +72,16 @@ export async function itemsFromSvg(svg) {
   return items;
 }
 
-/** @param {ArchiveItem[]} items @param {ArchiveLimits} [limits] @returns {Promise<Buffer>} */
-export async function encodeArchive(items, limits = configuration) {
+/** @param {ArchiveItem[]} items @param {ArchiveLimits} [limits] @param {ChunkSettings} [chunks] @returns {Promise<Buffer>} */
+export async function encodeArchive(items, limits = configuration, chunks) {
   const json = Buffer.from(
-    JSON.stringify({ format: ARCHIVE_FORMAT, version: 1, items }),
+    JSON.stringify({
+      format: ARCHIVE_FORMAT,
+      version: 1,
+      items,
+      // Export board settings without the source board's revision or activity.
+      ...(chunks && { chunks: validateChunkSettings(chunks) }),
+    }),
   );
   if (json.length > limits.MAX_ARCHIVE_JSON_BYTES)
     throw new BoundaryError(413, "archive_too_large");
@@ -102,7 +110,7 @@ export async function decodeArchive(data, limits = configuration) {
  * contain complete payloads; live messages use the existing wire protocol.
  * @param {unknown} archive
  * @param {ServerConfig} config
- * @returns {{items: ArchiveItem[], mutations: NormalizedMessageData[]}}
+ * @returns {{items: ArchiveItem[], mutations: NormalizedMessageData[], chunks?: ChunkSettings}}
  */
 export function prepareArchiveImport(archive, config) {
   if (
@@ -113,6 +121,19 @@ export function prepareArchiveImport(archive, config) {
     archive.items.length > config.MAX_ITEM_COUNT
   ) {
     throw badRequest("invalid_archive");
+  }
+  /** @type {ChunkSettings | undefined} */
+  let chunks;
+  if (Object.prototype.hasOwnProperty.call(archive, "chunks")) {
+    const settings = validateChunkSettings(archive.chunks);
+    if (
+      !settings ||
+      Object.keys(archive.chunks).some(
+        (key) => !Object.prototype.hasOwnProperty.call(settings, key),
+      )
+    )
+      throw badRequest("invalid_archive_chunks");
+    chunks = settings;
   }
   const sourceIds = new Set();
   const items = [];
@@ -214,7 +235,7 @@ export function prepareArchiveImport(archive, config) {
     }
     items.push(item);
   }
-  return { items, mutations };
+  return { items, mutations, ...(chunks && { chunks }) };
 }
 
 /**
@@ -246,8 +267,19 @@ export function applyArchiveImport(board, prepared) {
     candidate.paintOrder = board.nextPaintOrder;
     board.upsertItem(candidate);
   }
-  if (candidates.length > 0) board.delaySave();
-  return prepared.mutations.map((mutation) =>
+  const entries = prepared.mutations.map((mutation) =>
     board.recordPersistentMutation(mutation, now),
   );
+  if (prepared.chunks) {
+    board.metadata = {
+      ...board.metadata,
+      chunks: {
+        ...prepared.chunks,
+        revision: randomUUID(),
+        point: board.activityPoint,
+      },
+    };
+  }
+  if (candidates.length > 0 || prepared.chunks) board.delaySave();
+  return entries;
 }

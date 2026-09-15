@@ -5,6 +5,7 @@ import { gunzipSync } from "node:zlib";
 import { createBoardPage, expect, test } from "../fixtures/test";
 
 const moderatorSecret = "0123456789abcdef0123456789abcdef";
+const chunks = { width: 4000, height: 3000, margin: 800, viewMode: "free" };
 
 test.use({
   serverOptions: {
@@ -74,6 +75,13 @@ test("board moderators can save and restore editable backups from the Download b
   await expect
     .poll(() => page.evaluate(() => window.WBOApp.access.canBan))
     .toBe(true);
+  await page.locator("#chunkSettingsToggle").click();
+  await page.locator("#chunk-width").fill(String(chunks.width));
+  await page.locator("#chunk-height").fill(String(chunks.height));
+  await page.locator("#chunk-margin").fill(String(chunks.margin));
+  await page.locator("#chunk-view-mode").selectOption(chunks.viewMode);
+  await page.locator(".chunk-settings-dialog button[type=submit]").click();
+  await expect(page.locator(".chunk-settings-dialog")).toHaveCount(0);
   const originalTransform = await page
     .locator("#drawingArea path")
     .getAttribute("transform");
@@ -89,6 +97,7 @@ test("board moderators can save and restore editable backups from the Download b
   if (!file) throw new Error("Missing downloaded archive");
   const archive = JSON.parse(gunzipSync(await readFile(file)).toString("utf8"));
   expect(archive.items).toHaveLength(3);
+  expect(archive.chunks).toEqual(chunks);
 
   await server.writeBoard(server.dataPath, "archive-target", {
     existing: {
@@ -128,12 +137,31 @@ test("board moderators can save and restore editable backups from the Download b
       originalTransform,
     );
     await expect(viewer.locator("#existing")).toBeAttached();
+    await expect
+      .poll(() => viewer.evaluate(() => window.WBOApp.chunks.state))
+      .toMatchObject(chunks);
+    await expect(viewer.locator("#activityChunkGrid")).toHaveAttribute(
+      "width",
+      "4000",
+    );
+    await expect(viewer.locator("#activityChunkGrid path")).toHaveAttribute(
+      "stroke-width",
+      "8",
+    );
+    await expect(viewer.locator("#gridContainer")).toHaveAttribute(
+      "fill",
+      "none",
+    );
   }
   expect(await page.locator("#drawingArea rect").getAttribute("id")).not.toBe(
     "r1",
   );
   await boardPage.gotoBoard("archive-target", { lang: "en" });
   await expect(page.locator("#drawingArea > *")).toHaveCount(4);
+  await expect
+    .poll(() => page.evaluate(() => window.WBOApp.chunks.state))
+    .toMatchObject(chunks);
+  await expect(page.locator("#activityChunkGridContainer")).toBeVisible();
   await expect(peer.locator("#drawingArea rect")).toHaveAttribute(
     "opacity",
     "0.4",

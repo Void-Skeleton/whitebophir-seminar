@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// Seminar modifications, 2026-09-15: native archive HTTP API and moderator imports.
+// Seminar modifications, 2026-09-16: native archive API with chunk settings.
 import MessageCommon from "../../client-data/js/message_common.js";
 import { createHash } from "node:crypto";
 import { authenticateHttpV2 } from "../auth/user_key_v2.mjs";
@@ -22,6 +22,7 @@ import {
   getBoard,
   getActiveSocket,
   emitArchiveMutations,
+  emitChunkState,
 } from "../socket/index.mjs";
 import { resolveRequestClientIpSafe } from "../socket/policy.mjs";
 import { getSocketUserSecret } from "../socket/request.mjs";
@@ -127,7 +128,7 @@ async function handleArchive(ctx) {
   const board = await getBoard(boardName, ctx.runtime.config);
   const session = getBoardSession(board);
   if (method === "GET") {
-    const svg = await session.runExclusive(async () => {
+    const snapshot = await session.runExclusive(async () => {
       const saved = await board.save();
       if (
         saved.status === "failed" ||
@@ -136,13 +137,17 @@ async function handleArchive(ctx) {
       ) {
         throw new BoundaryError(503, "archive_save_failed");
       }
-      return readServedBaseline(boardName, {
-        historyDir: ctx.runtime.config.HISTORY_DIR,
-      });
+      return {
+        svg: await readServedBaseline(boardName, {
+          historyDir: ctx.runtime.config.HISTORY_DIR,
+        }),
+        chunks: board.metadata.chunks,
+      };
     });
     const data = await encodeArchive(
-      await itemsFromSvg(svg),
+      await itemsFromSvg(snapshot.svg),
       ctx.runtime.config,
+      snapshot.chunks,
     );
     ctx.response.writeHead(200, {
       "Content-Type": "application/gzip",
@@ -171,6 +176,7 @@ async function handleArchive(ctx) {
     checkAccess();
     const entries = applyArchiveImport(board, prepared);
     emitArchiveMutations(board, entries);
+    if (prepared.chunks) emitChunkState(board);
     return board.getSeq();
   });
   ctx.response.writeHead(200, { "Content-Type": "application/json" });

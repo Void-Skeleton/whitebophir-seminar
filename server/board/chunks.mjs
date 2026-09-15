@@ -23,6 +23,16 @@ export function parseStoredChunks(raw) {
   } catch {
     throw new Error("Invalid stored chunk settings");
   }
+  // Read boards saved before view modes replaced follow/locked. Locks no longer
+  // affect the camera; the old follow choice becomes a freely changeable mode.
+  if (
+    value &&
+    value.viewMode === undefined &&
+    typeof value.follow === "boolean" &&
+    typeof value.locked === "boolean"
+  ) {
+    value = { ...value, viewMode: value.follow ? "latest" : "free" };
+  }
   const state = validateChunkState(value);
   if (!state) throw new Error("Invalid stored chunk settings");
   return state;

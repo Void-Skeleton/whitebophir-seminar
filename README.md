@@ -5,7 +5,7 @@ The board is updated in real time for all connected users, and its state is alwa
 
 A demonstration server is available at [wbo.ophir.dev](https://wbo.ophir.dev)
 
-## Seminar fork modifications — 2026-09-15
+## Seminar fork modifications — 2026-09-16
 
 This modified version adds compressed native whiteboard export/import, a Python
 command-line helper, Ed25519 moderator authentication, per-board display
@@ -81,9 +81,21 @@ work over HTTP and HTTPS and are translated in every supported language.
 
 ### Canvas chunks and following activity
 
-Use **Follow activity** beside the Users control to center and fit the most
-recently edited chunk. Following holds the camera in place: turn it off to pan
-or zoom freely. The choice is remembered in local storage for this board and
+Choose a view mode beside the Users control:
+
+| Mode | Arrow keys | Ctrl+Arrow keys |
+| --- | --- | --- |
+| **Free** | Move 64 screen pixels | Move one configured chunk, preserving zoom |
+| **Focused on chunk** | Move one chunk | Move one chunk |
+| **Focused on last edited chunk** | Show a navigation reminder | Show a navigation reminder |
+
+Free mode allows normal panning and zooming. Both focused modes center and fit
+an entire chunk with its configured margin. Chunk focus stays on the selected
+chunk when other content changes; latest-edit focus follows accepted edits.
+In latest-edit focus, press the same arrow shortcut again within two seconds to
+switch to chunk focus and move one chunk. The direction and Ctrl modifier must
+match; holding a key does not confirm the change. Shortcuts leave forms and text
+editing alone. View mode and selected chunk are remembered for this board and
 browser. Cursor movement and rejected edits do not move the camera.
 
 Chunk changes ease into position. When your pencil stroke reaches another
@@ -95,26 +107,29 @@ the camera stops. Reduced-motion preferences disable the animation.
 Board moderators can open **Chunk settings** to set width, height, and the
 margin around each chunk, in unscaled board units. Width and height accept
 100–100,000; the margin accepts 0–100,000. Defaults are 10,000 × 7,000 with a
-500-unit margin. Chunk boundaries start at (0, 0); a light grid shows them once
-configured or while following. The Grid button emphasizes these borders with
-thicker, dark gray lines in both grid and dot modes. The camera fits the whole
+500-unit margin. Chunk boundaries start at (0, 0) and appear as thick, dark gray
+lines once configured or using a focused mode. Configured boundaries remain
+visible in every view mode, including when Grid is off. The camera fits the whole
 chunk plus the margin and leaves the tool rail clear, including on resize and
 near the canvas origin.
 
-**Follow for other users** switches following on or off for other users.
-**Lock other users’ choice** prevents them from changing that choice until a
-moderator unlocks it. This applies to ordinary viewers and editors; moderators
-can always control their own camera. Each saved moderator change resets other
-users to the chosen follow setting, even when unlocked. New and returning users
-receive the current settings; personal choices survive reconnects unless a new
-moderator revision overrides them. Temporary moderators can manage these
-settings while their grant is active.
+**View mode for other users** applies the selected mode to ordinary viewers and
+editors once when a moderator saves settings. Everyone remains free to change
+their mode immediately, including through the double-press override. Moderator
+locking has been removed. Other moderators keep their own view mode. New users
+start with the current board setting; personal choices survive reconnects unless
+a new moderator revision applies another setting. Temporary moderators can
+manage these settings while their grant is active. Previously saved follow/lock
+settings migrate to the corresponding freely changeable view mode.
 
 Activity uses the last accepted stroke point, or the center of the modified
 object's bounding box for shapes, text, transforms, copies, and erases. A batch
 uses its last spatial edit; clearing returns to the first chunk. Configured settings and
 the latest activity position are stored in the board SVG, including for empty
-boards. Native backup import preserves the destination's presentation settings.
+boards. Native `.wbo` backups also save chunk dimensions, margin, and the board's
+default view mode. Uploading a backup restores these settings and updates
+connected viewers. Older backups without chunk settings retain the destination's
+current settings.
 
 The Python helper reads settings with no options, or updates selected fields:
 
@@ -122,12 +137,14 @@ The Python helper reads settings with no options, or updates selected fields:
 python3 scripts/seminar_helper.py chunks --server http://localhost:8080 --board seminar
 python3 scripts/seminar_helper.py chunks --server http://localhost:8080 \
   --board seminar --private-key-file moderator.json \
-  --width 10000 --height 7000 --margin 500 --follow on --locked on
+  --width 10000 --height 7000 --margin 500 --view-mode latest
 ```
 
 The API is `GET` / `POST /chunks/{board}`. POST requires moderator permission,
-`Content-Type: application/json`, `X-WBO-Chunks: 1`, and all five settings:
-`{"width":10000,"height":7000,"margin":500,"follow":true,"locked":true}`.
+`Content-Type: application/json`, `X-WBO-Chunks: 1`, and all four settings:
+`{"width":10000,"height":7000,"margin":500,"viewMode":"latest"}`.
+`viewMode` accepts `free`, `chunk`, or `latest`; the helper's `--view-mode`
+replaces its previous `--follow` and `--locked` options.
 The server assigns a revision and activity position; clients cannot supply them.
 Requests are limited to 2 KiB and ten updates per board per ten seconds.
 Existing JWT, v1, and v2 authentication work over HTTP and HTTPS; v2 signatures
@@ -265,8 +282,16 @@ JSON `{ "imported": <object count>, "seq": <latest sequence> }`; errors are JSON
 `{ "error": "<reason>" }`. The archive envelope is:
 
 ```json
-{ "format": "whitebophir-board", "version": 1, "items": [] }
+{
+  "format": "whitebophir-board",
+  "version": 1,
+  "items": [],
+  "chunks": { "width": 4000, "height": 3000, "margin": 800, "viewMode": "free" }
+}
 ```
+
+`chunks` is optional and appears only when the board has configured chunk settings.
+It excludes personal camera choices, source activity, and permissions.
 
 The archive, HTTP, and Python round-trip tests run in `npm run test-node` (Python
 3.10+ and `scripts/requirements-seminar.txt` are therefore required for the full

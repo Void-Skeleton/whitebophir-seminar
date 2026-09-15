@@ -24,8 +24,6 @@
  * @licend
  */
 
-import { GRID_CHANGE_EVENT } from "../../js/board_chunks.js";
-
 /** @import { ToolBootContext, ToolRuntimeModules } from "../../../types/app-runtime" */
 const GRID_STATES = /** @type {const} */ (["none", "url(#grid)", "url(#dots)"]);
 /** @typedef {(typeof GRID_STATES)[number]} GridFill */
@@ -152,7 +150,6 @@ export function onstart(state) {
     "fill",
     state.states[state.index] || "none",
   );
-  state.board.svg.dispatchEvent(new Event(GRID_CHANGE_EVENT));
 }
 
 export function draw() {}

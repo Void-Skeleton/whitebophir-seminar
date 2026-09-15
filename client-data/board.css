@@ -1540,6 +1540,7 @@ text {
   pointer-events: auto;
 }
 .chunk-controls button,
+.chunk-controls select,
 .chunk-settings-dialog button {
   font: inherit;
   border: 1px solid #d9dde3;
@@ -1549,15 +1550,13 @@ text {
   color: #242932;
   cursor: pointer;
 }
-.chunk-controls button[aria-pressed="true"] {
-  background: #ccdfdf;
-  border-color: #abc6c6;
+.chunk-controls select {
+  min-width: 0;
+  max-width: 100%;
 }
-.chunk-controls button:disabled {
+.chunk-controls button:disabled,
+.chunk-controls select:disabled {
   cursor: default;
-}
-.chunk-controls span {
-  color: #606873;
 }
 .chunk-settings-dialog {
   width: min(360px, calc(100vw - 32px));
@@ -1588,6 +1587,16 @@ text {
   font: inherit;
   border: 1px solid #b8c0cc;
   border-radius: 2px;
+}
+.chunk-settings-dialog select {
+  min-width: 0;
+  max-width: 60%;
+  font: inherit;
+  padding: 4px;
+  border: 1px solid #d9dde3;
+  border-radius: 2px;
+  background: #fff;
+  color: #242932;
 }
 .chunk-settings-dialog button {
   margin-inline-end: 6px;

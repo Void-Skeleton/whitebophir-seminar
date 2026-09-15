@@ -41,12 +41,12 @@ const {
 const { MutationType: M } = require("../client-data/js/mutation_type.js");
 const run = promisify(execFile);
 const secret = "12".repeat(16);
+/** @type {import("../client-data/js/board_chunks.js").ChunkSettings} */
 const settings = {
   width: 4000,
   height: 3000,
   margin: 300,
-  follow: true,
-  locked: true,
+  viewMode: "latest",
 };
 
 test("chunk settings reject malformed inputs and use fixed board-space boundaries", () => {
@@ -68,11 +68,25 @@ test("chunk settings reject malformed inputs and use fixed board-space boundarie
     { ...settings, width: 99 },
     { ...settings, height: 100001 },
     { ...settings, margin: 1.5 },
-    { ...settings, locked: 1 },
-    { ...settings, follow: "false" },
+    { ...settings, viewMode: true },
+    { ...settings, viewMode: "locked" },
   ])
     assert.equal(validateChunkSettings(value), null);
   assert.equal(parseStoredChunks(undefined), undefined);
+  assert.deepEqual(
+    parseStoredChunks(
+      JSON.stringify({
+        width: 4000,
+        height: 3000,
+        margin: 300,
+        follow: true,
+        locked: true,
+        revision: "legacy",
+        point: { x: 0, y: 0 },
+      }),
+    ),
+    { ...settings, revision: "legacy", point: { x: 0, y: 0 } },
+  );
   assert.throws(() => parseStoredChunks("{broken"));
   assert.throws(() =>
     parseStoredChunks(
@@ -225,6 +239,8 @@ test("HTTP settings require moderator permission, survive an empty-board save, a
     { ...settings, point: { x: 9000, y: 9000 } },
     { ...settings, revision: "spoof" },
     { ...settings, toString: 1 },
+    { ...settings, locked: true },
+    { ...settings, follow: true },
   ])
     assert.equal((await post(input)).status, 400);
   assert.equal(
@@ -245,7 +261,7 @@ test("HTTP settings require moderator permission, survive an empty-board save, a
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("cache-control"), "no-store");
   const state = await response.json();
-  assert.equal(state.follow, true);
+  assert.equal(state.viewMode, "latest");
   assert.ok(state.revision);
   const loaded = await BoardData.load("seminar", config);
   assert.deepEqual(chunkState(loaded), state);
@@ -271,13 +287,14 @@ test("HTTP settings require moderator permission, survive an empty-board save, a
     "5000",
     "--margin",
     "200",
-    "--follow",
-    "on",
-    "--locked",
-    "on",
+    "--view-mode",
+    "chunk",
   ]);
   assert.equal(JSON.parse(cli.stdout).width, 6000);
-  assert.equal((await getBoard("cli", config)).metadata.chunks?.locked, true);
+  assert.equal(
+    (await getBoard("cli", config)).metadata.chunks?.viewMode,
+    "chunk",
+  );
   const body = JSON.stringify(settings);
   const challenge = await fetch(`${url}/auth/v2/challenge`, {
     method: "POST",
@@ -319,12 +336,10 @@ test("HTTP settings require moderator permission, survive an empty-board save, a
     "key",
     "--private-key-file",
     keyFile,
-    "--follow",
-    "on",
-    "--locked",
-    "on",
+    "--view-mode",
+    "latest",
   ]);
-  assert.equal(JSON.parse(signedCli.stdout).locked, true);
+  assert.equal(JSON.parse(signedCli.stdout).viewMode, "latest");
 });
 
 test("new sockets receive current chunk state; accepted broadcasts carry activity, cursors do not", async () => {

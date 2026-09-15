@@ -33,6 +33,8 @@ const { createServerApp } = require("../server/server.mjs");
 const { getBoard } = require("../server/socket/index.mjs");
 const runFile = promisify(execFile);
 const moderatorSecret = "0123456789abcdef0123456789abcdef";
+/** @type {import("../client-data/js/board_chunks.js").ChunkSettings} */
+const chunks = { width: 4000, height: 3000, margin: 800, viewMode: "latest" };
 
 /** @type {any[]} */
 const items = [
@@ -166,6 +168,69 @@ test("archive validation rejects malformed containers and oversized decompressio
   }
 });
 
+test("archives restore chunk settings, omit source activity and preserve settings in older backups", async (t) => {
+  const config = createConfig();
+  const board = new BoardData("archive-chunks", config);
+  t.after(() => board.dispose());
+  board.metadata = {
+    readonly: true,
+    chunks: {
+      ...chunks,
+      width: 2000,
+      revision: "destination",
+      point: { x: 0, y: 0 },
+    },
+  };
+  const sourceChunks = {
+    ...chunks,
+    revision: "source",
+    point: { x: 9999, y: 9999 },
+  };
+  const decoded = await decodeArchive(
+    await encodeArchive([], config, sourceChunks),
+  );
+  assert.deepEqual(decoded, { ...archive([]), chunks });
+  applyArchiveImport(board, prepareArchiveImport(decoded, config));
+  const restored = board.metadata.chunks;
+  assert.ok(restored);
+  assert.deepEqual(restored, {
+    ...chunks,
+    revision: restored.revision,
+    point: board.activityPoint,
+  });
+  assert.ok(restored.revision);
+  assert.notEqual(restored.revision, "destination");
+  assert.notEqual(restored.revision, "source");
+  assert.equal(board.metadata.readonly, true);
+  applyArchiveImport(board, prepareArchiveImport(archive(), config));
+  assert.deepEqual(board.metadata.chunks, {
+    ...restored,
+    point: board.activityPoint,
+  });
+});
+
+test("archive validation rejects invalid chunk settings before importing objects", () => {
+  for (const value of [
+    null,
+    [],
+    {},
+    { ...chunks, width: 99 },
+    { ...chunks, height: 100001 },
+    { ...chunks, margin: -1 },
+    { ...chunks, margin: 0.5 },
+    { ...chunks, width: "4000" },
+    { ...chunks, viewMode: "locked" },
+    { ...chunks, revision: "spoofed" },
+    { ...chunks, readonly: false },
+  ]) {
+    assert.throws(
+      () =>
+        prepareArchiveImport({ ...archive(), chunks: value }, createConfig()),
+      { reason: "invalid_archive_chunks" },
+    );
+  }
+});
+
 test("archive items cannot inject tools, duplicate IDs, SVG or invalid geometry", () => {
   const rect = items[0];
   const invalid = [
@@ -241,7 +306,7 @@ test("HTTP imports append atomically, save immediately on export and survive rel
   applyArchiveImport(board, seed);
   const response = await upload(
     `${url}/archive/destination`,
-    await encodeArchive(items),
+    await encodeArchive(items, config, chunks),
   );
   assert.equal(response.status, 200);
   assert.equal((await response.json()).imported, 5);
@@ -251,6 +316,7 @@ test("HTTP imports append atomically, save immediately on export and survive rel
   const exported = /** @type {any} */ (
     await decodeArchive(Buffer.from(await download.arrayBuffer()))
   );
+  assert.deepEqual(exported.chunks, chunks);
   assert.deepEqual(
     withoutIds(exported.items),
     withoutIds([items[0], ...items]),
@@ -262,6 +328,7 @@ test("HTTP imports append atomically, save immediately on export and survive rel
   const reloaded = await BoardData.load("destination", config);
   assert.equal(reloaded.authoritativeItemCount(), 6);
   assert.equal(reloaded.getSeq(), board.getSeq());
+  assert.deepEqual(reloaded.metadata.chunks, board.metadata.chunks);
   reloaded.dispose();
   const repeat = await upload(
     `${url}/archive/destination`,
@@ -270,21 +337,49 @@ test("HTTP imports append atomically, save immediately on export and survive rel
   assert.equal(repeat.status, 429);
 });
 
+test("settings-only archives persist even on empty boards", async (t) => {
+  const { config, url } = await start(t, {}, ["empty-chunks"]);
+  const response = await upload(
+    `${url}/archive/empty-chunks`,
+    await encodeArchive([], config, chunks),
+  );
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { imported: 0, seq: 0 });
+  const downloaded = await fetch(`${url}/archive/empty-chunks`);
+  assert.equal(downloaded.status, 200);
+  assert.deepEqual(
+    await decodeArchive(Buffer.from(await downloaded.arrayBuffer())),
+    { ...archive([]), chunks },
+  );
+  const reloaded = await BoardData.load("empty-chunks", config);
+  t.after(() => reloaded.dispose());
+  assert.equal(reloaded.authoritativeItemCount(), 0);
+  assert.deepEqual(
+    reloaded.metadata.chunks,
+    (await getBoard("empty-chunks", config)).metadata.chunks,
+  );
+});
+
 test("invalid imported geometry leaves existing content and sequence untouched", async (t) => {
   const { config, url } = await start(t, {}, ["invalid"]);
   const board = await getBoard("invalid", config);
-  const data = await encodeArchive([
-    items[0],
-    {
-      ...items[0],
-      id: "r2",
-      transform: { a: 1, b: 0, c: 0, d: 1, e: 10000000, f: 0 },
-    },
-  ]);
+  const data = await encodeArchive(
+    [
+      items[0],
+      {
+        ...items[0],
+        id: "r2",
+        transform: { a: 1, b: 0, c: 0, d: 1, e: 10000000, f: 0 },
+      },
+    ],
+    config,
+    chunks,
+  );
   const response = await upload(`${url}/archive/invalid`, data);
   assert.equal(response.status, 400);
   assert.equal(board.authoritativeItemCount(), 0);
   assert.equal(board.getSeq(), 0);
+  assert.equal(board.metadata.chunks, undefined);
 });
 
 test("imports reject read-only boards, cross-origin form bodies and unsupported methods", async (t) => {
@@ -342,18 +437,20 @@ test("temporary moderators can import until their grant is revoked", async (t) =
   assert.equal(board.getSeq(), seq);
 });
 
-test("archive capacity checks preserve existing objects", async (t) => {
+test("archive capacity checks preserve existing objects and chunk settings", async (t) => {
   const { config, url } = await start(t, { MAX_ITEM_COUNT: 1 }, ["full"]);
   const board = await getBoard("full", config);
-  const seed = prepareArchiveImport(archive([items[0]]), config);
+  const seed = prepareArchiveImport({ ...archive([items[0]]), chunks }, config);
   applyArchiveImport(board, seed);
+  const originalChunks = board.metadata.chunks;
   const response = await upload(
     `${url}/archive/full`,
-    await encodeArchive([items[1]]),
+    await encodeArchive([items[1]], config, { ...chunks, width: 2000 }),
   );
   assert.equal(response.status, 409);
   assert.equal(board.authoritativeItemCount(), 1);
   assert.ok(board.itemsById.has(seed.items[0]?.id || ""));
+  assert.equal(board.metadata.chunks, originalChunks);
 });
 
 test("archive routes enforce board JWT scope and deny editor imports", async (t) => {
@@ -432,7 +529,7 @@ test("archive configuration and modified-source links reach the browser", async 
 test("Python helper exports and imports the same native archive", async (t) => {
   const { config, directory, url } = await start(t, {}, ["cli-target"]);
   const board = await getBoard("cli-source", config);
-  const seed = prepareArchiveImport(archive(), config);
+  const seed = prepareArchiveImport({ ...archive(), chunks }, config);
   applyArchiveImport(board, seed);
   const file = path.join(directory, "backup.wbo");
   const helper = path.resolve(__dirname, "../scripts/seminar_helper.py");
@@ -460,6 +557,13 @@ test("Python helper exports and imports the same native archive", async (t) => {
     (await getBoard("cli-target", config)).authoritativeItemCount(),
     5,
   );
+  const targetChunks = (await getBoard("cli-target", config)).metadata.chunks;
+  assert.ok(targetChunks);
+  assert.deepEqual(targetChunks, {
+    ...chunks,
+    revision: targetChunks.revision,
+    point: board.activityPoint,
+  });
   await assert.rejects(
     runFile("python3", [
       helper,

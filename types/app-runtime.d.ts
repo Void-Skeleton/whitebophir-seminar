@@ -648,6 +648,8 @@ export type ToolModule<T = unknown> = {
 };
 
 export type ViewportController = {
+  panByKeyboard(dx: number, dy: number, width?: number, height?: number): void;
+  getViewCenter(): { x: number; y: number };
   holdFollowCamera(interrupt: () => void): { release(): void };
   isFollowCameraMoving(): boolean;
   setFollowFrame(

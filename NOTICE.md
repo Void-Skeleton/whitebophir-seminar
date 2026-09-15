@@ -65,3 +65,16 @@ Pencil input is blocked during camera transitions to prevent stray segments and
 repeated chunk switching.
 Chunk border emphasis is further increased with double the highlighted stroke
 width and a darker gray for stronger contrast against the regular grid.
+
+Further changes dated 2026-09-15 add Free, Focused on chunk, and Focused on last
+edited chunk view modes, smooth arrow-key navigation, and a timed double-press
+override. Moderator locking is removed; moderators can apply a mode to other
+users once, after which each user can freely change it. The settings API,
+stored-metadata migration, Python helper, all supported translations and tests
+are updated for these modes.
+
+Changes dated 2026-09-16 include chunk settings in native board backups and
+restore them on upload, including on empty boards. Archive validation, the HTTP
+snapshot and import paths, the Python helper, localized import descriptions,
+and regression tests are updated. Configured chunk boundaries now remain
+prominent independently of the Grid button in every view mode.
