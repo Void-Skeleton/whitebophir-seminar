@@ -115,7 +115,8 @@
     "archive_import_failed": "تعذّر الاستيراد. تحقّق من الملف وصلاحية التعديل، ثم انتظر 10 ثوانٍ قبل المحاولة مجددًا.",
     "archive_import_success": "تم استيراد النسخة الاحتياطية.",
     "archive_export_failed": "تعذّر التصدير. يُرجى المحاولة مجددًا.",
-    "source_code": "الشيفرة المصدرية"
+    "source_code": "الشيفرة المصدرية",
+    "auth_v2_failed": "فشلت المصادقة بالمفتاح. تحقق من مفتاحك الخاص المحلي وإعدادات مشرفي اللوحة، ثم أعد تحميل الصفحة."
   },
   "be": {
     "white-out": "Замазка",
@@ -233,7 +234,8 @@
     "archive_import_failed": "Не ўдалося імпартаваць. Праверце файл і правы на рэдагаванне, затым пачакайце 10 секунд і паспрабуйце яшчэ раз.",
     "archive_import_success": "Рэзервовая копія імпартаваная.",
     "archive_export_failed": "Не ўдалося экспартаваць. Паспрабуйце яшчэ раз.",
-    "source_code": "Зыходны код"
+    "source_code": "Зыходны код",
+    "auth_v2_failed": "Не ўдалося выканаць аўтэнтыфікацыю ключом. Праверце лакальны прыватны ключ і налады мадэратараў дошкі, затым перазагрузіце старонку."
   },
   "ca": {
     "white-out": "Corrector blanc",
@@ -351,7 +353,8 @@
     "archive_import_failed": "La importació ha fallat. Comprova el fitxer i els permisos d’edició i espera 10 segons abans de tornar-ho a provar.",
     "archive_import_success": "S’ha importat la còpia de seguretat.",
     "archive_export_failed": "L’exportació ha fallat. Torna-ho a provar.",
-    "source_code": "Codi font"
+    "source_code": "Codi font",
+    "auth_v2_failed": "Ha fallat l’autenticació amb clau. Comproveu la clau privada local i la configuració dels moderadors de la pissarra i torneu a carregar la pàgina."
   },
   "de": {
     "board_name_placeholder": "Name des Whiteboards…",
@@ -469,7 +472,8 @@
     "archive_import_failed": "Import fehlgeschlagen. Prüfe die Datei und deine Bearbeitungsrechte. Warte dann 10 Sekunden und versuche es erneut.",
     "archive_import_success": "Sicherung importiert.",
     "archive_export_failed": "Export fehlgeschlagen. Bitte versuche es erneut.",
-    "source_code": "Quellcode"
+    "source_code": "Quellcode",
+    "auth_v2_failed": "Die Schlüsselauthentifizierung ist fehlgeschlagen. Prüfe deinen lokal gespeicherten privaten Schlüssel und die Moderatoreinstellungen des Boards und lade die Seite neu."
   },
   "en": {
     "white-out": "White-out",
@@ -587,7 +591,8 @@
     "archive_import_failed": "Import failed. Check the file and your editing access, then wait 10 seconds before retrying.",
     "archive_import_success": "Backup imported.",
     "archive_export_failed": "Export failed. Please try again.",
-    "source_code": "Source code"
+    "source_code": "Source code",
+    "auth_v2_failed": "Key authentication failed. Check your local private key and the board’s moderator settings, then reload."
   },
   "es": {
     "board_name_placeholder": "Nombre de la pizarra …",
@@ -705,7 +710,8 @@
     "archive_import_failed": "Error al importar. Comprueba el archivo y tus permisos de edición y espera 10 segundos antes de volver a intentarlo.",
     "archive_import_success": "Copia de seguridad importada.",
     "archive_export_failed": "Error al exportar. Vuelve a intentarlo.",
-    "source_code": "Código fuente"
+    "source_code": "Código fuente",
+    "auth_v2_failed": "La autenticación con clave ha fallado. Comprueba tu clave privada local y la configuración de moderadores de la pizarra y vuelve a cargar la página."
   },
   "fr": {
     "board_name_placeholder": "Nom du tableau…",
@@ -822,7 +828,8 @@
     "archive_import_failed": "Échec de l’import. Vérifiez le fichier et vos droits de modification, puis attendez 10 secondes avant de réessayer.",
     "archive_import_success": "Sauvegarde importée.",
     "archive_export_failed": "Échec de l’export. Veuillez réessayer.",
-    "source_code": "Code source"
+    "source_code": "Code source",
+    "auth_v2_failed": "L’authentification par clé a échoué. Vérifiez votre clé privée locale et les paramètres des modérateurs du tableau, puis rechargez la page."
   },
   "hu": {
     "white-out": "Lefedő",
@@ -940,7 +947,8 @@
     "archive_import_failed": "Az importálás sikertelen. Ellenőrizd a fájlt és a szerkesztési jogosultságodat, majd várj 10 másodpercet, és próbáld újra.",
     "archive_import_success": "A biztonsági másolat importálva.",
     "archive_export_failed": "Az exportálás sikertelen. Próbáld újra.",
-    "source_code": "Forráskód"
+    "source_code": "Forráskód",
+    "auth_v2_failed": "A kulcsalapú hitelesítés sikertelen. Ellenőrizd a helyben tárolt privát kulcsodat és a tábla moderátorbeállításait, majd töltsd újra az oldalt."
   },
   "id": {
     "white-out": "Cairan koreksi",
@@ -1058,7 +1066,8 @@
     "archive_import_failed": "Impor gagal. Periksa file dan izin edit Anda, lalu tunggu 10 detik sebelum mencoba lagi.",
     "archive_import_success": "Cadangan berhasil diimpor.",
     "archive_export_failed": "Ekspor gagal. Silakan coba lagi.",
-    "source_code": "Kode sumber"
+    "source_code": "Kode sumber",
+    "auth_v2_failed": "Autentikasi kunci gagal. Periksa kunci privat lokal Anda dan pengaturan moderator papan, lalu muat ulang halaman."
   },
   "it": {
     "board_name_placeholder": "Nome della lavagna…",
@@ -1176,7 +1185,8 @@
     "archive_import_failed": "Importazione non riuscita. Controlla il file e i tuoi permessi di modifica, poi attendi 10 secondi prima di riprovare.",
     "archive_import_success": "Backup importato.",
     "archive_export_failed": "Esportazione non riuscita. Riprova.",
-    "source_code": "Codice sorgente"
+    "source_code": "Codice sorgente",
+    "auth_v2_failed": "Autenticazione tramite chiave non riuscita. Controlla la chiave privata locale e le impostazioni dei moderatori della lavagna, poi ricarica la pagina."
   },
   "ja": {
     "board_name_placeholder": "ボードの名前",
@@ -1294,7 +1304,8 @@
     "archive_import_failed": "インポートできませんでした。ファイルと編集権限を確認し、10 秒待ってから再試行してください。",
     "archive_import_success": "バックアップをインポートしました。",
     "archive_export_failed": "エクスポートできませんでした。もう一度お試しください。",
-    "source_code": "ソースコード"
+    "source_code": "ソースコード",
+    "auth_v2_failed": "鍵による認証に失敗しました。ローカルの秘密鍵とボードのモデレーター設定を確認してから、ページを再読み込みしてください。"
   },
   "my": {
     "board_name_placeholder": "ဝှိုက်ဘုတ်အမည် ... ",
@@ -1412,7 +1423,8 @@
     "archive_import_failed": "ဖိုင်ပြန်သွင်း၍ မရပါ။ ဖိုင်နှင့် တည်းဖြတ်ခွင့်ကို စစ်ဆေးပြီး ၁၀ စက္ကန့်စောင့်ကာ ထပ်ကြိုးစားပါ။",
     "archive_import_success": "အရန်ဖိုင် ပြန်သွင်းပြီးပါပြီ။",
     "archive_export_failed": "ဖိုင်ထုတ်ယူ၍ မရပါ။ ထပ်ကြိုးစားပါ။",
-    "source_code": "မူရင်းကုဒ်"
+    "source_code": "မူရင်းကုဒ်",
+    "auth_v2_failed": "သော့ဖြင့် အထောက်အထားစစ်ဆေးမှု မအောင်မြင်ပါ။ စက်တွင်းရှိ လျှို့ဝှက်သော့နှင့် ဘုတ်၏ ကြီးကြပ်သူ ဆက်တင်များကို စစ်ဆေးပြီး စာမျက်နှာကို ပြန်ဖွင့်ပါ။"
   },
   "pt": {
     "white-out": "Branquejar",
@@ -1530,7 +1542,8 @@
     "archive_import_failed": "Falha ao importar. Verifique o ficheiro e as suas permissões de edição e aguarde 10 segundos antes de tentar novamente.",
     "archive_import_success": "Cópia de segurança importada.",
     "archive_export_failed": "Falha ao exportar. Tente novamente.",
-    "source_code": "Código-fonte"
+    "source_code": "Código-fonte",
+    "auth_v2_failed": "A autenticação por chave falhou. Verifique a sua chave privada local e as definições dos moderadores do quadro e recarregue a página."
   },
   "ru": {
     "board_name_placeholder": "Название доски",
@@ -1648,7 +1661,8 @@
     "archive_import_failed": "Не удалось импортировать. Проверьте файл и права на редактирование, затем подождите 10 секунд и повторите попытку.",
     "archive_import_success": "Резервная копия импортирована.",
     "archive_export_failed": "Не удалось экспортировать. Повторите попытку.",
-    "source_code": "Исходный код"
+    "source_code": "Исходный код",
+    "auth_v2_failed": "Не удалось выполнить аутентификацию по ключу. Проверьте локальный закрытый ключ и настройки модераторов доски, затем перезагрузите страницу."
   },
   "sw": {
     "board_name_placeholder": "Jina la ubao mweupe ...",
@@ -1766,7 +1780,8 @@
     "archive_import_failed": "Imeshindikana kuingiza nakala. Kagua faili na ruhusa yako ya kuhariri, kisha subiri sekunde 10 kabla ya kujaribu tena.",
     "archive_import_success": "Nakala rudufu imeingizwa.",
     "archive_export_failed": "Imeshindikana kuhamisha. Tafadhali jaribu tena.",
-    "source_code": "Msimbo chanzo"
+    "source_code": "Msimbo chanzo",
+    "auth_v2_failed": "Uthibitishaji kwa ufunguo umeshindikana. Kagua ufunguo wako binafsi uliohifadhiwa kwenye kifaa na mipangilio ya wasimamizi wa ubao, kisha pakia ukurasa upya."
   },
   "th": {
     "board_name_placeholder": "ชื่อไวท์บอร์ด ...",
@@ -1884,7 +1899,8 @@
     "archive_import_failed": "นำเข้าไม่สำเร็จ โปรดตรวจสอบไฟล์และสิทธิ์แก้ไข แล้วรอ 10 วินาทีก่อนลองอีกครั้ง",
     "archive_import_success": "นำเข้าข้อมูลสำรองแล้ว",
     "archive_export_failed": "ส่งออกไม่สำเร็จ โปรดลองอีกครั้ง",
-    "source_code": "ซอร์สโค้ด"
+    "source_code": "ซอร์สโค้ด",
+    "auth_v2_failed": "ยืนยันตัวตนด้วยกุญแจไม่สำเร็จ โปรดตรวจสอบกุญแจส่วนตัวที่เก็บไว้ในเครื่องและการตั้งค่าผู้ดูแลบอร์ด แล้วโหลดหน้าใหม่"
   },
   "uk": {
     "white-out": "Коректор",
@@ -2002,7 +2018,8 @@
     "archive_import_failed": "Не вдалося імпортувати. Перевірте файл і права на редагування, потім зачекайте 10 секунд і спробуйте ще раз.",
     "archive_import_success": "Резервну копію імпортовано.",
     "archive_export_failed": "Не вдалося експортувати. Спробуйте ще раз.",
-    "source_code": "Вихідний код"
+    "source_code": "Вихідний код",
+    "auth_v2_failed": "Не вдалося виконати автентифікацію за ключем. Перевірте локальний приватний ключ і налаштування модераторів дошки, а потім перезавантажте сторінку."
   },
   "vi": {
     "white-out": "Bút xóa",
@@ -2120,7 +2137,8 @@
     "archive_import_failed": "Nhập thất bại. Hãy kiểm tra tệp và quyền chỉnh sửa, rồi chờ 10 giây trước khi thử lại.",
     "archive_import_success": "Đã nhập bản sao lưu.",
     "archive_export_failed": "Xuất thất bại. Vui lòng thử lại.",
-    "source_code": "Mã nguồn"
+    "source_code": "Mã nguồn",
+    "auth_v2_failed": "Xác thực bằng khóa không thành công. Hãy kiểm tra khóa riêng trên thiết bị và cài đặt người điều hành bảng, rồi tải lại trang."
   },
   "zh-CN": {
     "board_name_placeholder": "白板名称",
@@ -2238,7 +2256,8 @@
     "archive_import_failed": "导入失败。请检查文件和编辑权限，等待 10 秒后重试。",
     "archive_import_success": "备份已导入。",
     "archive_export_failed": "导出失败，请重试。",
-    "source_code": "源代码"
+    "source_code": "源代码",
+    "auth_v2_failed": "密钥认证失败。请检查本地私钥及白板的主持人设置，然后重新加载。"
   },
   "zh-TW": {
     "board_name_placeholder": "白板名稱",
@@ -2356,7 +2375,8 @@
     "archive_import_failed": "匯入失敗。請檢查檔案和編輯權限，等待 10 秒後重試。",
     "archive_import_success": "備份已匯入。",
     "archive_export_failed": "匯出失敗，請重試。",
-    "source_code": "原始碼"
+    "source_code": "原始碼",
+    "auth_v2_failed": "金鑰驗證失敗。請檢查本機私密金鑰及白板的主持人設定，然後重新載入。"
   },
   "pl": {
     "board_name_placeholder": "Nazwa tablicy",
@@ -2474,6 +2494,7 @@
     "archive_import_failed": "Import nie powiódł się. Sprawdź plik i uprawnienia do edycji, a następnie odczekaj 10 sekund i spróbuj ponownie.",
     "archive_import_success": "Kopia zapasowa została zaimportowana.",
     "archive_export_failed": "Eksport nie powiódł się. Spróbuj ponownie.",
-    "source_code": "Kod źródłowy"
+    "source_code": "Kod źródłowy",
+    "auth_v2_failed": "Uwierzytelnianie kluczem nie powiodło się. Sprawdź lokalny klucz prywatny i ustawienia moderatorów tablicy, a następnie odśwież stronę."
   }
 }

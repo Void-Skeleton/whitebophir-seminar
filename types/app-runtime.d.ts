@@ -449,6 +449,7 @@ export type ClientSocketOutgoingEventArgs = {
 };
 
 export type AppSocket = {
+  auth?: { v2?: string };
   id?: string;
   connected?: boolean;
   on: {
@@ -471,7 +472,10 @@ export type AppSocket = {
   disconnect?: () => void;
   destroy?: () => void;
   once: (eventName: string, handler: (...args: unknown[]) => void) => void;
-  io?: { engine?: { close: () => void }; opts?: { query?: string } };
+  io?: {
+    engine?: { close: () => void };
+    opts?: { query?: string; transports?: string[] };
+  };
 };
 
 export type MessageHook = (message: BoardMessage) => void;
@@ -893,6 +897,8 @@ export type TurnstileGlobal = {
 };
 
 export type SocketParams = {
+  transports?: string[];
+  auth?: { v2?: string };
   path: string;
   reconnection: boolean;
   reconnectionDelay: number;

@@ -48,6 +48,7 @@ test("frontend translation catalog covers rendered and runtime UI keys", () => {
     "archive_import_success",
     "archive_export_failed",
     "source_code",
+    "auth_v2_failed",
     "ellipse",
     "eraser",
     "grid",

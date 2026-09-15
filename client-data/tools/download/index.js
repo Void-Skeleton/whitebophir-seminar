@@ -128,7 +128,7 @@ async function importFile(state, file) {
       throw new Error("write_blocked");
     if (file.size > (state.config.MAX_ARCHIVE_BYTES || 64 * 1024 * 1024))
       throw new Error("archive_too_large");
-    const response = await fetch(archiveUrl(state), {
+    const response = await state.connection.fetchBoard(archiveUrl(state), {
       method: "POST",
       headers: {
         "Content-Type": "application/gzip",
@@ -172,7 +172,7 @@ async function chooseFileAction(state) {
     });
     if (action?.value === "svg") downloadSvgFile(state);
     if (action?.value === "wbo") {
-      const response = await fetch(archiveUrl(state));
+      const response = await state.connection.fetchBoard(archiveUrl(state));
       if (!response.ok) throw new Error("archive_export_failed");
       downloadContent(await response.blob(), `${state.identity.boardName}.wbo`);
     }

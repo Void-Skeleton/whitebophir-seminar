@@ -40,6 +40,7 @@ function getSocketHeaderValue(socket, headerName) {
  * @returns {string}
  */
 function getSocketUserSecret(socket) {
+  if (socket.verifiedV2PublicKey) return `v2:${socket.verifiedV2PublicKey}`;
   return getUserSecretFromCookieHeader(getSocketHeaderValue(socket, "cookie"));
 }
 

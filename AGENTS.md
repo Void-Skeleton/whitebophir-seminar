@@ -12,7 +12,7 @@ agents changing the repository.
 ## project contract
 
 - CI is the source of truth for required checks: [.github/workflows/CI.yml](./.github/workflows/CI.yml).
-- Local baseline: `npm install`, then `npm test`.
+- Local baseline: `npm install`, `python3 -m pip install -r scripts/requirements-seminar.txt`, then `npm test`.
 - `npm test` runs the Node suite, Playwright suite, and Biome lint. It does not run typecheck or benchmarks.
 - Use `npm run typecheck` for the unified JS typecheck.
 - Use `npm run bench` before and after changes, only for suspected hot-path, persistence, replay, or broadcast-throughput changes.
@@ -82,16 +82,42 @@ Archives are bounded to 1,000,000 generated live mutations. Native `.wbo`
 files are gzip-compressed JSON `{format: "whitebophir-board", version: 1,
 items: [...]}` using string tool IDs and complete item payloads in paint order.
 Archive metadata never grants access or replaces destination permissions.
+V2 archive requests carry a one-use signature through `X-WBO-Auth-V2`; imports
+also verify the SHA-512 digest of the exact compressed body before validation
+or board mutation.
 
 Board access decisions belong to
 [board_capabilities.mjs](./server/auth/board_capabilities.mjs). Board-scoped
 JWTs use [board_jwt.mjs](./server/auth/board_jwt.mjs) and the generic helpers in
 [jwt.mjs](./server/auth/jwt.mjs). `WBO_BOARD_MODERATORS` grants the existing
 moderator role to board-specific user-secret cookies through
-[board_moderators.mjs](./server/auth/board_moderators.mjs). The user-secret cookie is handled by
+[board_moderators.mjs](./server/auth/board_moderators.mjs). Its values can mix
+32-hex v1 cookie secrets and 64-hex Ed25519 public keys. Only a verified v2
+signature may turn a public key into moderator access. Challenge issuance and
+verification live in [user_key_v2.mjs](./server/auth/user_key_v2.mjs), exposed by
+`POST /auth/v2/challenge` in [auth_v2.mjs](./server/routes/auth_v2.mjs). HTTP board
+permission helpers consume proofs before reading board data. The ordinary
+user-secret cookie is handled by
 [user_secret_cookie.mjs](./server/auth/user_secret_cookie.mjs), and board-name
 normalization shared with the browser is in
 [board_name.js](./client-data/js/board_name.js).
+
+V2 private keys are 32-byte Ed25519 seeds stored as 64 hex characters in browser
+localStorage under `wbo-user-secret-v2-private`; they must never be cookies or
+network payloads. The public-key cookie `wbo-user-secret-v2-public` is only a
+hint for the private-board authentication shell, never proof of access. The
+lazy [board_auth_v2.js](./client-data/js/board_auth_v2.js) module uses the bundled
+[TweetNaCl.js](./client-data/vendor/tweetnacl/README.md) signer on HTTP and HTTPS.
+It loads during socket startup, after the initial viewport is restored, or for
+explicit key setup. Before signing, it preserves a valid matching local seed and
+public cookie, or generates and stores a fresh random pair when either half is
+missing, malformed, or mismatched. An empty IndexedDB store serializes key
+replacement across tabs on HTTP and HTTPS; it never stores key material.
+Private board pages first serve [auth-v2.html](./client-data/auth-v2.html) without
+board contents,
+then [board_auth_gate.js](./client-data/js/board_auth_gate.js) signs a one-use
+navigation proof. Signed HTTP responses are not cacheable. Native SVG baseline
+refresh and backup requests use the connection module's `fetchBoard` helper.
 
 The board HTML shell in [board.html](./client-data/board.html) carries the
 chrome, embedded configuration/translations/board state, and inline
@@ -152,10 +178,14 @@ The existing Download tool owns the native backup dialog alongside SVG export;
 viewers can download SVG or WBO files, and board moderators also get the import
 file picker. The tool reads live `permissions.canBan` and `canEdit` getters so
 temporary moderator grants and revocations affect subsequent actions. All
-archive actions are loaded with that tool. The standard-library Python CLI is
+archive actions are loaded with that tool. The Python CLI is
 [seminar_helper.py](./scripts/seminar_helper.py). `WBO_SOURCE_URL` configures
 the corresponding-source links in the homepage and Download dialog; deployments
 of this modified version must point it at their complete modified source.
+The helper's `keygen` and `--private-key-file` paths use the optional
+`cryptography` dependency in [requirements-seminar.txt](./scripts/requirements-seminar.txt);
+v1/JWT operations still need only Python's standard library. Key files remain
+local, use owner-only permissions, and are never overwritten.
 
 When a user interaction modifies the board, the active tool creates a live board
 message with primitives from [message_common.js](./client-data/js/message_common.js),
@@ -255,6 +285,23 @@ WBO uses Socket.IO. Clients connect with query fields such as `board`,
 `baselineSeq`, `token`, `tool`, `color`, and `size`. The server immediately emits
 `boardstate`, then emits a `broadcast` replay batch from the requested
 `baselineSeq`.
+
+V2 clients first obtain a challenge through HTTP, then connect with Socket.IO
+handshake `auth: {v2: "<nonce>.<signature>"}` over WebSocket (`ws` or `wss`). V2
+proofs are rejected on polling transports. The middleware verifies and consumes
+the proof before permissions, replay, or presence. A new proof is required on
+each reconnect; no reusable v2 session token is issued. Verified v2 identities
+use `v2:<public-key>` for presence, bans, and temporary moderator grants; legacy
+v1 role checks still read the original v1 cookie separately.
+
+Challenges encode `["wbo-auth-v2", audience, board, scope, publicKey, bodyHash,
+nonce, expiresAt]` as a UTF-8 JSON string. Scope is `socket` or
+`METHOD:<public pathname>`. POST archives bind their SHA-512 digest; other scopes
+use an empty digest. Clients validate the full context before signing. State is
+process-local, expires after 60 seconds, and is bounded to 4,096 pending
+challenges with at most 32 per IP. HTTP proofs use `X-WBO-Auth-V2`; only board
+HTML navigation can carry the proof in `authV2`, removed during browser boot.
+V2 never treats a claimed public key or a 64-hex v1 cookie as authentication.
 
 Live board writes are JSON messages sent on the `broadcast` event. They use
 numeric `tool` codes from [client-data/tools/manifest.js](./client-data/tools/manifest.js)
@@ -550,8 +597,11 @@ When touching hot paths:
   `npm run bench:broadcast`, `npm run bench:e2e`.
 - Profiling: `npm run profile -- <e2e|load|persist|broadcast>`.
 
-`npm test` needs Python 3.10+, Chromium and local browser/network capability. The
-Node archive tests also exercise the Python helper against a local server.
+`npm test` needs Python 3.10+, the Python dependency in
+`scripts/requirements-seminar.txt`, Chromium and local browser/network capability.
+The Node archive and v2 tests exercise the Python helper against a local server.
+The v2 browser suite uses `http://0.0.0.0` and explicitly verifies that the origin
+is not a secure context, so localhost Web Crypto support cannot mask regressions.
 If Chromium is
 missing, run `npx playwright install chromium`.
 

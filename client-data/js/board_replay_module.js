@@ -61,11 +61,14 @@ export class ReplayModule {
   }
 
   async refreshAuthoritativeBaseline() {
-    const response = await fetch(getAuthoritativeBaselineUrl(Date.now()), {
-      cache: "no-store",
-      credentials: "same-origin",
-      headers: { Accept: "image/svg+xml" },
-    });
+    const response = await this.getTools().connection.fetchBoard(
+      getAuthoritativeBaselineUrl(Date.now()),
+      {
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: { Accept: "image/svg+xml" },
+      },
+    );
     if (!response.ok) {
       throw new Error(`Baseline fetch failed with HTTP ${response.status}`);
     }

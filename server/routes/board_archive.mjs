@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Seminar modifications, 2026-09-15: native archive HTTP API and moderator imports.
 import MessageCommon from "../../client-data/js/message_common.js";
+import { createHash } from "node:crypto";
+import { authenticateHttpV2 } from "../auth/user_key_v2.mjs";
 import {
   applyArchiveImport,
   decodeArchive,
@@ -157,8 +159,12 @@ async function handleArchive(ctx) {
     requireArchiveTurnstile(ctx, boardName, capabilities.canClear);
   };
   checkAccess();
+  const body = await readArchiveBody(ctx);
+  const v2 = authenticateHttpV2(ctx, boardName);
+  if (v2 && createHash("sha512").update(body).digest("hex") !== v2.bodyHash)
+    throw forbidden("auth_v2_failed");
   const prepared = prepareArchiveImport(
-    await decodeArchive(await readArchiveBody(ctx), ctx.runtime.config),
+    await decodeArchive(body, ctx.runtime.config),
     ctx.runtime.config,
   );
   const seq = await session.runExclusive(() => {

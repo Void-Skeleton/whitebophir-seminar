@@ -482,6 +482,7 @@ export {
   observeRequest,
   requestErrorStatusCode,
   requestScheme,
+  requestAuthority,
   respondWithErrorPage,
   serveError,
 };

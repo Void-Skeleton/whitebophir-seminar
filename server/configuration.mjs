@@ -153,8 +153,9 @@ export const AUTO_FINGER_WHITEOUT = parseDisabledFlagEnv(
   "AUTO_FINGER_WHITEOUT",
 );
 
-/** Board-scoped moderator user secrets, in the form: `boardname:usersecret1 boardname2:usersecret2`.
- * The user secret is their wbo secret cookie.
+/** Board-scoped moderators: space-separated `board:secret[,secret]` groups.
+ * 32 hex characters select v1 cookie authentication; 64 select an Ed25519
+ * public key, authenticated only by a verified v2 challenge signature.
  */
 export const BOARD_MODERATORS = parseBoardModeratorsEnv("WBO_BOARD_MODERATORS");
 

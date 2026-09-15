@@ -182,6 +182,48 @@ export class ConnectionModule {
     this.accessRefreshTimerId = /** @type {number | null} */ (null);
   }
 
+  async authV2() {
+    try {
+      localStorage.getItem("wbo-user-secret-v2-private");
+    } catch {
+      return null;
+    }
+    return import("./board_auth_v2.js");
+  }
+
+  /** @param {URL | string} url @param {RequestInit & {body?: Blob}} [options] */
+  async fetchBoard(url, options = {}) {
+    const auth = await this.authV2();
+    if (!auth) return fetch(url, options);
+    const target = new URL(url, window.location.href);
+    if (target.origin !== window.location.origin)
+      throw new Error("auth_v2_failed");
+    const bodyHash = options.body ? await auth.hashBody(options.body) : "";
+    const proof = await auth.createProof(
+      this.getTools().identity.boardName,
+      `${options.method || "GET"}:${target.pathname}`,
+      bodyHash,
+    );
+    const headers = new Headers(options.headers);
+    headers.set("X-WBO-Auth-V2", proof);
+    return fetch(target, {
+      ...options,
+      headers,
+      cache: "no-store",
+      redirect: "error",
+    });
+  }
+
+  showAuthenticationError() {
+    const Tools = this.getTools();
+    this.state = "disconnected";
+    void Tools.ui.confirm({
+      message: Tools.i18n.t("auth_v2_failed"),
+      confirmLabel: Tools.i18n.t("moderation_acknowledge"),
+      cancelLabel: Tools.i18n.t("Cancel"),
+    });
+  }
+
   cancelAccessRefresh() {
     if (this.accessRefreshTimerId === null) return;
     window.clearTimeout(this.accessRefreshTimerId);
@@ -274,11 +316,26 @@ export class ConnectionModule {
         },
       );
 
+      try {
+        const auth = await this.authV2();
+        socketParams.auth = auth
+          ? { v2: await auth.createProof(Tools.identity.boardName, "socket") }
+          : {};
+        if (auth) socketParams.transports = ["websocket"];
+      } catch {
+        this.showAuthenticationError();
+        return;
+      }
+
       if (reusableSocket) {
+        reusableSocket.auth = socketParams.auth;
         if (reusableSocket.io) {
           reusableSocket.io.opts = {
             ...(reusableSocket.io.opts || {}),
             query: socketParams.query || "",
+            ...(socketParams.transports
+              ? { transports: socketParams.transports }
+              : {}),
           };
         }
         reusableSocket.connect();
@@ -344,6 +401,10 @@ export class ConnectionModule {
           authoritativeSeq: Tools.replay.authoritativeSeq,
         });
         Tools.connection.state = "disconnected";
+        if (reason === "auth_v2_failed") {
+          this.showAuthenticationError();
+          return;
+        }
         if (reason === "baseline_not_replayable") {
           this.logBoardEvent("warn", "replay.baseline_not_replayable", {
             authoritativeSeq: Tools.replay.authoritativeSeq,

@@ -5,6 +5,7 @@ import {
   isValidBoardName,
 } from "../../client-data/js/board_name.js";
 import { BoardPermissions } from "../auth/board_capabilities.mjs";
+import { authenticateHttpV2 } from "../auth/user_key_v2.mjs";
 import {
   appendSetCookieHeader,
   generateUserSecret,
@@ -195,22 +196,28 @@ function ensureBoardUserSecretCookie(request, response, parsedUrl) {
 function boardPermissionsForRequest(ctx, boardName) {
   const config = ctx.runtime.config;
   const userSecret = getUserSecretFromCookieHeader(ctx.request.headers.cookie);
+  const v2 = authenticateHttpV2(ctx, boardName);
+  const identity = v2 ? `v2:${v2.publicKey}` : userSecret;
   return BoardPermissions.forBoard({
     config,
     boardName,
-    userInfo: { token: ctx.url.searchParams.get("token"), userSecret },
+    userInfo: {
+      token: ctx.url.searchParams.get("token"),
+      userSecret,
+      verifiedPublicKey: v2?.publicKey,
+    },
     // Render the served board state ban-aware too, so a banned user's HTML
     // (board-state script + toolbar) is read-only from first paint, matching
     // the socket, and carries the same one-shot access refresh delay.
     getBanExpiresAt: () =>
       getEditBanExpiresAt(
         boardName,
-        userSecret,
+        identity,
         resolveRequestClientIpSafe(config, ctx.request),
         Date.now(),
       ),
     getTemporaryModeratorExpiresAt: () =>
-      getTemporaryModeratorExpiresAt(boardName, userSecret, Date.now()),
+      getTemporaryModeratorExpiresAt(boardName, identity, Date.now()),
   });
 }
 

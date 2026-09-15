@@ -5,6 +5,11 @@ import {
 import { errorLogFields, logFrontendEvent } from "./frontend_logging.js";
 
 const documentElement = document.documentElement;
+const navigationUrl = new URL(window.location.href);
+if (navigationUrl.searchParams.has("authV2")) {
+  navigationUrl.searchParams.delete("authV2");
+  window.history.replaceState(window.history.state, "", navigationUrl);
+}
 
 const CRITICAL_BOOT_TOOL_NAMES = ["hand"];
 

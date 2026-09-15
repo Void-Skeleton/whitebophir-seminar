@@ -29,10 +29,11 @@ function staticFileCacheControl(config, filePath) {
 
 /**
  * @param {import("../../types/server-runtime.d.ts").ServerConfig} config
+ * @param {boolean} [authenticatedV2]
  * @returns {string}
  */
-function boardSvgCacheControl(config) {
-  return config.IS_DEVELOPMENT
+function boardSvgCacheControl(config, authenticatedV2 = false) {
+  return config.IS_DEVELOPMENT || authenticatedV2
     ? "no-store"
     : "public, max-age=3, must-revalidate";
 }

@@ -13,7 +13,7 @@ import { isConfiguredModerator } from "./board_moderators.mjs";
 
 /** @typedef {{AUTH_SECRET_KEY: string, BOARD_MODERATORS?: Map<string, Set<string>>}} BoardCapabilityConfig */
 /** @typedef {{name: string, readonly?: boolean, isReadOnly?: () => boolean}} BoardCapabilityBoard */
-/** @typedef {{token?: string | null, userSecret?: string | null}} BoardCapabilityUserInfo */
+/** @typedef {{token?: string | null, userSecret?: string | null, verifiedPublicKey?: string}} BoardCapabilityUserInfo */
 /** @typedef {() => boolean} IsBannedPredicate */
 /** @typedef {() => number | null} GetBanExpiresAt */
 /** @typedef {() => number | null} GetTemporaryModeratorExpiresAt */
@@ -56,7 +56,14 @@ function isClearCapableRole(role) {
  * @returns {"moderator" | "editor" | "reader" | "forbidden"}
  */
 function roleForBoard(config, boardName, userInfo) {
-  if (isConfiguredModerator(config, boardName, userInfo?.userSecret))
+  if (
+    isConfiguredModerator(
+      config,
+      boardName,
+      userInfo?.userSecret,
+      userInfo?.verifiedPublicKey,
+    )
+  )
     return "moderator";
   if (config.AUTH_SECRET_KEY === "") return "editor";
   const token = userInfo?.token;

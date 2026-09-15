@@ -366,7 +366,7 @@ class Template extends StaticTemplate {
       request,
       parsedUrl,
       parameters,
-      this.cacheControl(),
+      parameters.noStore ? "no-store" : this.cacheControl(),
       Buffer.byteLength(body),
     );
     stream.end(body);
@@ -502,7 +502,7 @@ class BoardTemplate extends Template {
       request,
       parsedUrl,
       parameters,
-      this.cacheControl(),
+      parameters.noStore ? "no-store" : this.cacheControl(),
     );
     stream.write(prefix);
     inlineBoardSvgStream.pipe(stream, { end: false });

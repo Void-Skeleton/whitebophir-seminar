@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<!-- Seminar modifications, 2026-09-15. SPDX-License-Identifier: AGPL-3.0-or-later -->
+<html lang="{{language}}" dir="{{direction}}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <base href="{{baseHref}}" />
+  <title>WBO</title>
+  <style>body { margin: 32px; background: #fcfcfd; color: #111827; font: 13px sans-serif; }</style>
+  <script type="module" src="js/board_auth_gate.js"></script>
+</head>
+<body>
+  <p id="auth-v2-loading">{{translations.loading}}</p>
+  <p id="auth-v2-error" hidden>{{translations.auth_v2_failed}}</p>
+</body>
+</html>

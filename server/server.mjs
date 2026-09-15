@@ -6,6 +6,7 @@ import * as productionConfig from "./configuration.mjs";
 import { route, routeHttpRequests } from "./http/dispatch.mjs";
 import observability from "./observability/index.mjs";
 import { boardArchive } from "./routes/board_archive.mjs";
+import { authV2Challenge } from "./routes/auth_v2.mjs";
 import {
   downloadBoard,
   rejectMissingBoardName,
@@ -37,6 +38,7 @@ const hasDot = (value) => typeof value === "string" && value.includes(".");
  */
 function createWhiteboardHttpHandler() {
   return routeHttpRequests([
+    route("/auth/v2/challenge", authV2Challenge, "auth_v2_challenge"),
     route("/boards", redirectBoardQuery, "boards_redirect"),
     route("/boards/", rejectMissingBoardName, "board_page"),
     route("/boards/{board}.svg", serveBoardSvg, "board_svg"),

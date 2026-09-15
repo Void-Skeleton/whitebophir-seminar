@@ -25,6 +25,7 @@ export type ServerRuntime = {
   indexTemplate: import("../server/http/templating.mjs").Template;
   rulesTemplate: import("../server/http/templating.mjs").RulesTemplate;
   manifestTemplate: import("../server/http/templating.mjs").Template;
+  authV2Template: import("../server/http/templating.mjs").Template;
 };
 
 export type ObservedHttpRequest = {
@@ -101,6 +102,7 @@ export type SocketBoardPermissionContext = {
 };
 
 export type AppSocket = import("socket.io").Socket & {
+  verifiedV2PublicKey?: string;
   boardName?: string;
   boardPermissionContext?: SocketBoardPermissionContext;
   replayBootstrap?: unknown;

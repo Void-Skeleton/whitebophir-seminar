@@ -4,6 +4,15 @@ Don't add them all at once. Only add the ones that I asked you to add:
 
 <!-- 1. Allow exporting the contents of a whiteboard in the internal formats of WBO (instead of SVG only), and allow such an exported file to be reimported. The exported file should be compressed.  -->
 
+<!-- 1. I don't like how authentication is currently implemented. The user token `wbo-user-secret-v1` cookie may be transmitted unencrypted on a HTTP connection, and may be stored unencrypted on an untrusted host. Add a parallel authentication process by storing user cookies `wbo-user-secret-v2-private` and `wbo-user-secret-v2-public`, an Ed25519 keypair. 
+
+   When the server starts, an environmental variable `WBO_BOARD_MODERATORS='<board_name>:<value>'` or an identical way to configure moderators should grant moderator permissions for board `<board_name>` for a user holding secret `<value>`:
+
+   - If `<value>` is 32 hex chars, then it is a v1 secret value, and the server should authenticate using the old method; 
+   - If `<value>` is 64 hex chars, then it is a v2 secret value. You should interpret it as a 32-byte Ed25519 public key. The server should perform authentication by sending a random string to client, and expect the client to return the signature of this string using `wbo-user-secret-v2-private`, which should be the matching private key of this public key. 
+
+   When multiple moderator secrets are provided for a single board, the server should grant moderator permissions to any user holding a v1 token matching any v1 token given, or any user holding a private key matching any public key given.  -->
+
 2. Allow users to set their names when entering a board, either through a URL parameter, or as an input box on the homepage. 
   
 3. The moderator can modify a setting (in some interface) that divides the canvas into chunks of a specified size. Everyone can turn on a setting that locks their perspective to be centered on the last modified chunk (with margins to be configured by the moderator). The moderator can modify and lock this setting for everyone else. 

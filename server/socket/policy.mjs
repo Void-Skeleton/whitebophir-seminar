@@ -5,10 +5,11 @@ import {
 } from "../../client-data/js/message_tool_metadata.js";
 import RateLimitCommon from "../../client-data/js/rate_limit_common.js";
 import { BoardPermissions } from "../auth/board_capabilities.mjs";
+import { getUserSecretFromCookieHeader } from "../auth/user_secret_cookie.mjs";
 import observability from "../observability/index.mjs";
 import { getEditBanExpiresAt } from "./bans.mjs";
 import { normalizeIncomingMessage } from "./message_validation.mjs";
-import { getSocketUserSecret } from "./request.mjs";
+import { getSocketHeaderValue, getSocketUserSecret } from "./request.mjs";
 import { getTemporaryModeratorExpiresAt } from "./temporary_moderators.mjs";
 
 const { logger, metrics, tracing } = observability;
@@ -384,7 +385,13 @@ function boardPermissionsForSocket(config, boardName, socket) {
   const permissions = BoardPermissions.forBoard({
     config,
     boardName,
-    userInfo: { token: getSocketToken(socket), userSecret },
+    userInfo: {
+      token: getSocketToken(socket),
+      userSecret: getUserSecretFromCookieHeader(
+        getSocketHeaderValue(socket, "cookie"),
+      ),
+      verifiedPublicKey: socket.verifiedV2PublicKey,
+    },
     // Lazy + live: only resolved when a capability query depends on the ban
     // (so canOpen never needs the IP), and re-read on every query so a ban and
     // its expiry take effect without reconnecting. The expiry is also exposed

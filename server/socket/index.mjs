@@ -1,5 +1,7 @@
 // Modified 2026-09-14: publish validated archive imports to synced viewers.
 import * as socketIO from "socket.io";
+import { verifyProof } from "../auth/user_key_v2.mjs";
+import { isValidBoardName } from "../../client-data/js/board_name.js";
 import { SocketEvents } from "../../client-data/js/socket_events.js";
 import { BoardData } from "../board/data.mjs";
 import {
@@ -394,6 +396,22 @@ async function startIO(app, config) {
       /** @type {AppSocket} */ socket,
       /** @type {(error?: Error) => void} */ next,
     ) => {
+      const proof = socket.handshake.auth?.v2;
+      if (proof !== undefined) {
+        const boardName = socket.handshake.query?.board;
+        try {
+          if (!isValidBoardName(boardName)) throw new Error("auth_v2_failed");
+          const identity = verifyProof(config, proof, boardName, "socket");
+          // Polling session IDs are bearer credentials on HTTP. V2 sessions
+          // stay on the WebSocket connection whose handshake proves the key.
+          if (socket.conn.transport.name !== "websocket")
+            throw new Error("auth_v2_failed");
+          socket.verifiedV2PublicKey = identity.publicKey;
+        } catch {
+          next(new Error("auth_v2_failed"));
+          return;
+        }
+      }
       prepareConnectionReplay(
         socket,
         config,

@@ -1,0 +1,2 @@
+# Ed25519 key generation/signing for the optional v2 authentication path.
+cryptography>=41.0.0

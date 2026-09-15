@@ -142,6 +142,10 @@ function createServerRuntime(config) {
     indexTemplate,
     rulesTemplate,
     manifestTemplate,
+    authV2Template: new templating.Template(
+      configuredTemplatePathWithBundledFallback(config, "auth-v2.html"),
+      config,
+    ),
   };
 }
 

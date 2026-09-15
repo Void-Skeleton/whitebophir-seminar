@@ -1,4 +1,4 @@
-const BOARD_MODERATOR_SECRET_PATTERN = /^[0-9a-f]{32}$/i;
+const BOARD_MODERATOR_SECRET_PATTERN = /^(?:[0-9a-f]{32}|[0-9a-f]{64})$/i;
 
 /**
  * @param {string} name

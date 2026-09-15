@@ -26,5 +26,20 @@ tool and `client-data/js/board_tool_registry_module.js` use live moderator
 permissions, and `server/routes/board_archive.mjs` enforces those permissions for
 uploads. Archive tests and documentation cover these access rules.
 
+Changes dated 2026-09-15 also implement the new feature 1: parallel Ed25519
+moderator authentication on HTTP and HTTPS. They add `server/auth/user_key_v2.mjs`,
+`server/routes/auth_v2.mjs`, browser key/signing and private-board bootstrap
+modules, and Python key generation/signing. Configuration, board capabilities,
+HTTP routes/cache handling, socket authentication/identity, runtime types,
+translations, tests, CI, and documentation are updated to integrate v2 while
+preserving v1. Private seeds remain in browser-local storage or local CLI files.
+Browser startup automatically creates a random keypair when either stored half
+is missing or invalid, or when the halves do not match; valid pairs are retained.
+
+`client-data/vendor/tweetnacl` contains TweetNaCl.js 1.0.3, its upstream source,
+types, author list and public-domain license. See its README for provenance.
+The vendor files retain their upstream license; new WBO integration files use
+AGPL-3.0-or-later.
+
 New implementation files are licensed AGPL-3.0-or-later. See README.md for the
 deployment setting that links users to the corresponding modified source.

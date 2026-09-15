@@ -1,4 +1,8 @@
 import { getLoadedBoard } from "../board/registry.mjs";
+import {
+  authenticateHttpV2,
+  getPublicKeyCookie,
+} from "../auth/user_key_v2.mjs";
 import { respondWithErrorPage } from "../http/observation.mjs";
 import observability from "../observability/index.mjs";
 import {
@@ -40,7 +44,7 @@ const { tracing } = observability;
  *   cachedSeqs: number[],
  * }} BoardPageDocumentRequest
  */
-/** @typedef {BoardPageRedirectRequest | BoardPageDocumentRequest} BoardPageRequest */
+/** @typedef {BoardPageRedirectRequest | BoardPageDocumentRequest | {kind: "authenticate"}} BoardPageRequest */
 
 /**
  * @param {HttpRouteContext} ctx
@@ -63,6 +67,15 @@ function redirectBoardQuery(ctx) {
  */
 async function serveBoardPage(ctx) {
   const pageRequest = resolveBoardPageRequest(ctx);
+  if (pageRequest.kind === "authenticate") {
+    ctx.response.writeHead(200, {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Referrer-Policy": "no-referrer",
+    });
+    ctx.response.end(ctx.runtime.authV2Template.renderForRequest(ctx.request));
+    return;
+  }
   if (pageRequest.kind === "redirect") {
     ctx.response.writeHead(301, { Location: pageRequest.redirect });
     ctx.response.end();
@@ -109,14 +122,20 @@ function resolveBoardPageRequest(ctx) {
     };
   }
   const boardPermissions = boardPermissionsForRequest(ctx, boardName);
+  if (
+    !boardPermissions.canOpen() &&
+    !authenticateHttpV2(ctx, boardName) &&
+    getPublicKeyCookie(ctx.request.headers.cookie)
+  )
+    return { kind: "authenticate" };
   boardPermissions.requireOpen();
   return {
     kind: "document",
     boardName,
     boardPermissions,
-    cachedSeqs: parseBoardPageETagCandidates(
-      ctx.request.headers["if-none-match"],
-    ),
+    cachedSeqs: authenticateHttpV2(ctx, boardName)
+      ? []
+      : parseBoardPageETagCandidates(ctx.request.headers["if-none-match"]),
   };
 }
 
@@ -190,6 +209,7 @@ function readBoardDocumentForPage(ctx, pageRequest) {
  * @returns {boolean}
  */
 function serveBoardDocumentCacheHit(ctx, pageRequest, document) {
+  if (authenticateHttpV2(ctx, pageRequest.boardName)) return false;
   const etag = boardPageETag(document.metadata.seq || 0);
   if (!matchesIfNoneMatch(ctx.request.headers["if-none-match"], etag)) {
     return false;
@@ -274,6 +294,7 @@ async function renderBoardDocument(ctx, pageRequest, document) {
   // omit admin-only tools, but socket permission checks still grant moderator
   // abilities such as report-to-ban.
   const renderOptions = {
+    noStore: !!authenticateHttpV2(ctx, pageRequest.boardName),
     etag: boardPageETag(document.metadata.seq || 0),
     boardState,
     varyCookie: boardHtmlVariesByCookie(boardState),

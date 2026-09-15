@@ -1,4 +1,5 @@
 import { badRequest } from "../http/boundary_errors.mjs";
+import { hasHttpV2Identity } from "../auth/user_key_v2.mjs";
 import { boardSvgCacheControl, CSP } from "../http/cache_policy.mjs";
 import { startCompressedResponse } from "../http/compression.mjs";
 import {
@@ -58,7 +59,10 @@ async function serveBoardSvg(ctx) {
   pinServedBoardBaseline(boardName, persistedSeq, ctx.runtime.config);
   if (matchesIfNoneMatch(ctx.request.headers["if-none-match"], etag)) {
     ctx.response.writeHead(304, {
-      "Cache-Control": boardSvgCacheControl(ctx.runtime.config),
+      "Cache-Control": boardSvgCacheControl(
+        ctx.runtime.config,
+        hasHttpV2Identity(ctx.request),
+      ),
       ETag: etag,
     });
     ctx.response.end();
@@ -100,7 +104,10 @@ async function serveBoardSvg(ctx) {
     {
       "Content-Type": "image/svg+xml",
       "Content-Security-Policy": CSP,
-      "Cache-Control": boardSvgCacheControl(ctx.runtime.config),
+      "Cache-Control": boardSvgCacheControl(
+        ctx.runtime.config,
+        hasHttpV2Identity(ctx.request),
+      ),
       ETag: etag,
     },
   );
@@ -194,7 +201,10 @@ async function respondWithBoardPreview(ctx, boardName, startedAt) {
     {
       "Content-Type": "image/svg+xml",
       "Content-Security-Policy": CSP,
-      "Cache-Control": boardSvgCacheControl(ctx.runtime.config),
+      "Cache-Control": boardSvgCacheControl(
+        ctx.runtime.config,
+        hasHttpV2Identity(ctx.request),
+      ),
     },
   );
   if (compressedResponse.encoding !== undefined) {
