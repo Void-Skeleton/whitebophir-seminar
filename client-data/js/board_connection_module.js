@@ -374,6 +374,9 @@ export class ConnectionModule {
       socket.on(SocketEvents.CHUNK_STATE, (state) =>
         Tools.chunks.receive(state),
       );
+      socket.on(SocketEvents.THEME_STATE, (state) =>
+        Tools.theme.receive(state),
+      );
       socket.on(SocketEvents.BOARDSTATE, (boardState) => {
         Tools.access.applyBoardState(normalizeBoardState(boardState));
       });

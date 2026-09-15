@@ -6,7 +6,7 @@ import * as productionConfig from "./configuration.mjs";
 import { route, routeHttpRequests } from "./http/dispatch.mjs";
 import observability from "./observability/index.mjs";
 import { boardArchive } from "./routes/board_archive.mjs";
-import { boardChunks } from "./routes/board_chunks.mjs";
+import { boardChunks, boardTheme } from "./routes/board_chunks.mjs";
 import { authV2Challenge } from "./routes/auth_v2.mjs";
 import {
   downloadBoard,
@@ -52,6 +52,7 @@ function createWhiteboardHttpHandler() {
     ...boardNameRouteGroup("/download", downloadBoard, "download_board"),
     ...boardNameRouteGroup("/archive", boardArchive, "board_archive"),
     ...boardNameRouteGroup("/chunks", boardChunks, "board_chunks"),
+    ...boardNameRouteGroup("/theme", boardTheme, "board_theme"),
     ...boardNameRouteGroup("/preview", serveBoardPreview, "preview_board"),
     ...boardNameRouteGroup("/export", serveBoardPreview, "preview_board", {
       access: "user",

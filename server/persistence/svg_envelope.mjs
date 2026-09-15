@@ -1,4 +1,5 @@
 import { normalizeSvgExtent } from "../board/svg_extent.mjs";
+import { THEME_SVG_RESOURCES } from "../../client-data/js/board_theme.js";
 import { escapeHtml, unescapeHtml } from "./xml_escape.mjs";
 
 const STORED_SVG_FORMAT = "whitebophir-svg-v2";
@@ -216,6 +217,7 @@ function updateRootMetadata(prefix, metadata, seq, svgExtent) {
     "data-wbo-format": STORED_SVG_FORMAT,
     "data-wbo-seq": String(seq),
     "data-wbo-readonly": metadata.readonly ? "true" : "false",
+    ...(metadata.theme ? { "data-wbo-theme": metadata.theme } : {}),
     ...(metadata.chunks
       ? { "data-wbo-chunks": JSON.stringify(metadata.chunks) }
       : {}),
@@ -234,7 +236,11 @@ function updateRootMetadata(prefix, metadata, seq, svgExtent) {
       openTag = `${openTag.slice(0, -1)}${encoded}>`;
     }
   });
-  return `${prefix.slice(0, root.openTagStart)}${openTag}${prefix.slice(root.openTagEnd + 1)}`;
+  const themeResources =
+    metadata.theme && !prefix.includes('id="wbo-theme-defs"')
+      ? THEME_SVG_RESOURCES
+      : "";
+  return `${prefix.slice(0, root.openTagStart)}${openTag}${themeResources}${prefix.slice(root.openTagEnd + 1)}`;
 }
 
 /**
@@ -268,11 +274,14 @@ function createDefaultStoredSvgEnvelope(metadata, seq, svgExtent) {
       `<svg id="canvas" xmlns="http://www.w3.org/2000/svg" version="1.1" ` +
       `width="${extent.width}" height="${extent.height}" data-wbo-format="${STORED_SVG_FORMAT}" ` +
       `data-wbo-seq="${seq}" data-wbo-readonly="${metadata.readonly ? "true" : "false"}"` +
+      (metadata.theme ? ` data-wbo-theme="${metadata.theme}"` : "") +
       (metadata.chunks
         ? ` data-wbo-chunks="${escapeHtml(JSON.stringify(metadata.chunks))}"`
         : "") +
       ">" +
-      `<defs id="defs"></defs><g id="drawingArea">`,
+      `<defs id="defs"></defs>` +
+      (metadata.theme ? THEME_SVG_RESOURCES : "") +
+      `<g id="drawingArea">`,
     suffix: `</g><g id="cursors"></g></svg>`,
   };
 }

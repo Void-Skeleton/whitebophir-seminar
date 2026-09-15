@@ -110,6 +110,8 @@ def validate_archive(data, max_archive_bytes=MAX_ARCHIVE_BYTES, max_json_bytes=M
         validate_chunk_response(archive["chunks"])
         if set(archive["chunks"]) != {"width", "height", "margin", "viewMode"}:
             raise ValueError("Invalid archive chunk settings")
+    if "theme" in archive and archive["theme"] not in ("light", "dark"):
+        raise ValueError("Invalid archive theme")
     return archive
 
 
@@ -163,13 +165,15 @@ def main(argv=None):
     join.add_argument("--board", required=True)
     join.add_argument("--name", required=True)
     join.add_argument("--token", help="Optional board JWT to include in the URL")
-    for name in ("export", "import", "chunks"):
+    for name in ("export", "import", "chunks", "theme"):
         command = subcommands.add_parser(name)
         if name == "chunks":
             command.add_argument("--width", type=int, help="Chunk width in board units")
             command.add_argument("--height", type=int, help="Chunk height in board units")
             command.add_argument("--margin", type=int, help="Margin in board units")
             command.add_argument("--view-mode", choices=("free", "chunk", "latest"), help="Apply a view mode to other users; they may change it afterwards")
+        elif name == "theme":
+            command.add_argument("--mode", choices=("light", "dark"), help="Set the board theme for everyone; omit to read it")
         else:
             command.add_argument("file", type=Path, help="Path to a .wbo archive")
         command.add_argument("--server", default="http://localhost:8080")
@@ -198,6 +202,21 @@ def main(argv=None):
             headers["Cookie"] = "wbo-user-secret-v1=" + args.user_secret
         if args.socket_id:
             headers["X-WBO-Socket-Id"] = args.socket_id
+        if args.command == "theme":
+            parts = urlsplit(url)
+            path = urlsplit(args.server).path.rstrip("/") + "/theme/" + quote(args.board, safe="")
+            url = urlunsplit((parts.scheme, parts.netloc, path, parts.query, ""))
+            data = json.dumps({"theme": args.mode}).encode() if args.mode else None
+            if data is not None:
+                headers.update({"Content-Type": "application/json", "X-WBO-Theme": "1"})
+            if args.private_key_file:
+                headers.update(authentication_v2(args, url, data))
+            with urlopen(Request(url, data=data, headers=headers), timeout=60) as response:
+                result = json.loads(response.read(4096))
+            if not isinstance(result, dict) or result.get("theme") not in ("light", "dark"):
+                raise ValueError("Invalid board theme response")
+            print(json.dumps(result))
+            return 0
         if args.command == "chunks":
             parts = urlsplit(url)
             path = urlsplit(args.server).path.rstrip("/") + "/chunks/" + quote(args.board, safe="")

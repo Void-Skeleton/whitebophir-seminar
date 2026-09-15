@@ -276,7 +276,7 @@ function applyEditorMetrics(input, metrics) {
   input.size = 1;
   input.style.fontSize = `${metrics.fontSize}px`;
   input.style.lineHeight = `${metrics.fontSize}px`;
-  input.style.caretColor = metrics.caretColor;
+  input.style.setProperty("--text-caret-color", metrics.caretColor);
   input.style.fontFamily = metrics.fontFamily || "";
   input.style.fontStyle = metrics.fontStyle || "";
   input.style.fontWeight = metrics.fontWeight || "";

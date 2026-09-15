@@ -13,6 +13,23 @@ body {
   overscroll-behavior: none;
 }
 
+/* Board themes change the canvas; chrome keeps its existing controls. */
+html[data-board-theme="dark"],
+html[data-board-theme="dark"] body {
+  background: #202020;
+}
+html[data-board-theme="dark"] .wbo-pencil-live-overlay {
+  filter: url(#wbo-dark-colors);
+}
+html[data-board-theme="dark"] #textToolInput {
+  caret-color: white;
+  border-color: #b8c0cc;
+}
+#boardThemeToggle[aria-pressed="true"] {
+  background: var(--board-control-bg-active);
+  border-color: var(--board-accent-strong);
+}
+
 :root {
   --board-shell-offset: 10px;
   --board-control-size: 40px;

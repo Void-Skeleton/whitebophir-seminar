@@ -19,6 +19,8 @@ function i18nKey(raw) {
 test("frontend translation catalog covers rendered and runtime UI keys", () => {
   const translations = JSON.parse(fs.readFileSync(TRANSLATIONS_PATH, "utf8"));
   const requiredKeys = [
+    "board_dark_mode",
+    "board_theme_failed",
     "chunk_settings",
     "chunk_view_mode",
     "chunk_view_free",

@@ -122,6 +122,7 @@ export class BoardShellModule {
 
   bindPresencePanel() {
     this.getTools().chunks.init();
+    this.getTools().theme.init();
     this.getTools().presence.initConnectedUsersUI();
   }
 
@@ -179,7 +180,7 @@ export class BoardShellModule {
     Tools.preferences.colorChooser = colorChooser;
     colorChooser.value = Tools.preferences.currentColor;
     colorChooser.onchange = colorChooser.oninput = () => {
-      Tools.preferences.setColor(colorChooser.value);
+      Tools.preferences.setColor(Tools.theme.storedColor(colorChooser.value));
     };
 
     sizeChooser.value = String(Tools.preferences.currentSize);
@@ -195,14 +196,20 @@ export class BoardShellModule {
     const syncStyleAriaLabel = () => {
       styleSummary.setAttribute(
         "aria-label",
-        `${Tools.i18n.t("color")} ${Tools.preferences.currentColor}, ` +
+        `${Tools.i18n.t("color")} ${Tools.theme.displayColor(Tools.preferences.currentColor)}, ` +
           `${Tools.i18n.t("size")} ${Tools.preferences.currentSize}, ` +
           `${Tools.i18n.t("opacity")} ${Tools.preferences.currentOpacity}`,
       );
     };
     const updatePreview = () => {
       const r = styleSizeToPreviewRadius(Tools.preferences.currentSize);
-      stylePreviewDot.setAttribute("fill", Tools.preferences.currentColor);
+      stylePreviewDot.setAttribute(
+        "fill",
+        Tools.theme.displayColor(Tools.preferences.currentColor),
+      );
+      colorChooser.value = Tools.theme.displayColor(
+        Tools.preferences.currentColor,
+      );
       stylePreviewDot.setAttribute(
         "fill-opacity",
         String(Tools.preferences.currentOpacity),
@@ -337,10 +344,10 @@ export class BoardShellModule {
     }
     elem.addEventListener("click", setColor);
     elem.id = `color_${button.color.replace(/^#/, "")}`;
-    elem.style.backgroundColor = button.color;
+    elem.style.backgroundColor = Tools.theme.displayColor(button.color);
     elem.dataset.color = button.color;
     elem.setAttribute("aria-pressed", "false");
-    const colorLabel = `${Tools.i18n.t("color")} ${button.color}`;
+    const colorLabel = `${Tools.i18n.t("color")} ${Tools.theme.displayColor(button.color)}`;
     elem.title = button.key
       ? `${colorLabel} — ${Tools.i18n.t("keyboard shortcut")}: ${button.key}`
       : colorLabel;

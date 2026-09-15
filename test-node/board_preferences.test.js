@@ -60,32 +60,27 @@ function withMathRandom(value, callback) {
   }
 }
 
-test("createInitialPreferences restores the stored color before choosing a random preset", async () => {
+test("createInitialPreferences restores the stored color before the default", async () => {
   const { createInitialPreferences } = await import(
     "../client-data/js/board_preferences.js"
   );
   const preferences = withWindow(
     { localStorage: createLocalStorage({ "wbo.currentColor": "#123ABC" }) },
-    () =>
-      withMathRandom(0.99, () =>
-        createInitialPreferences([{ color: "#000000" }, { color: "#ffffff" }]),
-      ),
+    () => withMathRandom(0.99, () => createInitialPreferences()),
   );
 
   assert.equal(preferences.color, "#123ABC");
 });
 
-test("createInitialPreferences keeps random color choice when localStorage is empty", async () => {
+test("createInitialPreferences defaults to canonical black when localStorage is empty", async () => {
   const { createInitialPreferences } = await import(
     "../client-data/js/board_preferences.js"
   );
   const preferences = withWindow({ localStorage: createLocalStorage() }, () =>
-    withMathRandom(0.75, () =>
-      createInitialPreferences([{ color: "#000000" }, { color: "#ffffff" }]),
-    ),
+    withMathRandom(0.75, () => createInitialPreferences()),
   );
 
-  assert.equal(preferences.color, "#ffffff");
+  assert.equal(preferences.color, "#000000");
 });
 
 test("PreferenceModule persists color changes", async () => {

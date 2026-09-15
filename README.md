@@ -79,6 +79,35 @@ stable user identity used by friends, bans, or moderator grants. The server
 limits rename attempts to ten per socket per ten seconds. All name controls
 work over HTTP and HTTPS and are translated in every supported language.
 
+### Board dark mode
+
+Moderators can use **Board dark mode** beside the chunk controls to change the
+canvas for everyone. The setting is saved with board data and native `.wbo`
+backups, survives restarts, and appears in SVG downloads and previews. Temporary
+moderators can also change it. Ordinary viewers and editors follow the board's
+theme.
+
+The dark canvas is `#202020`. New sessions default to black ink in light mode
+and white ink in dark mode; existing color preferences are retained. Switching
+modes preserves hues: black becomes white, white matches the background, and
+light red becomes dark red. Original stroke colors remain intact, so switching
+back restores them exactly. The color picker, swatches, and active pencil stroke
+show the current appearance. Chunk borders and the optional grid and dots are
+white in dark mode. The surrounding controls keep their existing appearance.
+
+```sh
+python3 scripts/seminar_helper.py theme --server http://localhost:8080 --board seminar
+python3 scripts/seminar_helper.py theme --server http://localhost:8080 \
+  --board seminar --user-secret "$WBO_USER_SECRET" --mode dark
+```
+
+The helper also accepts `--private-key-file` or `--token`. `GET /theme/{board}`
+returns `{ "theme": "light" }` or `{ "theme": "dark" }`. Moderator-only POST
+accepts that same object with `X-WBO-Theme: 1` and `Content-Type: application/json`.
+V2 requests sign the exact body and work over HTTP and HTTPS. Updates share the
+chunk-settings rate limit. Backups can contain an optional `theme` field;
+older backups without it preserve the destination's theme.
+
 ### Canvas chunks and following activity
 
 Choose a view mode beside the Users control:

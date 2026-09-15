@@ -99,7 +99,7 @@ function defaultBoardMetadata() {
 
 let boardInstanceSequence = 0;
 /** @typedef {{minX: number, minY: number, maxX: number, maxY: number}} Bounds */
-/** @typedef {{readonly: boolean, chunks?: import("../../client-data/js/board_chunks.js").ChunkState}} BoardMetadata */
+/** @typedef {{readonly: boolean, chunks?: import("../../client-data/js/board_chunks.js").ChunkState, theme?: import("../../client-data/js/board_theme.js").BoardTheme}} BoardMetadata */
 /** @typedef {{ok: false, reason: string}} ValidationFailure */
 /** @typedef {{ok: true}} ValidationSuccess */
 /** @typedef {ValidationSuccess | ValidationFailure} BoardMutationResult */

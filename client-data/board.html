@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{language}}" dir="ltr" data-ui-direction="{{direction}}"{{#moderator}} data-moderator="true"{{/moderator}}>
+<html lang="{{language}}" dir="ltr" data-ui-direction="{{direction}}" data-board-theme="{{boardTheme}}"{{#moderator}} data-moderator="true"{{/moderator}}>
 
 <head>
 	<meta charset="utf-8" />
@@ -55,6 +55,7 @@
 				<option value="latest">{{translations.chunk_view_latest}}</option>
 			</select>
 			<button id="chunkSettingsToggle" type="button" hidden>{{translations.chunk_settings}}</button>
+			<button id="boardThemeToggle" type="button" aria-pressed="false" hidden>{{translations.board_dark_mode}}</button>
 		</div>
 		<div id="boardStatusIndicator" class="board-status-card board-status-reconnecting" role="status"
 			aria-live="polite" data-state="reconnecting">

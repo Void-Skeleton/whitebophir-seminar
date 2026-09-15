@@ -11,7 +11,7 @@ import observability from "../observability/index.mjs";
 import {
   boardExists,
   readServedBaseline,
-  readStoredSvgSeq,
+  readStoredSvgMetadata,
   streamServedBaseline,
 } from "../persistence/svg_board_store.mjs";
 import {
@@ -52,10 +52,11 @@ async function serveBoardSvg(ctx) {
   const boardName = requireBoardPathName(ctx.params);
   annotateBoardRequest(ctx.observed, boardName);
   requireBoardOpenPermission(ctx, boardName);
-  const persistedSeq = await readStoredSvgSeq(boardName, {
+  const stored = await readStoredSvgMetadata(boardName, {
     historyDir: ctx.runtime.config.HISTORY_DIR,
   });
-  const etag = boardPageETag(persistedSeq);
+  const persistedSeq = stored.seq;
+  const etag = boardPageETag(persistedSeq, stored.metadata.theme);
   pinServedBoardBaseline(boardName, persistedSeq, ctx.runtime.config);
   if (matchesIfNoneMatch(ctx.request.headers["if-none-match"], etag)) {
     ctx.response.writeHead(304, {

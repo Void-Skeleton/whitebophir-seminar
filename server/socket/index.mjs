@@ -559,6 +559,9 @@ async function bootstrapSocketBoard(socket, replay, config) {
       syncedPersistentSockets.delete(socket.id);
       socket.emit(SocketEvents.BROADCAST, replay.replayBatch);
       socket.emit(SocketEvents.CHUNK_STATE, chunkState(board));
+      socket.emit(SocketEvents.THEME_STATE, {
+        theme: board.metadata.theme || "light",
+      });
       syncedPersistentSockets.add(socket.id);
       tracing.setActiveSpanAttributes({
         "wbo.socket.replay.outcome": replay.outcome,
@@ -1030,4 +1033,12 @@ export {
 export function emitChunkState(board) {
   for (const id of board.users)
     getActiveSocket(id)?.emit(SocketEvents.CHUNK_STATE, chunkState(board));
+}
+
+/** @param {import("../board/data.mjs").BoardData} board */
+export function emitThemeState(board) {
+  for (const id of board.users)
+    getActiveSocket(id)?.emit(SocketEvents.THEME_STATE, {
+      theme: board.metadata.theme || "light",
+    });
 }

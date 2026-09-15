@@ -93,6 +93,12 @@ test("v2 moderators open, upload, download and reconnect on a real plain HTTP or
   expect(new URL(page.url()).searchParams.has("authV2")).toBe(false);
   await expect(boardPage.tool("clear")).toBeVisible();
 
+  await page.locator("#boardThemeToggle").click();
+  await expect(page.locator("#canvas")).toHaveAttribute(
+    "data-wbo-theme",
+    "dark",
+  );
+
   await boardPage.tool("download").click();
   const downloading = page.waitForEvent("download");
   await page
@@ -134,6 +140,10 @@ test("v2 moderators open, upload, download and reconnect on a real plain HTTP or
   await boardPage.waitForSocketConnected();
   await expect(page.locator("#drawingArea > rect")).toHaveCount(2);
   expect(requests.join("\n")).not.toContain(seed);
+  await expect(page.locator("#canvas")).toHaveAttribute(
+    "data-wbo-theme",
+    "dark",
+  );
   expect(
     (await context.cookies()).some(
       (cookie) => cookie.name === "wbo-user-secret-v2-private",

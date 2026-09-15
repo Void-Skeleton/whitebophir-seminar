@@ -1,4 +1,5 @@
 import { parseStoredChunks } from "../board/chunks.mjs";
+import { isBoardTheme } from "../../client-data/js/board_theme.js";
 import { once } from "node:events";
 import fs from "node:fs";
 import { readFile, rename, stat, writeFile } from "node:fs/promises";
@@ -77,9 +78,13 @@ function readStoredSvgRootMetadata(prefix) {
   const chunks = parseStoredChunks(
     readRawAttribute(rawAttributes, "data-wbo-chunks"),
   );
+  const theme = readRawAttribute(rawAttributes, "data-wbo-theme");
+  if (theme !== undefined && !isBoardTheme(theme))
+    throw new Error("Invalid stored board theme");
   return {
     readonly: readRawAttribute(rawAttributes, "data-wbo-readonly") === "true",
     ...(chunks ? { chunks } : {}),
+    ...(theme ? { theme } : {}),
     seq: normalizeStoredSeq(readRawAttribute(rawAttributes, "data-wbo-seq")),
     svgExtent: createSvgExtent(
       readRawAttribute(rawAttributes, "width"),
@@ -259,6 +264,7 @@ async function readStoredSvgMetadata(boardName, options) {
           metadata = {
             readonly: rootMetadata.readonly,
             ...(rootMetadata.chunks ? { chunks: rootMetadata.chunks } : {}),
+            ...(rootMetadata.theme ? { theme: rootMetadata.theme } : {}),
             seq,
           };
           break;
@@ -450,6 +456,7 @@ async function readCanonicalBoardState(boardName, options) {
             metadata = {
               readonly: rootMetadata.readonly,
               ...(rootMetadata.chunks ? { chunks: rootMetadata.chunks } : {}),
+              ...(rootMetadata.theme ? { theme: rootMetadata.theme } : {}),
             };
             seq = rootMetadata.seq;
             svgExtent.width = rootMetadata.svgExtent.width;
@@ -546,7 +553,7 @@ async function writeBoardState(boardName, board, metadata, seq, options) {
     "wbo.svg.item_count": Object.keys(board).length,
     "wbo.svg.seq": seq,
   });
-  if (Object.keys(board).length === 0 && !metadata.chunks) {
+  if (Object.keys(board).length === 0 && !metadata.chunks && !metadata.theme) {
     for (const emptyPath of [
       file,
       backupFile,
@@ -1030,7 +1037,7 @@ async function rewriteStoredSvgFromCanonical(
 /**
  * @param {string} boardName
  * @param {{historyDir?: string}=} [options]
- * @returns {Promise<{metadata: {readonly: boolean, seq?: number}, inlineBoardSvg: string | null, source: "svg" | "svg_backup" | "generated", byteLength: number}>}
+ * @returns {Promise<{metadata: BoardMetadata & {seq?: number}, inlineBoardSvg: string | null, source: "svg" | "svg_backup" | "generated", byteLength: number}>}
  */
 async function readBoardDocumentState(boardName, options) {
   const historyDir = options?.historyDir;
@@ -1132,6 +1139,7 @@ export {
   readCanonicalBoardState,
   readServedBaseline,
   readStoredSvgSeq,
+  readStoredSvgMetadata,
   rewriteStoredSvgFromCanonical,
   STORED_SVG_FORMAT,
   streamServedBaseline,

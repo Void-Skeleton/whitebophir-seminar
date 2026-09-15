@@ -390,6 +390,9 @@ export type UserReportedPayload = {
 export type ClientSocketIncomingEventMap = {
   [SocketEvents.BOARDSTATE]: AppBoardState;
   [SocketEvents.CHUNK_STATE]: import("../client-data/js/board_chunks.js").ChunkState;
+  [SocketEvents.THEME_STATE]: {
+    theme: import("../client-data/js/board_theme.js").BoardTheme;
+  };
   [SocketEvents.BROADCAST]: IncomingBroadcast;
   [SocketEvents.CONNECT]: undefined;
   [SocketEvents.CONNECT_ERROR]: {
@@ -869,6 +872,7 @@ export type AppToolsState = {
   coordinates: AppCoordinateModule;
   access: AppAccessModule;
   chunks: import("../client-data/js/board_chunks_module.js").ChunksModule;
+  theme: import("../client-data/js/board_theme_module.js").ThemeModule;
   dom: BoardDomModule;
   interaction: AppInteractionModule;
   presence: AppPresenceModule;

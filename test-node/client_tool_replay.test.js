@@ -188,7 +188,12 @@ function createBaseElement(store, tagName) {
   const element = /** @type {any} */ ({
     _id: "",
     tagName: tagName,
-    style: /** @type {{[key: string]: any}} */ ({}),
+    style: /** @type {{[key: string]: any}} */ ({
+      /** @param {string} name @param {string} value */
+      setProperty(name, value) {
+        this[name] = value;
+      },
+    }),
     attributes: /** @type {{[key: string]: any}} */ ({}),
     parentNode: null,
     parentElement: null,

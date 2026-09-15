@@ -8,7 +8,7 @@
   border: 1px solid #4b5563;
   border-radius: 2px;
   color: transparent;
-  caret-color: #000;
+  caret-color: var(--text-caret-color, #000);
   background: transparent;
   font-family: "Arial", "Helvetica", sans-serif;
   outline: none;

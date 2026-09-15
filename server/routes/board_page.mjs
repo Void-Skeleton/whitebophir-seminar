@@ -160,12 +160,20 @@ async function serveLoadedBoardCacheHit(ctx, pageRequest) {
   const loadedBoard = await loadedBoardPromise;
   const persistedSeq = loadedBoard.getPersistedSeq();
   if (!pageRequest.cachedSeqs.includes(persistedSeq)) return false;
+  const etag = boardPageETag(persistedSeq, loadedBoard.persistedMetadata.theme);
+  if (
+    loadedBoard.persistedMetadata.theme &&
+    !matchesIfNoneMatch(ctx.request.headers["if-none-match"], etag) &&
+    !matchesIfNoneMatch(ctx.request.headers["if-none-match"], etag.slice(2))
+  )
+    return false;
 
   respondWithBoardPageNotModified(
     ctx,
     pageRequest.boardName,
     persistedSeq,
     pageRequest.boardPermissions.boardState(loadedBoard),
+    etag,
   );
   return true;
 }
@@ -217,7 +225,10 @@ function readBoardDocumentForPage(ctx, pageRequest) {
  */
 function serveBoardDocumentCacheHit(ctx, pageRequest, document) {
   if (authenticateHttpV2(ctx, pageRequest.boardName)) return false;
-  const etag = boardPageETag(document.metadata.seq || 0);
+  const etag = boardPageETag(
+    document.metadata.seq || 0,
+    document.metadata.theme,
+  );
   if (!matchesIfNoneMatch(ctx.request.headers["if-none-match"], etag)) {
     return false;
   }
@@ -302,9 +313,10 @@ async function renderBoardDocument(ctx, pageRequest, document) {
   // abilities such as report-to-ban.
   const renderOptions = {
     noStore: !!authenticateHttpV2(ctx, pageRequest.boardName),
-    etag: boardPageETag(document.metadata.seq || 0),
+    etag: boardPageETag(document.metadata.seq || 0, document.metadata.theme),
     boardState,
     varyCookie: boardHtmlVariesByCookie(boardState),
+    boardTheme: document.metadata.theme || "light",
   };
 
   if (document.source === "svg" || document.source === "svg_backup") {

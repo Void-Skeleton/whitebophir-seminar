@@ -78,3 +78,9 @@ restore them on upload, including on empty boards. Archive validation, the HTTP
 snapshot and import paths, the Python helper, localized import descriptions,
 and regression tests are updated. Configured chunk boundaries now remain
 prominent independently of the Grid button in every view mode.
+
+Changes dated 2026-09-16 add the new seminar feature 1: moderator-controlled
+board dark mode, hue-preserving reversible color presentation, white grids and
+chunk borders, and default white ink on dark canvases. Board metadata, SVG
+previews and exports, native backups, live theme synchronization, the Python
+helper, all supported UI translations, and regression tests are extended.

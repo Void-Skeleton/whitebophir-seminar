@@ -65,10 +65,9 @@ export function saveStoredColorPreference(color) {
 }
 
 /**
- * @param {ColorPreset[]} colorPresets
  * @returns {AppInitialPreferences}
  */
-export function createInitialPreferences(colorPresets = DEFAULT_COLOR_PRESETS) {
+export function createInitialPreferences() {
   const storedColor = readStoredColorPreference();
   if (storedColor) {
     return {
@@ -78,11 +77,10 @@ export function createInitialPreferences(colorPresets = DEFAULT_COLOR_PRESETS) {
       opacity: DEFAULT_INITIAL_OPACITY,
     };
   }
-  const colorIndex = (Math.random() * colorPresets.length) | 0;
-  const initialPreset = colorPresets[colorIndex] || colorPresets[0];
   return {
     tool: "hand",
-    color: initialPreset?.color || "#001f3f",
+    // Canonical black renders white on a dark board.
+    color: "#000000",
     size: DEFAULT_INITIAL_SIZE,
     opacity: DEFAULT_INITIAL_OPACITY,
   };

@@ -86,6 +86,9 @@ board settings alongside items. Import validates it before any mutation, restore
 it with a fresh revision and destination activity point, and emits `chunk_state`
 to connected viewers. Settings-only archives also persist on empty boards.
 Older archives without `chunks` retain the destination's current settings.
+Archives may also carry `theme: "light" | "dark"`; importing it restores the
+board theme and emits `theme_state`. Without `theme`, destination mode is kept.
+Item colors remain canonical light-palette values in both modes.
 Archive metadata never grants access or replaces destination permissions.
 V2 archive requests carry a one-use signature through `X-WBO-Auth-V2`; imports
 also verify the SHA-512 digest of the exact compressed body before validation
@@ -202,6 +205,29 @@ revision in localStorage, migrating the previous local follow boolean.
 The Python helper exposes `chunks --view-mode free|chunk|latest` and dimension
 options. Stored legacy `follow`/`locked` metadata is migrated by
 `parseStoredChunks`; HTTP updates reject those obsolete fields.
+
+Shared canvas themes live in [board_theme.js](./client-data/js/board_theme.js),
+with moderator controls in [board_theme_module.js](./client-data/js/board_theme_module.js)
+loaded after initial viewport boot. `GET` / `POST /theme/{board}` shares the
+bounded, moderator-authorized settings handler in `board_chunks.mjs`. POST
+requires `X-WBO-Theme: 1`, JSON `{theme: "light" | "dark"}`, and a body-bound v2
+proof when applicable. Chunk and theme updates share the ten-per-board-per-ten-
+seconds limit and save under the session queue before broadcasting. Permanent
+and temporary moderators can set the theme. The Python helper exposes
+`theme --mode light|dark`; omit `--mode` to read it.
+
+Theme metadata persists as `data-wbo-theme`, including on empty boards. Stored
+SVG embeds its filter and styles, so previews and SVG exports share the board's
+appearance. Only presentation changes: canonical object colors, sequence, IDs,
+and geometry stay intact. Board HTML and SVG ETags include the configured theme
+so a theme-only save invalidates cached appearances. A hue-preserving lightness
+inversion maps black to white, white to `#202020`, and pale colors to darker
+versions of the same hue.
+The SVG filter works on groups and the local Pencil overlay without traversing
+items; user-space filter bounds keep horizontal and vertical strokes visible.
+Text caret, color picker, swatches, and style preview follow the mode. Fresh
+preferences default to canonical black (white when dark); stored choices remain.
+Chunk borders and regular grid/dot patterns become white in dark mode.
 
 [server/board/chunks.mjs](./server/board/chunks.mjs) derives activity from accepted
 mutations and cached canonical bounds without hydrating pencil payloads or
@@ -357,6 +383,8 @@ immediately emits `boardstate`, then a `broadcast` replay batch from the request
 also emit `chunk_state`. Accepted live frames optionally include
 `activityPoint: {x,y}`; the client follows it only after processing the frame in
 sequence. Replay uses the final chunk snapshot instead of moving through old edits.
+Connections also receive `theme_state {theme: "light" | "dark"}` after replay;
+theme changes and archive restoration emit the same snapshot.
 
 V2 clients first obtain a challenge through HTTP, then connect with Socket.IO
 handshake `auth: {v2: "<nonce>.<signature>"}` over WebSocket (`ws` or `wss`). V2

@@ -111,7 +111,7 @@
     "archive_export_svg": "تصدير SVG",
     "archive_export_wbo": "تصدير نسخة احتياطية بصيغة WBO",
     "archive_import_wbo": "استيراد نسخة احتياطية بصيغة WBO",
-    "archive_import_note": "نسخ WBO الاحتياطية مضغوطة وتبقى قابلة للتعديل. يضيف الاستيراد عناصر إلى هذه اللوحة. تُستعاد أيضًا إعدادات تقسيم اللوحة إلى أجزاء إذا كانت محفوظة في النسخة الاحتياطية.",
+    "archive_import_note": "نسخ WBO الاحتياطية مضغوطة وتبقى قابلة للتعديل. يضيف الاستيراد عناصر إلى هذه اللوحة. تُستعاد أيضًا إعدادات تقسيم اللوحة إلى أجزاء إذا كانت محفوظة في النسخة الاحتياطية. كما يُستعاد مظهر اللوحة إذا كان محفوظًا في النسخة الاحتياطية.",
     "archive_import_failed": "تعذّر الاستيراد. تحقّق من الملف وصلاحية التعديل، ثم انتظر 10 ثوانٍ قبل المحاولة مجددًا.",
     "archive_import_success": "تم استيراد النسخة الاحتياطية.",
     "archive_export_failed": "تعذّر التصدير. يُرجى المحاولة مجددًا.",
@@ -137,7 +137,9 @@
     "chunk_view_chunk": "التركيز على جزء",
     "chunk_view_latest": "التركيز على آخر جزء تم تعديله",
     "chunk_view_for_others": "وضع العرض للمستخدمين الآخرين",
-    "chunk_navigation_reminder": "اضغط اختصار السهم نفسه مرة أخرى خلال ثانيتين للتبديل إلى التركيز على جزء والانتقال."
+    "chunk_navigation_reminder": "اضغط اختصار السهم نفسه مرة أخرى خلال ثانيتين للتبديل إلى التركيز على جزء والانتقال.",
+    "board_dark_mode": "الوضع الداكن للوحة",
+    "board_theme_failed": "تعذّر حفظ مظهر اللوحة. تحقّق من اتصالك وصلاحيات المشرف، ثم حاول مجددًا."
   },
   "be": {
     "white-out": "Замазка",
@@ -251,7 +253,7 @@
     "archive_export_svg": "Экспартаваць SVG",
     "archive_export_wbo": "Экспартаваць рэзервовую копію WBO",
     "archive_import_wbo": "Імпартаваць рэзервовую копію WBO",
-    "archive_import_note": "Рэзервовыя копіі WBO сціснутыя і захоўваюць магчымасць рэдагавання. Пры імпарце аб’екты дадаюцца на гэтую дошку. Калі ў копіі ёсць налады падзелу дошкі на блокі, яны таксама аднаўляюцца.",
+    "archive_import_note": "Рэзервовыя копіі WBO сціснутыя і захоўваюць магчымасць рэдагавання. Пры імпарце аб’екты дадаюцца на гэтую дошку. Калі ў копіі ёсць налады падзелу дошкі на блокі, яны таксама аднаўляюцца. Тэма дошкі таксама аднаўляецца, калі яна захавана ў копіі.",
     "archive_import_failed": "Не ўдалося імпартаваць. Праверце файл і правы на рэдагаванне, затым пачакайце 10 секунд і паспрабуйце яшчэ раз.",
     "archive_import_success": "Рэзервовая копія імпартаваная.",
     "archive_export_failed": "Не ўдалося экспартаваць. Паспрабуйце яшчэ раз.",
@@ -277,7 +279,9 @@
     "chunk_view_chunk": "Фокус на блоку",
     "chunk_view_latest": "Фокус на апошнім змененым блоку",
     "chunk_view_for_others": "Рэжым прагляду для іншых карыстальнікаў",
-    "chunk_navigation_reminder": "Націсніце тое ж спалучэнне са стрэлкай яшчэ раз на працягу 2 секунд, каб перайсці ў рэжым фокусу на блоку і перамясціцца."
+    "chunk_navigation_reminder": "Націсніце тое ж спалучэнне са стрэлкай яшчэ раз на працягу 2 секунд, каб перайсці ў рэжым фокусу на блоку і перамясціцца.",
+    "board_dark_mode": "Цёмны рэжым дошкі",
+    "board_theme_failed": "Не ўдалося захаваць тэму дошкі. Праверце злучэнне і правы мадэратара, затым паспрабуйце зноў."
   },
   "ca": {
     "white-out": "Corrector blanc",
@@ -391,7 +395,7 @@
     "archive_export_svg": "Exporta SVG",
     "archive_export_wbo": "Exporta una còpia de seguretat WBO",
     "archive_import_wbo": "Importa una còpia de seguretat WBO",
-    "archive_import_note": "Les còpies WBO estan comprimides i es poden continuar editant. La importació afegeix objectes a aquesta pissarra. Si la còpia inclou la configuració de les seccions del llenç, també es restaura.",
+    "archive_import_note": "Les còpies WBO estan comprimides i es poden continuar editant. La importació afegeix objectes a aquesta pissarra. Si la còpia inclou la configuració de les seccions del llenç, també es restaura. El tema de la pissarra també es restaura si està desat a la còpia.",
     "archive_import_failed": "La importació ha fallat. Comprova el fitxer i els permisos d’edició i espera 10 segons abans de tornar-ho a provar.",
     "archive_import_success": "S’ha importat la còpia de seguretat.",
     "archive_export_failed": "L’exportació ha fallat. Torna-ho a provar.",
@@ -417,7 +421,9 @@
     "chunk_view_chunk": "Centrat en un bloc",
     "chunk_view_latest": "Centrat en l’últim bloc editat",
     "chunk_view_for_others": "Mode de vista dels altres usuaris",
-    "chunk_navigation_reminder": "Torna a prémer la mateixa drecera amb fletxa en un termini de 2 segons per centrar la vista en un bloc i desplaçar-te."
+    "chunk_navigation_reminder": "Torna a prémer la mateixa drecera amb fletxa en un termini de 2 segons per centrar la vista en un bloc i desplaçar-te.",
+    "board_dark_mode": "Mode fosc de la pissarra",
+    "board_theme_failed": "No s’ha pogut desar el tema de la pissarra. Comproveu la connexió i els permisos de moderació i torneu-ho a provar."
   },
   "de": {
     "board_name_placeholder": "Name des Whiteboards…",
@@ -531,7 +537,7 @@
     "archive_export_svg": "SVG exportieren",
     "archive_export_wbo": "WBO-Sicherung exportieren",
     "archive_import_wbo": "WBO-Sicherung importieren",
-    "archive_import_note": "WBO-Sicherungen sind komprimiert und bleiben bearbeitbar. Beim Import werden Objekte zu dieser Tafel hinzugefügt. Enthält die Sicherung Einstellungen für die Leinwandabschnitte, werden diese ebenfalls wiederhergestellt.",
+    "archive_import_note": "WBO-Sicherungen sind komprimiert und bleiben bearbeitbar. Beim Import werden Objekte zu dieser Tafel hinzugefügt. Enthält die Sicherung Einstellungen für die Leinwandabschnitte, werden diese ebenfalls wiederhergestellt. Ein in der Sicherung gespeichertes Tafeldesign wird ebenfalls wiederhergestellt.",
     "archive_import_failed": "Import fehlgeschlagen. Prüfe die Datei und deine Bearbeitungsrechte. Warte dann 10 Sekunden und versuche es erneut.",
     "archive_import_success": "Sicherung importiert.",
     "archive_export_failed": "Export fehlgeschlagen. Bitte versuche es erneut.",
@@ -557,7 +563,9 @@
     "chunk_view_chunk": "Auf Abschnitt zentriert",
     "chunk_view_latest": "Auf zuletzt bearbeiteten Abschnitt zentriert",
     "chunk_view_for_others": "Ansichtsmodus für andere Nutzer",
-    "chunk_navigation_reminder": "Drücke innerhalb von 2 Sekunden erneut dieselbe Pfeiltastenkombination, um zur Abschnittsansicht zu wechseln und dich zu bewegen."
+    "chunk_navigation_reminder": "Drücke innerhalb von 2 Sekunden erneut dieselbe Pfeiltastenkombination, um zur Abschnittsansicht zu wechseln und dich zu bewegen.",
+    "board_dark_mode": "Dunkle Tafel",
+    "board_theme_failed": "Das Tafeldesign konnte nicht gespeichert werden. Prüfe die Verbindung und deine Moderationsrechte und versuche es erneut."
   },
   "en": {
     "white-out": "White-out",
@@ -671,7 +679,7 @@
     "archive_export_svg": "Export SVG",
     "archive_export_wbo": "Export WBO backup",
     "archive_import_wbo": "Import WBO backup",
-    "archive_import_note": "WBO backups are compressed and editable. Import adds objects to this board. Saved chunk settings are also restored when included in the backup.",
+    "archive_import_note": "WBO backups are compressed and editable. Import adds objects to this board. Saved chunk settings are also restored when included in the backup. A board theme saved in the backup is restored too.",
     "archive_import_failed": "Import failed. Check the file and your editing access, then wait 10 seconds before retrying.",
     "archive_import_success": "Backup imported.",
     "archive_export_failed": "Export failed. Please try again.",
@@ -697,7 +705,9 @@
     "chunk_view_chunk": "Focused on chunk",
     "chunk_view_latest": "Focused on last edited chunk",
     "chunk_view_for_others": "View mode for other users",
-    "chunk_navigation_reminder": "Press the same arrow shortcut again within 2 seconds to switch to chunk focus and move."
+    "chunk_navigation_reminder": "Press the same arrow shortcut again within 2 seconds to switch to chunk focus and move.",
+    "board_dark_mode": "Board dark mode",
+    "board_theme_failed": "Could not save the board theme. Check your connection and moderator permissions, then try again."
   },
   "es": {
     "board_name_placeholder": "Nombre de la pizarra …",
@@ -811,7 +821,7 @@
     "archive_export_svg": "Exportar SVG",
     "archive_export_wbo": "Exportar copia de seguridad WBO",
     "archive_import_wbo": "Importar copia de seguridad WBO",
-    "archive_import_note": "Las copias WBO están comprimidas y se pueden seguir editando. Al importar, se añaden objetos a esta pizarra. Si la copia incluye la configuración de las secciones del lienzo, también se restaura.",
+    "archive_import_note": "Las copias WBO están comprimidas y se pueden seguir editando. Al importar, se añaden objetos a esta pizarra. Si la copia incluye la configuración de las secciones del lienzo, también se restaura. También se restaura el tema de la pizarra si está guardado en la copia.",
     "archive_import_failed": "Error al importar. Comprueba el archivo y tus permisos de edición y espera 10 segundos antes de volver a intentarlo.",
     "archive_import_success": "Copia de seguridad importada.",
     "archive_export_failed": "Error al exportar. Vuelve a intentarlo.",
@@ -837,7 +847,9 @@
     "chunk_view_chunk": "Centrado en un bloque",
     "chunk_view_latest": "Centrado en el último bloque editado",
     "chunk_view_for_others": "Modo de vista para otros usuarios",
-    "chunk_navigation_reminder": "Pulsa de nuevo el mismo atajo de flecha antes de 2 segundos para centrar la vista en un bloque y desplazarte."
+    "chunk_navigation_reminder": "Pulsa de nuevo el mismo atajo de flecha antes de 2 segundos para centrar la vista en un bloque y desplazarte.",
+    "board_dark_mode": "Modo oscuro de la pizarra",
+    "board_theme_failed": "No se pudo guardar el tema de la pizarra. Comprueba la conexión y tus permisos de moderación e inténtalo de nuevo."
   },
   "fr": {
     "board_name_placeholder": "Nom du tableau…",
@@ -950,7 +962,7 @@
     "archive_export_svg": "Exporter en SVG",
     "archive_export_wbo": "Exporter une sauvegarde WBO",
     "archive_import_wbo": "Importer une sauvegarde WBO",
-    "archive_import_note": "Les sauvegardes WBO sont compressées et restent modifiables. L’import ajoute des objets à ce tableau. Si la sauvegarde contient des réglages de découpage du tableau, ils sont également restaurés.",
+    "archive_import_note": "Les sauvegardes WBO sont compressées et restent modifiables. L’import ajoute des objets à ce tableau. Si la sauvegarde contient des réglages de découpage du tableau, ils sont également restaurés. Le thème du tableau est également restauré s’il figure dans la sauvegarde.",
     "archive_import_failed": "Échec de l’import. Vérifiez le fichier et vos droits de modification, puis attendez 10 secondes avant de réessayer.",
     "archive_import_success": "Sauvegarde importée.",
     "archive_export_failed": "Échec de l’export. Veuillez réessayer.",
@@ -976,7 +988,9 @@
     "chunk_view_chunk": "Centré sur un bloc",
     "chunk_view_latest": "Centré sur le dernier bloc modifié",
     "chunk_view_for_others": "Mode d’affichage des autres utilisateurs",
-    "chunk_navigation_reminder": "Appuyez à nouveau sur le même raccourci fléché dans les 2 secondes pour passer au centrage sur un bloc et vous déplacer."
+    "chunk_navigation_reminder": "Appuyez à nouveau sur le même raccourci fléché dans les 2 secondes pour passer au centrage sur un bloc et vous déplacer.",
+    "board_dark_mode": "Mode sombre du tableau",
+    "board_theme_failed": "Impossible d’enregistrer le thème du tableau. Vérifiez votre connexion et vos droits de modération, puis réessayez."
   },
   "hu": {
     "white-out": "Lefedő",
@@ -1090,7 +1104,7 @@
     "archive_export_svg": "SVG exportálása",
     "archive_export_wbo": "WBO biztonsági másolat exportálása",
     "archive_import_wbo": "WBO biztonsági másolat importálása",
-    "archive_import_note": "A WBO biztonsági másolatok tömörítettek, és szerkeszthetők maradnak. Az importálás objektumokat ad ehhez a táblához. Ha a biztonsági másolat tartalmazza a táblarészek beállításait, azok is visszaállnak.",
+    "archive_import_note": "A WBO biztonsági másolatok tömörítettek, és szerkeszthetők maradnak. Az importálás objektumokat ad ehhez a táblához. Ha a biztonsági másolat tartalmazza a táblarészek beállításait, azok is visszaállnak. A tábla témája is visszaáll, ha a biztonsági másolat tartalmazza.",
     "archive_import_failed": "Az importálás sikertelen. Ellenőrizd a fájlt és a szerkesztési jogosultságodat, majd várj 10 másodpercet, és próbáld újra.",
     "archive_import_success": "A biztonsági másolat importálva.",
     "archive_export_failed": "Az exportálás sikertelen. Próbáld újra.",
@@ -1116,7 +1130,9 @@
     "chunk_view_chunk": "Fókusz egy szakaszon",
     "chunk_view_latest": "Fókusz a legutóbb szerkesztett szakaszon",
     "chunk_view_for_others": "Más felhasználók nézetmódja",
-    "chunk_navigation_reminder": "Nyomd meg újra ugyanazt a nyílbillentyű-kombinációt 2 másodpercen belül a szakaszra fókuszáláshoz és a mozgáshoz."
+    "chunk_navigation_reminder": "Nyomd meg újra ugyanazt a nyílbillentyű-kombinációt 2 másodpercen belül a szakaszra fókuszáláshoz és a mozgáshoz.",
+    "board_dark_mode": "Sötét tábla",
+    "board_theme_failed": "Nem sikerült menteni a tábla témáját. Ellenőrizd a kapcsolatot és a moderátori jogosultságodat, majd próbáld újra."
   },
   "id": {
     "white-out": "Cairan koreksi",
@@ -1230,7 +1246,7 @@
     "archive_export_svg": "Ekspor SVG",
     "archive_export_wbo": "Ekspor cadangan WBO",
     "archive_import_wbo": "Impor cadangan WBO",
-    "archive_import_note": "Cadangan WBO dikompresi dan tetap dapat diedit. Impor akan menambahkan objek ke papan ini. Pengaturan petak yang tersimpan juga dipulihkan jika disertakan dalam cadangan.",
+    "archive_import_note": "Cadangan WBO dikompresi dan tetap dapat diedit. Impor akan menambahkan objek ke papan ini. Pengaturan petak yang tersimpan juga dipulihkan jika disertakan dalam cadangan. Tema papan juga dipulihkan jika tersimpan dalam cadangan.",
     "archive_import_failed": "Impor gagal. Periksa file dan izin edit Anda, lalu tunggu 10 detik sebelum mencoba lagi.",
     "archive_import_success": "Cadangan berhasil diimpor.",
     "archive_export_failed": "Ekspor gagal. Silakan coba lagi.",
@@ -1256,7 +1272,9 @@
     "chunk_view_chunk": "Fokus pada petak",
     "chunk_view_latest": "Fokus pada petak terakhir yang diedit",
     "chunk_view_for_others": "Mode tampilan pengguna lain",
-    "chunk_navigation_reminder": "Tekan lagi pintasan panah yang sama dalam 2 detik untuk beralih ke fokus petak dan berpindah."
+    "chunk_navigation_reminder": "Tekan lagi pintasan panah yang sama dalam 2 detik untuk beralih ke fokus petak dan berpindah.",
+    "board_dark_mode": "Mode gelap papan",
+    "board_theme_failed": "Tema papan tidak dapat disimpan. Periksa koneksi dan izin moderator Anda, lalu coba lagi."
   },
   "it": {
     "board_name_placeholder": "Nome della lavagna…",
@@ -1370,7 +1388,7 @@
     "archive_export_svg": "Esporta SVG",
     "archive_export_wbo": "Esporta backup WBO",
     "archive_import_wbo": "Importa backup WBO",
-    "archive_import_note": "I backup WBO sono compressi e restano modificabili. L’importazione aggiunge oggetti a questa lavagna. Se il backup include le impostazioni delle sezioni della lavagna, anche queste vengono ripristinate.",
+    "archive_import_note": "I backup WBO sono compressi e restano modificabili. L’importazione aggiunge oggetti a questa lavagna. Se il backup include le impostazioni delle sezioni della lavagna, anche queste vengono ripristinate. Anche il tema della lavagna viene ripristinato se è salvato nel backup.",
     "archive_import_failed": "Importazione non riuscita. Controlla il file e i tuoi permessi di modifica, poi attendi 10 secondi prima di riprovare.",
     "archive_import_success": "Backup importato.",
     "archive_export_failed": "Esportazione non riuscita. Riprova.",
@@ -1396,7 +1414,9 @@
     "chunk_view_chunk": "Centrata su un riquadro",
     "chunk_view_latest": "Centrata sull’ultimo riquadro modificato",
     "chunk_view_for_others": "Modalità di visualizzazione degli altri utenti",
-    "chunk_navigation_reminder": "Premi di nuovo la stessa scorciatoia con la freccia entro 2 secondi per centrare la vista su un riquadro e spostarti."
+    "chunk_navigation_reminder": "Premi di nuovo la stessa scorciatoia con la freccia entro 2 secondi per centrare la vista su un riquadro e spostarti.",
+    "board_dark_mode": "Modalità scura della lavagna",
+    "board_theme_failed": "Impossibile salvare il tema della lavagna. Controlla la connessione e i permessi di moderazione, quindi riprova."
   },
   "ja": {
     "board_name_placeholder": "ボードの名前",
@@ -1510,7 +1530,7 @@
     "archive_export_svg": "SVG をエクスポート",
     "archive_export_wbo": "WBO バックアップをエクスポート",
     "archive_import_wbo": "WBO バックアップをインポート",
-    "archive_import_note": "WBO バックアップは圧縮され、編集可能な状態で保存されます。インポートすると、このボードにオブジェクトが追加されます。バックアップにキャンバスの区画設定が含まれている場合は、その設定も復元されます。",
+    "archive_import_note": "WBO バックアップは圧縮され、編集可能な状態で保存されます。インポートすると、このボードにオブジェクトが追加されます。バックアップにキャンバスの区画設定が含まれている場合は、その設定も復元されます。ボードのテーマが保存されている場合は、それも復元されます。",
     "archive_import_failed": "インポートできませんでした。ファイルと編集権限を確認し、10 秒待ってから再試行してください。",
     "archive_import_success": "バックアップをインポートしました。",
     "archive_export_failed": "エクスポートできませんでした。もう一度お試しください。",
@@ -1536,7 +1556,9 @@
     "chunk_view_chunk": "区画にフォーカス",
     "chunk_view_latest": "最後に編集された区画にフォーカス",
     "chunk_view_for_others": "他のユーザーの表示モード",
-    "chunk_navigation_reminder": "2秒以内に同じ矢印キーのショートカットをもう一度押すと、区画にフォーカスするモードに切り替わり、移動します。"
+    "chunk_navigation_reminder": "2秒以内に同じ矢印キーのショートカットをもう一度押すと、区画にフォーカスするモードに切り替わり、移動します。",
+    "board_dark_mode": "ボードのダークモード",
+    "board_theme_failed": "ボードのテーマを保存できませんでした。接続とモデレーター権限を確認して、もう一度お試しください。"
   },
   "my": {
     "board_name_placeholder": "ဝှိုက်ဘုတ်အမည် ... ",
@@ -1650,7 +1672,7 @@
     "archive_export_svg": "SVG အဖြစ် ထုတ်ယူရန်",
     "archive_export_wbo": "WBO အရန်ဖိုင် ထုတ်ယူရန်",
     "archive_import_wbo": "WBO အရန်ဖိုင် ပြန်သွင်းရန်",
-    "archive_import_note": "WBO အရန်ဖိုင်များကို ချုံ့ထားပြီး ပြန်လည်တည်းဖြတ်နိုင်ပါသည်။ ဖိုင်ပြန်သွင်းပါက ဤဘုတ်ပေါ်သို့ အရာဝတ္ထုများ ထပ်ထည့်ပေးပါမည်။ အရန်ဖိုင်တွင် ဘုတ်ကွက်ခွဲခြင်း ဆက်တင်များ ပါဝင်ပါက ထိုဆက်တင်များကိုလည်း ပြန်လည်သတ်မှတ်ပေးပါမည်။",
+    "archive_import_note": "WBO အရန်ဖိုင်များကို ချုံ့ထားပြီး ပြန်လည်တည်းဖြတ်နိုင်ပါသည်။ ဖိုင်ပြန်သွင်းပါက ဤဘုတ်ပေါ်သို့ အရာဝတ္ထုများ ထပ်ထည့်ပေးပါမည်။ အရန်ဖိုင်တွင် ဘုတ်ကွက်ခွဲခြင်း ဆက်တင်များ ပါဝင်ပါက ထိုဆက်တင်များကိုလည်း ပြန်လည်သတ်မှတ်ပေးပါမည်။ အရန်ဖိုင်တွင် ဘုတ်အပြင်အဆင် ပါဝင်ပါက ၎င်းကိုလည်း ပြန်လည်သတ်မှတ်ပေးပါမည်။",
     "archive_import_failed": "ဖိုင်ပြန်သွင်း၍ မရပါ။ ဖိုင်နှင့် တည်းဖြတ်ခွင့်ကို စစ်ဆေးပြီး ၁၀ စက္ကန့်စောင့်ကာ ထပ်ကြိုးစားပါ။",
     "archive_import_success": "အရန်ဖိုင် ပြန်သွင်းပြီးပါပြီ။",
     "archive_export_failed": "ဖိုင်ထုတ်ယူ၍ မရပါ။ ထပ်ကြိုးစားပါ။",
@@ -1676,7 +1698,9 @@
     "chunk_view_chunk": "အကွက်တစ်ခုကို အာရုံစိုက်ရန်",
     "chunk_view_latest": "နောက်ဆုံးတည်းဖြတ်ထားသော အကွက်ကို အာရုံစိုက်ရန်",
     "chunk_view_for_others": "အခြားအသုံးပြုသူများ၏ မြင်ကွင်းမုဒ်",
-    "chunk_navigation_reminder": "အကွက်အာရုံစိုက်မုဒ်သို့ ပြောင်းပြီး ရွှေ့ရန် တူညီသော မြားခလုတ်တွဲကို ၂ စက္ကန့်အတွင်း ထပ်နှိပ်ပါ။"
+    "chunk_navigation_reminder": "အကွက်အာရုံစိုက်မုဒ်သို့ ပြောင်းပြီး ရွှေ့ရန် တူညီသော မြားခလုတ်တွဲကို ၂ စက္ကန့်အတွင်း ထပ်နှိပ်ပါ။",
+    "board_dark_mode": "ဘုတ်အတွက် အမှောင်မုဒ်",
+    "board_theme_failed": "ဘုတ်အပြင်အဆင်ကို မသိမ်းဆည်းနိုင်ပါ။ ချိတ်ဆက်မှုနှင့် ကြီးကြပ်သူခွင့်ပြုချက်များကို စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ။"
   },
   "pt": {
     "white-out": "Branquejar",
@@ -1790,7 +1814,7 @@
     "archive_export_svg": "Exportar SVG",
     "archive_export_wbo": "Exportar cópia de segurança WBO",
     "archive_import_wbo": "Importar cópia de segurança WBO",
-    "archive_import_note": "As cópias WBO são comprimidas e continuam editáveis. A importação adiciona objetos a este quadro. Se a cópia incluir as definições das secções do quadro, estas também são restauradas.",
+    "archive_import_note": "As cópias WBO são comprimidas e continuam editáveis. A importação adiciona objetos a este quadro. Se a cópia incluir as definições das secções do quadro, estas também são restauradas. O tema do quadro também é restaurado se estiver guardado na cópia.",
     "archive_import_failed": "Falha ao importar. Verifique o ficheiro e as suas permissões de edição e aguarde 10 segundos antes de tentar novamente.",
     "archive_import_success": "Cópia de segurança importada.",
     "archive_export_failed": "Falha ao exportar. Tente novamente.",
@@ -1816,7 +1840,9 @@
     "chunk_view_chunk": "Centrado num bloco",
     "chunk_view_latest": "Centrado no último bloco editado",
     "chunk_view_for_others": "Modo de visualização dos outros utilizadores",
-    "chunk_navigation_reminder": "Prima novamente o mesmo atalho de seta dentro de 2 segundos para centrar a vista num bloco e deslocar-se."
+    "chunk_navigation_reminder": "Prima novamente o mesmo atalho de seta dentro de 2 segundos para centrar a vista num bloco e deslocar-se.",
+    "board_dark_mode": "Modo escuro do quadro",
+    "board_theme_failed": "Não foi possível guardar o tema do quadro. Verifique a ligação e as permissões de moderação e tente novamente."
   },
   "ru": {
     "board_name_placeholder": "Название доски",
@@ -1930,7 +1956,7 @@
     "archive_export_svg": "Экспорт SVG",
     "archive_export_wbo": "Экспорт резервной копии WBO",
     "archive_import_wbo": "Импорт резервной копии WBO",
-    "archive_import_note": "Резервные копии WBO сжаты и сохраняют возможность редактирования. При импорте объекты добавляются на эту доску. Если в копии сохранены настройки разбиения доски на блоки, они также восстанавливаются.",
+    "archive_import_note": "Резервные копии WBO сжаты и сохраняют возможность редактирования. При импорте объекты добавляются на эту доску. Если в копии сохранены настройки разбиения доски на блоки, они также восстанавливаются. Тема доски также восстанавливается, если она сохранена в копии.",
     "archive_import_failed": "Не удалось импортировать. Проверьте файл и права на редактирование, затем подождите 10 секунд и повторите попытку.",
     "archive_import_success": "Резервная копия импортирована.",
     "archive_export_failed": "Не удалось экспортировать. Повторите попытку.",
@@ -1956,7 +1982,9 @@
     "chunk_view_chunk": "Фокус на блоке",
     "chunk_view_latest": "Фокус на последнем изменённом блоке",
     "chunk_view_for_others": "Режим просмотра для других пользователей",
-    "chunk_navigation_reminder": "Нажмите ту же комбинацию со стрелкой ещё раз в течение 2 секунд, чтобы перейти к фокусу на блоке и переместиться."
+    "chunk_navigation_reminder": "Нажмите ту же комбинацию со стрелкой ещё раз в течение 2 секунд, чтобы перейти к фокусу на блоке и переместиться.",
+    "board_dark_mode": "Тёмный режим доски",
+    "board_theme_failed": "Не удалось сохранить тему доски. Проверьте соединение и права модератора, затем попробуйте снова."
   },
   "sw": {
     "board_name_placeholder": "Jina la ubao mweupe ...",
@@ -2070,7 +2098,7 @@
     "archive_export_svg": "Hamisha kama SVG",
     "archive_export_wbo": "Hamisha nakala rudufu ya WBO",
     "archive_import_wbo": "Ingiza nakala rudufu ya WBO",
-    "archive_import_note": "Nakala rudufu za WBO zimebanwa na zinaweza kuhaririwa. Kuingiza nakala huongeza vitu kwenye ubao huu. Mipangilio ya kugawa ubao katika sehemu pia hurejeshwa ikiwa imehifadhiwa katika nakala rudufu.",
+    "archive_import_note": "Nakala rudufu za WBO zimebanwa na zinaweza kuhaririwa. Kuingiza nakala huongeza vitu kwenye ubao huu. Mipangilio ya kugawa ubao katika sehemu pia hurejeshwa ikiwa imehifadhiwa katika nakala rudufu. Mandhari ya ubao pia hurejeshwa ikiwa yamehifadhiwa katika nakala rudufu.",
     "archive_import_failed": "Imeshindikana kuingiza nakala. Kagua faili na ruhusa yako ya kuhariri, kisha subiri sekunde 10 kabla ya kujaribu tena.",
     "archive_import_success": "Nakala rudufu imeingizwa.",
     "archive_export_failed": "Imeshindikana kuhamisha. Tafadhali jaribu tena.",
@@ -2096,7 +2124,9 @@
     "chunk_view_chunk": "Lenga sehemu moja",
     "chunk_view_latest": "Lenga sehemu iliyohaririwa mwisho",
     "chunk_view_for_others": "Hali ya mwonekano kwa watumiaji wengine",
-    "chunk_navigation_reminder": "Bonyeza tena njia ileile ya mkato ya mshale ndani ya sekunde 2 ili kulenga sehemu moja na kusogea."
+    "chunk_navigation_reminder": "Bonyeza tena njia ileile ya mkato ya mshale ndani ya sekunde 2 ili kulenga sehemu moja na kusogea.",
+    "board_dark_mode": "Hali ya giza ya ubao",
+    "board_theme_failed": "Mandhari ya ubao hayakuweza kuhifadhiwa. Angalia muunganisho na ruhusa zako za usimamizi, kisha ujaribu tena."
   },
   "th": {
     "board_name_placeholder": "ชื่อไวท์บอร์ด ...",
@@ -2210,7 +2240,7 @@
     "archive_export_svg": "ส่งออก SVG",
     "archive_export_wbo": "ส่งออกข้อมูลสำรอง WBO",
     "archive_import_wbo": "นำเข้าข้อมูลสำรอง WBO",
-    "archive_import_note": "ข้อมูลสำรอง WBO ถูกบีบอัดและยังแก้ไขได้ การนำเข้าจะเพิ่มวัตถุลงในกระดานนี้ หากข้อมูลสำรองมีการตั้งค่าการแบ่งกระดานเป็นส่วน ๆ ระบบจะคืนค่าการตั้งค่าเหล่านั้นด้วย",
+    "archive_import_note": "ข้อมูลสำรอง WBO ถูกบีบอัดและยังแก้ไขได้ การนำเข้าจะเพิ่มวัตถุลงในกระดานนี้ หากข้อมูลสำรองมีการตั้งค่าการแบ่งกระดานเป็นส่วน ๆ ระบบจะคืนค่าการตั้งค่าเหล่านั้นด้วย ธีมกระดานจะถูกคืนค่าด้วย หากบันทึกไว้ในข้อมูลสำรอง",
     "archive_import_failed": "นำเข้าไม่สำเร็จ โปรดตรวจสอบไฟล์และสิทธิ์แก้ไข แล้วรอ 10 วินาทีก่อนลองอีกครั้ง",
     "archive_import_success": "นำเข้าข้อมูลสำรองแล้ว",
     "archive_export_failed": "ส่งออกไม่สำเร็จ โปรดลองอีกครั้ง",
@@ -2236,7 +2266,9 @@
     "chunk_view_chunk": "โฟกัสที่ช่อง",
     "chunk_view_latest": "โฟกัสที่ช่องที่แก้ไขล่าสุด",
     "chunk_view_for_others": "โหมดมุมมองสำหรับผู้ใช้อื่น",
-    "chunk_navigation_reminder": "กดปุ่มลัดลูกศรเดิมอีกครั้งภายใน 2 วินาที เพื่อเปลี่ยนเป็นโหมดโฟกัสที่ช่องและเลื่อนมุมมอง"
+    "chunk_navigation_reminder": "กดปุ่มลัดลูกศรเดิมอีกครั้งภายใน 2 วินาที เพื่อเปลี่ยนเป็นโหมดโฟกัสที่ช่องและเลื่อนมุมมอง",
+    "board_dark_mode": "โหมดมืดของกระดาน",
+    "board_theme_failed": "บันทึกธีมกระดานไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่อและสิทธิ์ผู้ดูแล แล้วลองอีกครั้ง"
   },
   "uk": {
     "white-out": "Коректор",
@@ -2350,7 +2382,7 @@
     "archive_export_svg": "Експортувати SVG",
     "archive_export_wbo": "Експортувати резервну копію WBO",
     "archive_import_wbo": "Імпортувати резервну копію WBO",
-    "archive_import_note": "Резервні копії WBO стиснуті й зберігають можливість редагування. Імпорт додає об’єкти на цю дошку. Якщо в копії збережено налаштування поділу дошки на блоки, вони також відновлюються.",
+    "archive_import_note": "Резервні копії WBO стиснуті й зберігають можливість редагування. Імпорт додає об’єкти на цю дошку. Якщо в копії збережено налаштування поділу дошки на блоки, вони також відновлюються. Тема дошки також відновлюється, якщо її збережено в копії.",
     "archive_import_failed": "Не вдалося імпортувати. Перевірте файл і права на редагування, потім зачекайте 10 секунд і спробуйте ще раз.",
     "archive_import_success": "Резервну копію імпортовано.",
     "archive_export_failed": "Не вдалося експортувати. Спробуйте ще раз.",
@@ -2376,7 +2408,9 @@
     "chunk_view_chunk": "Фокус на блоці",
     "chunk_view_latest": "Фокус на останньому зміненому блоці",
     "chunk_view_for_others": "Режим перегляду для інших користувачів",
-    "chunk_navigation_reminder": "Натисніть ту саму комбінацію зі стрілкою ще раз протягом 2 секунд, щоб перейти до фокусу на блоці та переміститися."
+    "chunk_navigation_reminder": "Натисніть ту саму комбінацію зі стрілкою ще раз протягом 2 секунд, щоб перейти до фокусу на блоці та переміститися.",
+    "board_dark_mode": "Темний режим дошки",
+    "board_theme_failed": "Не вдалося зберегти тему дошки. Перевірте з’єднання та права модератора, а потім спробуйте знову."
   },
   "vi": {
     "white-out": "Bút xóa",
@@ -2490,7 +2524,7 @@
     "archive_export_svg": "Xuất SVG",
     "archive_export_wbo": "Xuất bản sao lưu WBO",
     "archive_import_wbo": "Nhập bản sao lưu WBO",
-    "archive_import_note": "Bản sao lưu WBO được nén và vẫn có thể chỉnh sửa. Khi nhập, các đối tượng sẽ được thêm vào bảng này. Nếu bản sao lưu có chứa cài đặt chia bảng thành các ô, các cài đặt đó cũng sẽ được khôi phục.",
+    "archive_import_note": "Bản sao lưu WBO được nén và vẫn có thể chỉnh sửa. Khi nhập, các đối tượng sẽ được thêm vào bảng này. Nếu bản sao lưu có chứa cài đặt chia bảng thành các ô, các cài đặt đó cũng sẽ được khôi phục. Giao diện bảng cũng được khôi phục nếu có trong bản sao lưu.",
     "archive_import_failed": "Nhập thất bại. Hãy kiểm tra tệp và quyền chỉnh sửa, rồi chờ 10 giây trước khi thử lại.",
     "archive_import_success": "Đã nhập bản sao lưu.",
     "archive_export_failed": "Xuất thất bại. Vui lòng thử lại.",
@@ -2516,7 +2550,9 @@
     "chunk_view_chunk": "Tập trung vào một ô",
     "chunk_view_latest": "Tập trung vào ô chỉnh sửa gần nhất",
     "chunk_view_for_others": "Chế độ xem cho người dùng khác",
-    "chunk_navigation_reminder": "Nhấn lại cùng phím tắt mũi tên trong vòng 2 giây để chuyển sang chế độ tập trung vào ô và di chuyển."
+    "chunk_navigation_reminder": "Nhấn lại cùng phím tắt mũi tên trong vòng 2 giây để chuyển sang chế độ tập trung vào ô và di chuyển.",
+    "board_dark_mode": "Chế độ tối cho bảng",
+    "board_theme_failed": "Không thể lưu giao diện bảng. Hãy kiểm tra kết nối và quyền điều hành rồi thử lại."
   },
   "zh-CN": {
     "board_name_placeholder": "白板名称",
@@ -2630,7 +2666,7 @@
     "archive_export_svg": "导出 SVG",
     "archive_export_wbo": "导出 WBO 备份",
     "archive_import_wbo": "导入 WBO 备份",
-    "archive_import_note": "WBO 备份经过压缩，导入后仍可编辑。导入会将备份中的对象添加到当前白板。如果备份中包含白板分块设置，也会一并恢复。",
+    "archive_import_note": "WBO 备份经过压缩，导入后仍可编辑。导入会将备份中的对象添加到当前白板。如果备份中包含白板分块设置，也会一并恢复。备份中保存的白板主题也会一并恢复。",
     "archive_import_failed": "导入失败。请检查文件和编辑权限，等待 10 秒后重试。",
     "archive_import_success": "备份已导入。",
     "archive_export_failed": "导出失败，请重试。",
@@ -2656,7 +2692,9 @@
     "chunk_view_chunk": "聚焦分块",
     "chunk_view_latest": "聚焦最新编辑分块",
     "chunk_view_for_others": "其他用户的视图模式",
-    "chunk_navigation_reminder": "请在 2 秒内再次按下相同的方向键组合，切换到分块聚焦模式并移动视角。"
+    "chunk_navigation_reminder": "请在 2 秒内再次按下相同的方向键组合，切换到分块聚焦模式并移动视角。",
+    "board_dark_mode": "白板深色模式",
+    "board_theme_failed": "无法保存白板主题。请检查网络连接和管理员权限，然后重试。"
   },
   "zh-TW": {
     "board_name_placeholder": "白板名稱",
@@ -2770,7 +2808,7 @@
     "archive_export_svg": "匯出 SVG",
     "archive_export_wbo": "匯出 WBO 備份",
     "archive_import_wbo": "匯入 WBO 備份",
-    "archive_import_note": "WBO 備份經過壓縮，匯入後仍可編輯。匯入會將備份中的物件加入目前的白板。如果備份中包含白板分塊設定，也會一併還原。",
+    "archive_import_note": "WBO 備份經過壓縮，匯入後仍可編輯。匯入會將備份中的物件加入目前的白板。如果備份中包含白板分塊設定，也會一併還原。備份中儲存的白板主題也會一併還原。",
     "archive_import_failed": "匯入失敗。請檢查檔案和編輯權限，等待 10 秒後重試。",
     "archive_import_success": "備份已匯入。",
     "archive_export_failed": "匯出失敗，請重試。",
@@ -2796,7 +2834,9 @@
     "chunk_view_chunk": "聚焦區塊",
     "chunk_view_latest": "聚焦最近編輯的區塊",
     "chunk_view_for_others": "其他使用者的檢視模式",
-    "chunk_navigation_reminder": "請在 2 秒內再次按下相同的方向鍵組合，切換至區塊聚焦模式並移動視角。"
+    "chunk_navigation_reminder": "請在 2 秒內再次按下相同的方向鍵組合，切換至區塊聚焦模式並移動視角。",
+    "board_dark_mode": "白板深色模式",
+    "board_theme_failed": "無法儲存白板主題。請檢查網路連線和管理員權限，然後重試。"
   },
   "pl": {
     "board_name_placeholder": "Nazwa tablicy",
@@ -2910,7 +2950,7 @@
     "archive_export_svg": "Eksportuj SVG",
     "archive_export_wbo": "Eksportuj kopię zapasową WBO",
     "archive_import_wbo": "Importuj kopię zapasową WBO",
-    "archive_import_note": "Kopie WBO są skompresowane i zachowują możliwość edycji. Import dodaje obiekty do tej tablicy. Jeśli kopia zawiera ustawienia podziału tablicy na części, zostaną one również przywrócone.",
+    "archive_import_note": "Kopie WBO są skompresowane i zachowują możliwość edycji. Import dodaje obiekty do tej tablicy. Jeśli kopia zawiera ustawienia podziału tablicy na części, zostaną one również przywrócone. Motyw tablicy również zostanie przywrócony, jeśli jest zapisany w kopii.",
     "archive_import_failed": "Import nie powiódł się. Sprawdź plik i uprawnienia do edycji, a następnie odczekaj 10 sekund i spróbuj ponownie.",
     "archive_import_success": "Kopia zapasowa została zaimportowana.",
     "archive_export_failed": "Eksport nie powiódł się. Spróbuj ponownie.",
@@ -2936,6 +2976,8 @@
     "chunk_view_chunk": "Skupienie na obszarze",
     "chunk_view_latest": "Skupienie na ostatnio edytowanym obszarze",
     "chunk_view_for_others": "Tryb widoku innych użytkowników",
-    "chunk_navigation_reminder": "Naciśnij ponownie ten sam skrót ze strzałką w ciągu 2 sekund, aby przełączyć się na skupienie na obszarze i przesunąć widok."
+    "chunk_navigation_reminder": "Naciśnij ponownie ten sam skrót ze strzałką w ciągu 2 sekund, aby przełączyć się na skupienie na obszarze i przesunąć widok.",
+    "board_dark_mode": "Ciemny tryb tablicy",
+    "board_theme_failed": "Nie udało się zapisać motywu tablicy. Sprawdź połączenie i uprawnienia moderatora, a następnie spróbuj ponownie."
   }
 }

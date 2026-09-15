@@ -49,10 +49,11 @@ function matchesIfNoneMatch(ifNoneMatch, etag) {
 
 /**
  * @param {number | string} seq
+ * @param {import("../../client-data/js/board_theme.js").BoardTheme} [theme]
  * @returns {string}
  */
-function boardPageETag(seq) {
-  return `W/"wbo-seq-${Number(seq) || 0}"`;
+function boardPageETag(seq, theme) {
+  return `W/"wbo-seq-${Number(seq) || 0}${theme ? `-${theme}` : ""}"`;
 }
 
 /**
@@ -60,8 +61,7 @@ function boardPageETag(seq) {
  * @returns {number | null}
  */
 function parseBoardPageETag(value) {
-  const match =
-    /^W\/"wbo-seq-(\d+)"$/.exec(value) || /^"wbo-seq-(\d+)"$/.exec(value);
+  const match = /^(?:W\/)?"wbo-seq-(\d+)(?:-(?:light|dark))?"$/.exec(value);
   if (!match?.[1]) return null;
   const seq = Number(match[1]);
   return Number.isSafeInteger(seq) && seq >= 0 ? seq : null;

@@ -42,6 +42,7 @@ export class AccessModule {
     const Tools = this.getTools();
     this.boardState = boardState;
     Tools.chunks.sync();
+    Tools.theme.sync();
     Tools.connection.scheduleAccessRefresh(boardState.accessRefreshAfterMs);
     // Hide editing affordances whenever the user cannot edit (a read-only board,
     // or a banned user on a writable one). The drawing tools themselves are

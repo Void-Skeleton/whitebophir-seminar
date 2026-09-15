@@ -792,7 +792,7 @@ test("board pages are no-store in development and render plain asset URLs", asyn
     assert.equal(frenchResponse.statusCode, 200);
     assert.match(
       arabicResponse.body,
-      /<html lang="ar" dir="ltr" data-ui-direction="rtl">/,
+      /<html lang="ar" dir="ltr" data-ui-direction="rtl" data-board-theme="light">/,
     );
     assert.match(
       arabicResponse.body,

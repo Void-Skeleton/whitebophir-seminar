@@ -5,6 +5,7 @@ import { Readable } from "node:stream";
 import { promisify } from "node:util";
 import { gunzip, gzip } from "node:zlib";
 import { validateChunkSettings } from "../../client-data/js/board_chunks.js";
+import { isBoardTheme } from "../../client-data/js/board_theme.js";
 import MessageCommon from "../../client-data/js/message_common.js";
 import { MutationType } from "../../client-data/js/mutation_type.js";
 import { TOOL_BY_ID } from "../../client-data/tools/index.js";
@@ -36,6 +37,7 @@ const ITEM_FIELDS = new Set([
 
 /** @import { ServerConfig, NormalizedMessageData } from "../../types/server-runtime.d.ts" */
 /** @import { ChunkSettings } from "../../client-data/js/board_chunks.js" */
+/** @import { BoardTheme } from "../../client-data/js/board_theme.js" */
 /** @typedef {Record<string, any>} ArchiveItem */
 /** @typedef {Pick<ServerConfig, "MAX_ARCHIVE_BYTES" | "MAX_ARCHIVE_JSON_BYTES">} ArchiveLimits */
 
@@ -72,8 +74,13 @@ export async function itemsFromSvg(svg) {
   return items;
 }
 
-/** @param {ArchiveItem[]} items @param {ArchiveLimits} [limits] @param {ChunkSettings} [chunks] @returns {Promise<Buffer>} */
-export async function encodeArchive(items, limits = configuration, chunks) {
+/** @param {ArchiveItem[]} items @param {ArchiveLimits} [limits] @param {ChunkSettings} [chunks] @param {BoardTheme} [theme] @returns {Promise<Buffer>} */
+export async function encodeArchive(
+  items,
+  limits = configuration,
+  chunks,
+  theme,
+) {
   const json = Buffer.from(
     JSON.stringify({
       format: ARCHIVE_FORMAT,
@@ -81,6 +88,7 @@ export async function encodeArchive(items, limits = configuration, chunks) {
       items,
       // Export board settings without the source board's revision or activity.
       ...(chunks && { chunks: validateChunkSettings(chunks) }),
+      ...(theme && { theme }),
     }),
   );
   if (json.length > limits.MAX_ARCHIVE_JSON_BYTES)
@@ -110,7 +118,7 @@ export async function decodeArchive(data, limits = configuration) {
  * contain complete payloads; live messages use the existing wire protocol.
  * @param {unknown} archive
  * @param {ServerConfig} config
- * @returns {{items: ArchiveItem[], mutations: NormalizedMessageData[], chunks?: ChunkSettings}}
+ * @returns {{items: ArchiveItem[], mutations: NormalizedMessageData[], chunks?: ChunkSettings, theme?: BoardTheme}}
  */
 export function prepareArchiveImport(archive, config) {
   if (
@@ -124,6 +132,11 @@ export function prepareArchiveImport(archive, config) {
   }
   /** @type {ChunkSettings | undefined} */
   let chunks;
+  if (
+    Object.prototype.hasOwnProperty.call(archive, "theme") &&
+    !isBoardTheme(archive.theme)
+  )
+    throw badRequest("invalid_archive_theme");
   if (Object.prototype.hasOwnProperty.call(archive, "chunks")) {
     const settings = validateChunkSettings(archive.chunks);
     if (
@@ -235,7 +248,12 @@ export function prepareArchiveImport(archive, config) {
     }
     items.push(item);
   }
-  return { items, mutations, ...(chunks && { chunks }) };
+  return {
+    items,
+    mutations,
+    ...(chunks && { chunks }),
+    ...(archive.theme && { theme: archive.theme }),
+  };
 }
 
 /**
@@ -280,6 +298,9 @@ export function applyArchiveImport(board, prepared) {
       },
     };
   }
-  if (candidates.length > 0 || prepared.chunks) board.delaySave();
+  if (prepared.theme)
+    board.metadata = { ...board.metadata, theme: prepared.theme };
+  if (candidates.length > 0 || prepared.chunks || prepared.theme)
+    board.delaySave();
   return entries;
 }

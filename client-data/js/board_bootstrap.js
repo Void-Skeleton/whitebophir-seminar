@@ -27,7 +27,7 @@ export function createBoardRuntimeShellFromPage() {
           boardName: resolveBoardName(window.location.pathname),
           token: new URL(window.location.href).searchParams.get("token"),
           colorPresets,
-          initialPreferences: createInitialPreferences(colorPresets),
+          initialPreferences: createInitialPreferences(),
         },
       )
     )

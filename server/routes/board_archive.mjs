@@ -23,6 +23,7 @@ import {
   getActiveSocket,
   emitArchiveMutations,
   emitChunkState,
+  emitThemeState,
 } from "../socket/index.mjs";
 import { resolveRequestClientIpSafe } from "../socket/policy.mjs";
 import { getSocketUserSecret } from "../socket/request.mjs";
@@ -142,12 +143,14 @@ async function handleArchive(ctx) {
           historyDir: ctx.runtime.config.HISTORY_DIR,
         }),
         chunks: board.metadata.chunks,
+        theme: board.metadata.theme,
       };
     });
     const data = await encodeArchive(
       await itemsFromSvg(snapshot.svg),
       ctx.runtime.config,
       snapshot.chunks,
+      snapshot.theme,
     );
     ctx.response.writeHead(200, {
       "Content-Type": "application/gzip",
@@ -177,6 +180,7 @@ async function handleArchive(ctx) {
     const entries = applyArchiveImport(board, prepared);
     emitArchiveMutations(board, entries);
     if (prepared.chunks) emitChunkState(board);
+    if (prepared.theme) emitThemeState(board);
     return board.getSeq();
   });
   ctx.response.writeHead(200, { "Content-Type": "application/json" });

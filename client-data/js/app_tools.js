@@ -1,5 +1,6 @@
 import { initializeCoreRuntime } from "./app_tools_core.js";
 import { ChunksModule } from "./board_chunks_module.js";
+import { ThemeModule } from "./board_theme_module.js";
 import { AccessModule } from "./board_access_module.js";
 import { ConnectionModule } from "./board_connection_module.js";
 import {
@@ -68,6 +69,7 @@ export function attachFullRuntimeModules(tools, options) {
   tools.connection.socketIOExtraHeaders = options.socketIOExtraHeaders;
   tools.access = new AccessModule(() => tools);
   tools.chunks = new ChunksModule(() => tools);
+  tools.theme = new ThemeModule(() => tools);
   tools.presence = new PresenceModule(() => tools);
   tools.messages = new MessageModule(tools.toolRegistry, tools.identity);
   tools.messages.hooks = [

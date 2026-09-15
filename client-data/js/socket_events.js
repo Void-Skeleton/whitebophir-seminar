@@ -1,6 +1,7 @@
 export const SocketEvents = Object.freeze({
   BOARDSTATE: "boardstate",
   CHUNK_STATE: "chunk_state",
+  THEME_STATE: "theme_state",
   BROADCAST: "broadcast",
   CONNECT: "connect",
   CONNECT_ERROR: "connect_error",
