@@ -998,6 +998,8 @@ function createUnavailableCoordinateRuntime() {
  */
 function createUnavailableViewportRuntime() {
   return {
+    getWheelMode: () => unavailableCapability("viewport.getWheelMode"),
+    setWheelMode: () => unavailableCapability("viewport.setWheelMode"),
     panByKeyboard: () => unavailableCapability("viewport.panByKeyboard"),
     getViewCenter: () => unavailableCapability("viewport.getViewCenter"),
     holdFollowCamera: () => ({ release() {} }),

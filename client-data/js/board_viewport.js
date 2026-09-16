@@ -1,3 +1,8 @@
+// Seminar modifications, 2026-09-16: personal wheel zoom/navigation controls.
+import {
+  readStoredWheelMode,
+  saveStoredWheelMode,
+} from "./board_preferences.js";
 import { isTextEntryTarget } from "./text_entry_target.js";
 
 export const DEFAULT_BOARD_SCALE = 0.1;
@@ -14,6 +19,8 @@ const WHEEL_LINE_PIXELS = 30;
 const WHEEL_PAGE_PIXELS = 1000;
 const WHEEL_ZOOM_SENSITIVITY = 0.01;
 const WHEEL_MAX_FRAME_DELTA = 30;
+const WHEEL_NAVIGATION_INTERVAL_MS = 120;
+const WHEEL_GESTURE_GAP_MS = 180;
 const SCALE_WILL_CHANGE_TIMEOUT_MS = 1000;
 const VIEWPORT_HASH_SYNC_DELAY_MS = 200;
 const FOLLOW_TRANSITION_MS = 240;
@@ -98,13 +105,15 @@ const TOUCH_EVENT_NAMES = [
 
 /** @typedef {"app-gesture" | "native-pan"} ViewportTouchPolicy */
 /** @typedef {"none" | "browser" | "viewport-gesture"} TouchGestureOwner */
-/** @typedef {Pick<import("../../types/app-runtime").AppToolsState, "config" | "coordinates" | "dom" | "preferences" | "toolRegistry" | "viewportState">} ViewportRuntime */
+/** @typedef {Pick<import("../../types/app-runtime").AppToolsState, "config" | "coordinates" | "dom" | "preferences" | "toolRegistry" | "viewportState"> & Partial<Pick<import("../../types/app-runtime").AppToolsState, "chunks">>} ViewportRuntime */
 /** @typedef {{startPinchPan(event: TouchEvent): void, updatePinchPan(event: TouchEvent): void, endPinchPan(): void, cancelPinchPan(): void}} GestureCoordinatorHandlers */
 /** @typedef {"touchstart" | "touchmove" | "touchend" | "touchcancel"} GestureCoordinatorEventName */
 /** @typedef {Record<GestureCoordinatorEventName, (event: TouchEvent) => void>} GestureCoordinatorEventHandlers */
 
 /**
  * @typedef {{
+ *   getWheelMode(): import("./board_preferences.js").WheelMode,
+ *   setWheelMode(mode: unknown): void,
  *   holdFollowCamera(interrupt: () => void): {release(): void},
  *   isFollowCameraMoving(): boolean,
  *   setFollowFrame(frame: (BoardRect & {margin: number}) | null, deferUntilStrokeEnd?: boolean): void,
@@ -431,6 +440,10 @@ export function createViewportController(Tools) {
   let wheelDelta = 0;
   let wheelPageX = 0;
   let wheelPageY = 0;
+  let wheelMode = readStoredWheelMode();
+  let lastWheelDirection = 0;
+  let lastWheelEventAt = -Infinity;
+  let lastWheelNavigationAt = -Infinity;
   /** @type {number | null} */
   let viewportHashScrollTimeout = null;
   let lastViewportHashStateUpdate = Date.now();
@@ -878,8 +891,41 @@ export function createViewportController(Tools) {
    * @returns {void}
    */
   function handleWheel(event) {
+    if (
+      event.target instanceof Element &&
+      event.target.closest(
+        "input, textarea, select, [contenteditable]:not([contenteditable='false']), [role='textbox'], dialog",
+      )
+    )
+      return;
     if (!safePreventDefault(event)) return;
 
+    if (wheelMode === "navigate" && !event.ctrlKey && !event.shiftKey) {
+      if (event.altKey || event.metaKey) return;
+      const direction = Math.sign(normalizeWheelDelta(event));
+      if (!direction) return;
+      const now = performance.now();
+      const repeat =
+        direction === lastWheelDirection &&
+        now - lastWheelEventAt < WHEEL_GESTURE_GAP_MS;
+      lastWheelDirection = direction;
+      lastWheelEventAt = now;
+      if (repeat && now - lastWheelNavigationAt < WHEEL_NAVIGATION_INTERVAL_MS)
+        return;
+      lastWheelNavigationAt = now;
+      if (Tools.chunks) {
+        Tools.chunks.navigateByArrow(
+          direction < 0 ? "ArrowUp" : "ArrowDown",
+          false,
+          repeat,
+          "wheel",
+        );
+      } else {
+        controller.panByKeyboard(0, direction);
+      }
+      return;
+    }
+    lastWheelDirection = 0;
     if (event.shiftKey && !event.ctrlKey) {
       controller.panBy(
         normalizeWheelAxisDelta(event, "deltaX"),
@@ -1160,6 +1206,21 @@ export function createViewportController(Tools) {
 
   /** @type {ViewportController} */
   const controller = {
+    getWheelMode() {
+      return wheelMode;
+    },
+    setWheelMode(mode) {
+      if (mode !== "zoom" && mode !== "navigate") return;
+      wheelMode = mode;
+      lastWheelDirection = 0;
+      if (wheelAnimationFrame !== null) {
+        window.cancelAnimationFrame(wheelAnimationFrame);
+        wheelAnimationFrame = null;
+        wheelDelta = 0;
+      }
+      Tools.chunks?.clearNavigationNotice();
+      saveStoredWheelMode(mode);
+    },
     getViewCenter() {
       const menu = document.getElementById("menu");
       const inset =

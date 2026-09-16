@@ -220,9 +220,24 @@ export class ChunksModule {
       )
     )
       return;
+    if (!/^Arrow(Left|Right|Up|Down)$/.test(event.key)) return;
+    event.preventDefault();
+    this.navigateByArrow(event.key, event.ctrlKey, event.repeat);
+  }
+
+  /**
+   * Shared by keyboard shortcuts and the personal wheel navigation preference.
+   * @param {string} arrow
+   * @param {boolean} [ctrlKey]
+   * @param {boolean} [repeat]
+   * @param {"keyboard" | "wheel"} [source]
+   */
+  navigateByArrow(arrow, ctrlKey = false, repeat = false, source = "keyboard") {
+    const Tools = this.getTools();
+    if (!this.received || Tools.replay.awaitingSnapshot) return;
     let dx = 0;
     let dy = 0;
-    switch (event.key) {
+    switch (arrow) {
       case "ArrowLeft":
         dx = -1;
         break;
@@ -238,19 +253,18 @@ export class ChunksModule {
       default:
         return;
     }
-    event.preventDefault();
     if (this.following) {
-      const key = `${event.ctrlKey ? "Ctrl+" : ""}${event.key}`;
+      const key = `${source}:${ctrlKey ? "Ctrl+" : ""}${arrow}`;
       const now = performance.now();
       const pending = this.pendingNavigation;
       if (
-        event.repeat ||
+        repeat ||
         !pending ||
         pending.key !== key ||
         now > pending.expiresAt
       ) {
-        // Holding a key must not accidentally confirm a mode change.
-        if (!event.repeat)
+        // Holding a key or continuing one wheel gesture cannot confirm.
+        if (!repeat)
           this.pendingNavigation = {
             key,
             expiresAt: now + NAVIGATION_CONFIRM_MS,
@@ -259,7 +273,11 @@ export class ChunksModule {
           hidden: false,
           state: "paused",
           title: Tools.i18n.t("chunk_view_latest"),
-          detail: Tools.i18n.t("chunk_navigation_reminder"),
+          detail: Tools.i18n.t(
+            source === "wheel"
+              ? "chunk_wheel_navigation_reminder"
+              : "chunk_navigation_reminder",
+          ),
         };
         Tools.status.showBoardStatus(
           this.navigationNotice,
@@ -280,8 +298,8 @@ export class ChunksModule {
       Tools.viewportState.controller.panByKeyboard(
         dx,
         dy,
-        event.ctrlKey ? this.state.width : undefined,
-        event.ctrlKey ? this.state.height : undefined,
+        ctrlKey ? this.state.width : undefined,
+        ctrlKey ? this.state.height : undefined,
       );
     }
   }

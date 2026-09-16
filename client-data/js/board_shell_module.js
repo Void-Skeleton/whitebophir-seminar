@@ -128,6 +128,13 @@ export class BoardShellModule {
 
   bindPreferenceControls() {
     const Tools = this.getTools();
+    const wheelMode = document.getElementById("wheelMode");
+    if (wheelMode instanceof HTMLSelectElement) {
+      wheelMode.value = Tools.viewportState.controller.getWheelMode();
+      wheelMode.addEventListener("change", () =>
+        Tools.viewportState.controller.setWheelMode(wheelMode.value),
+      );
+    }
     const colorChooser = getRequiredInput("chooseColor");
     const sizeChooser = getRequiredInput("chooseSize");
     const opacityChooser = getRequiredInput("chooseOpacity");

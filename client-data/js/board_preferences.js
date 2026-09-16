@@ -3,7 +3,30 @@
 const DEFAULT_INITIAL_SIZE = 40;
 const DEFAULT_INITIAL_OPACITY = 1;
 const LOCAL_STORAGE_COLOR_KEY = "wbo.currentColor";
+const LOCAL_STORAGE_WHEEL_KEY = "wbo.wheelMode";
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+
+/** @typedef {"zoom" | "navigate"} WheelMode */
+
+/** @returns {WheelMode} */
+export function readStoredWheelMode() {
+  try {
+    return getLocalStorage()?.getItem(LOCAL_STORAGE_WHEEL_KEY) === "navigate"
+      ? "navigate"
+      : "zoom";
+  } catch {
+    return "zoom";
+  }
+}
+
+/** @param {WheelMode} mode */
+export function saveStoredWheelMode(mode) {
+  try {
+    getLocalStorage()?.setItem(LOCAL_STORAGE_WHEEL_KEY, mode);
+  } catch {
+    // Keep the current session's choice when storage is unavailable.
+  }
+}
 
 export const DEFAULT_COLOR_PRESETS = [
   { color: "#001f3f", key: "1" },

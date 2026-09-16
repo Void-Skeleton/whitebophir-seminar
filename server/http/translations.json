@@ -139,7 +139,11 @@
     "chunk_view_for_others": "وضع العرض للمستخدمين الآخرين",
     "chunk_navigation_reminder": "اضغط اختصار السهم نفسه مرة أخرى خلال ثانيتين للتبديل إلى التركيز على جزء والانتقال.",
     "board_dark_mode": "الوضع الداكن للوحة",
-    "board_theme_failed": "تعذّر حفظ مظهر اللوحة. تحقّق من اتصالك وصلاحيات المشرف، ثم حاول مجددًا."
+    "board_theme_failed": "تعذّر حفظ مظهر اللوحة. تحقّق من اتصالك وصلاحيات المشرف، ثم حاول مجددًا.",
+    "wheel_mode": "التحكم بالتمرير (لك فقط)",
+    "wheel_mode_zoom": "التمرير: تكبير وتصغير",
+    "wheel_mode_navigate": "التمرير: تنقل · Ctrl: تكبير وتصغير",
+    "chunk_wheel_navigation_reminder": "توقف قليلًا، ثم مرّر في الاتجاه نفسه خلال ثانيتين للتركيز على جزء والانتقال."
   },
   "be": {
     "white-out": "Замазка",
@@ -281,7 +285,11 @@
     "chunk_view_for_others": "Рэжым прагляду для іншых карыстальнікаў",
     "chunk_navigation_reminder": "Націсніце тое ж спалучэнне са стрэлкай яшчэ раз на працягу 2 секунд, каб перайсці ў рэжым фокусу на блоку і перамясціцца.",
     "board_dark_mode": "Цёмны рэжым дошкі",
-    "board_theme_failed": "Не ўдалося захаваць тэму дошкі. Праверце злучэнне і правы мадэратара, затым паспрабуйце зноў."
+    "board_theme_failed": "Не ўдалося захаваць тэму дошкі. Праверце злучэнне і правы мадэратара, затым паспрабуйце зноў.",
+    "wheel_mode": "Кіраванне пракруткай (толькі для вас)",
+    "wheel_mode_zoom": "Пракрутка: маштаб",
+    "wheel_mode_navigate": "Пракрутка: рух · Ctrl: маштаб",
+    "chunk_wheel_navigation_reminder": "Зрабіце кароткую паўзу і пракруціце ў тым жа кірунку на працягу 2 секунд, каб перайсці да фокусу на блоку і перамясціцца."
   },
   "ca": {
     "white-out": "Corrector blanc",
@@ -423,7 +431,11 @@
     "chunk_view_for_others": "Mode de vista dels altres usuaris",
     "chunk_navigation_reminder": "Torna a prémer la mateixa drecera amb fletxa en un termini de 2 segons per centrar la vista en un bloc i desplaçar-te.",
     "board_dark_mode": "Mode fosc de la pissarra",
-    "board_theme_failed": "No s’ha pogut desar el tema de la pissarra. Comproveu la connexió i els permisos de moderació i torneu-ho a provar."
+    "board_theme_failed": "No s’ha pogut desar el tema de la pissarra. Comproveu la connexió i els permisos de moderació i torneu-ho a provar.",
+    "wheel_mode": "Controls de desplaçament (només per a tu)",
+    "wheel_mode_zoom": "Roda: zoom",
+    "wheel_mode_navigate": "Roda: moure · Ctrl: zoom",
+    "chunk_wheel_navigation_reminder": "Fes una pausa breu i torna a desplaçar en la mateixa direcció abans de 2 segons per centrar la vista en un bloc i moure’t."
   },
   "de": {
     "board_name_placeholder": "Name des Whiteboards…",
@@ -565,7 +577,11 @@
     "chunk_view_for_others": "Ansichtsmodus für andere Nutzer",
     "chunk_navigation_reminder": "Drücke innerhalb von 2 Sekunden erneut dieselbe Pfeiltastenkombination, um zur Abschnittsansicht zu wechseln und dich zu bewegen.",
     "board_dark_mode": "Dunkle Tafel",
-    "board_theme_failed": "Das Tafeldesign konnte nicht gespeichert werden. Prüfe die Verbindung und deine Moderationsrechte und versuche es erneut."
+    "board_theme_failed": "Das Tafeldesign konnte nicht gespeichert werden. Prüfe die Verbindung und deine Moderationsrechte und versuche es erneut.",
+    "wheel_mode": "Scroll-Steuerung (nur für dich)",
+    "wheel_mode_zoom": "Scrollen: Zoom",
+    "wheel_mode_navigate": "Scrollen: Bewegen · Strg: Zoom",
+    "chunk_wheel_navigation_reminder": "Halte kurz inne und scrolle innerhalb von 2 Sekunden erneut in dieselbe Richtung, um zur Abschnittsansicht zu wechseln und dich zu bewegen."
   },
   "en": {
     "white-out": "White-out",
@@ -707,7 +723,11 @@
     "chunk_view_for_others": "View mode for other users",
     "chunk_navigation_reminder": "Press the same arrow shortcut again within 2 seconds to switch to chunk focus and move.",
     "board_dark_mode": "Board dark mode",
-    "board_theme_failed": "Could not save the board theme. Check your connection and moderator permissions, then try again."
+    "board_theme_failed": "Could not save the board theme. Check your connection and moderator permissions, then try again.",
+    "wheel_mode": "Scroll controls (only you)",
+    "wheel_mode_zoom": "Scroll: zoom",
+    "wheel_mode_navigate": "Scroll: move · Ctrl: zoom",
+    "chunk_wheel_navigation_reminder": "Pause briefly, then scroll in the same direction again within 2 seconds to switch to chunk focus and move."
   },
   "es": {
     "board_name_placeholder": "Nombre de la pizarra …",
@@ -849,7 +869,11 @@
     "chunk_view_for_others": "Modo de vista para otros usuarios",
     "chunk_navigation_reminder": "Pulsa de nuevo el mismo atajo de flecha antes de 2 segundos para centrar la vista en un bloque y desplazarte.",
     "board_dark_mode": "Modo oscuro de la pizarra",
-    "board_theme_failed": "No se pudo guardar el tema de la pizarra. Comprueba la conexión y tus permisos de moderación e inténtalo de nuevo."
+    "board_theme_failed": "No se pudo guardar el tema de la pizarra. Comprueba la conexión y tus permisos de moderación e inténtalo de nuevo.",
+    "wheel_mode": "Controles de desplazamiento (solo para ti)",
+    "wheel_mode_zoom": "Rueda: zoom",
+    "wheel_mode_navigate": "Rueda: mover · Ctrl: zoom",
+    "chunk_wheel_navigation_reminder": "Haz una pausa breve y vuelve a desplazar en la misma dirección antes de 2 segundos para centrar la vista en un bloque y moverte."
   },
   "fr": {
     "board_name_placeholder": "Nom du tableau…",
@@ -990,7 +1014,11 @@
     "chunk_view_for_others": "Mode d’affichage des autres utilisateurs",
     "chunk_navigation_reminder": "Appuyez à nouveau sur le même raccourci fléché dans les 2 secondes pour passer au centrage sur un bloc et vous déplacer.",
     "board_dark_mode": "Mode sombre du tableau",
-    "board_theme_failed": "Impossible d’enregistrer le thème du tableau. Vérifiez votre connexion et vos droits de modération, puis réessayez."
+    "board_theme_failed": "Impossible d’enregistrer le thème du tableau. Vérifiez votre connexion et vos droits de modération, puis réessayez.",
+    "wheel_mode": "Commandes de défilement (pour vous uniquement)",
+    "wheel_mode_zoom": "Molette : zoom",
+    "wheel_mode_navigate": "Molette : déplacer · Ctrl : zoom",
+    "chunk_wheel_navigation_reminder": "Marquez une courte pause, puis faites défiler à nouveau dans le même sens sous 2 secondes pour centrer la vue sur un bloc et vous déplacer."
   },
   "hu": {
     "white-out": "Lefedő",
@@ -1132,7 +1160,11 @@
     "chunk_view_for_others": "Más felhasználók nézetmódja",
     "chunk_navigation_reminder": "Nyomd meg újra ugyanazt a nyílbillentyű-kombinációt 2 másodpercen belül a szakaszra fókuszáláshoz és a mozgáshoz.",
     "board_dark_mode": "Sötét tábla",
-    "board_theme_failed": "Nem sikerült menteni a tábla témáját. Ellenőrizd a kapcsolatot és a moderátori jogosultságodat, majd próbáld újra."
+    "board_theme_failed": "Nem sikerült menteni a tábla témáját. Ellenőrizd a kapcsolatot és a moderátori jogosultságodat, majd próbáld újra.",
+    "wheel_mode": "Görgetés vezérlése (csak neked)",
+    "wheel_mode_zoom": "Görgetés: nagyítás",
+    "wheel_mode_navigate": "Görgetés: mozgatás · Ctrl: nagyítás",
+    "chunk_wheel_navigation_reminder": "Tarts rövid szünetet, majd 2 másodpercen belül görgess újra ugyanabba az irányba a szakaszra fókuszáláshoz és a mozgáshoz."
   },
   "id": {
     "white-out": "Cairan koreksi",
@@ -1274,7 +1306,11 @@
     "chunk_view_for_others": "Mode tampilan pengguna lain",
     "chunk_navigation_reminder": "Tekan lagi pintasan panah yang sama dalam 2 detik untuk beralih ke fokus petak dan berpindah.",
     "board_dark_mode": "Mode gelap papan",
-    "board_theme_failed": "Tema papan tidak dapat disimpan. Periksa koneksi dan izin moderator Anda, lalu coba lagi."
+    "board_theme_failed": "Tema papan tidak dapat disimpan. Periksa koneksi dan izin moderator Anda, lalu coba lagi.",
+    "wheel_mode": "Kontrol gulir (hanya untuk Anda)",
+    "wheel_mode_zoom": "Gulir: zoom",
+    "wheel_mode_navigate": "Gulir: pindah · Ctrl: zoom",
+    "chunk_wheel_navigation_reminder": "Berhenti sebentar, lalu gulir lagi ke arah yang sama dalam 2 detik untuk beralih ke fokus petak dan berpindah."
   },
   "it": {
     "board_name_placeholder": "Nome della lavagna…",
@@ -1416,7 +1452,11 @@
     "chunk_view_for_others": "Modalità di visualizzazione degli altri utenti",
     "chunk_navigation_reminder": "Premi di nuovo la stessa scorciatoia con la freccia entro 2 secondi per centrare la vista su un riquadro e spostarti.",
     "board_dark_mode": "Modalità scura della lavagna",
-    "board_theme_failed": "Impossibile salvare il tema della lavagna. Controlla la connessione e i permessi di moderazione, quindi riprova."
+    "board_theme_failed": "Impossibile salvare il tema della lavagna. Controlla la connessione e i permessi di moderazione, quindi riprova.",
+    "wheel_mode": "Controlli di scorrimento (solo per te)",
+    "wheel_mode_zoom": "Rotella: zoom",
+    "wheel_mode_navigate": "Rotella: sposta · Ctrl: zoom",
+    "chunk_wheel_navigation_reminder": "Fai una breve pausa, poi scorri di nuovo nella stessa direzione entro 2 secondi per centrare la vista su un riquadro e spostarti."
   },
   "ja": {
     "board_name_placeholder": "ボードの名前",
@@ -1558,7 +1598,11 @@
     "chunk_view_for_others": "他のユーザーの表示モード",
     "chunk_navigation_reminder": "2秒以内に同じ矢印キーのショートカットをもう一度押すと、区画にフォーカスするモードに切り替わり、移動します。",
     "board_dark_mode": "ボードのダークモード",
-    "board_theme_failed": "ボードのテーマを保存できませんでした。接続とモデレーター権限を確認して、もう一度お試しください。"
+    "board_theme_failed": "ボードのテーマを保存できませんでした。接続とモデレーター権限を確認して、もう一度お試しください。",
+    "wheel_mode": "スクロール操作（自分のみ）",
+    "wheel_mode_zoom": "スクロール：拡大・縮小",
+    "wheel_mode_navigate": "スクロール：移動 · Ctrl：拡大・縮小",
+    "chunk_wheel_navigation_reminder": "少し間を置き、2秒以内に同じ方向にもう一度スクロールすると、区画にフォーカスするモードに切り替わり、移動します。"
   },
   "my": {
     "board_name_placeholder": "ဝှိုက်ဘုတ်အမည် ... ",
@@ -1700,7 +1744,11 @@
     "chunk_view_for_others": "အခြားအသုံးပြုသူများ၏ မြင်ကွင်းမုဒ်",
     "chunk_navigation_reminder": "အကွက်အာရုံစိုက်မုဒ်သို့ ပြောင်းပြီး ရွှေ့ရန် တူညီသော မြားခလုတ်တွဲကို ၂ စက္ကန့်အတွင်း ထပ်နှိပ်ပါ။",
     "board_dark_mode": "ဘုတ်အတွက် အမှောင်မုဒ်",
-    "board_theme_failed": "ဘုတ်အပြင်အဆင်ကို မသိမ်းဆည်းနိုင်ပါ။ ချိတ်ဆက်မှုနှင့် ကြီးကြပ်သူခွင့်ပြုချက်များကို စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ။"
+    "board_theme_failed": "ဘုတ်အပြင်အဆင်ကို မသိမ်းဆည်းနိုင်ပါ။ ချိတ်ဆက်မှုနှင့် ကြီးကြပ်သူခွင့်ပြုချက်များကို စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ။",
+    "wheel_mode": "လှိမ့်ခြင်း ထိန်းချုပ်မှုများ (သင့်အတွက်သာ)",
+    "wheel_mode_zoom": "လှိမ့်ရန်: ချဲ့/ချုံ့",
+    "wheel_mode_navigate": "လှိမ့်ရန်: ရွှေ့ · Ctrl: ချဲ့/ချုံ့",
+    "chunk_wheel_navigation_reminder": "ခဏရပ်ပြီး ၂ စက္ကန့်အတွင်း တူညီသောဘက်သို့ ထပ်လှိမ့်ပါ။ အကွက်အာရုံစိုက်မုဒ်သို့ ပြောင်းပြီး ရွှေ့ပါမည်။"
   },
   "pt": {
     "white-out": "Branquejar",
@@ -1842,7 +1890,11 @@
     "chunk_view_for_others": "Modo de visualização dos outros utilizadores",
     "chunk_navigation_reminder": "Prima novamente o mesmo atalho de seta dentro de 2 segundos para centrar a vista num bloco e deslocar-se.",
     "board_dark_mode": "Modo escuro do quadro",
-    "board_theme_failed": "Não foi possível guardar o tema do quadro. Verifique a ligação e as permissões de moderação e tente novamente."
+    "board_theme_failed": "Não foi possível guardar o tema do quadro. Verifique a ligação e as permissões de moderação e tente novamente.",
+    "wheel_mode": "Controlos de deslocamento (só para si)",
+    "wheel_mode_zoom": "Roda: zoom",
+    "wheel_mode_navigate": "Roda: mover · Ctrl: zoom",
+    "chunk_wheel_navigation_reminder": "Faça uma breve pausa e volte a deslocar no mesmo sentido dentro de 2 segundos para centrar a vista num bloco e mover-se."
   },
   "ru": {
     "board_name_placeholder": "Название доски",
@@ -1984,7 +2036,11 @@
     "chunk_view_for_others": "Режим просмотра для других пользователей",
     "chunk_navigation_reminder": "Нажмите ту же комбинацию со стрелкой ещё раз в течение 2 секунд, чтобы перейти к фокусу на блоке и переместиться.",
     "board_dark_mode": "Тёмный режим доски",
-    "board_theme_failed": "Не удалось сохранить тему доски. Проверьте соединение и права модератора, затем попробуйте снова."
+    "board_theme_failed": "Не удалось сохранить тему доски. Проверьте соединение и права модератора, затем попробуйте снова.",
+    "wheel_mode": "Управление прокруткой (только для вас)",
+    "wheel_mode_zoom": "Прокрутка: масштаб",
+    "wheel_mode_navigate": "Прокрутка: движение · Ctrl: масштаб",
+    "chunk_wheel_navigation_reminder": "Сделайте короткую паузу и прокрутите в том же направлении ещё раз в течение 2 секунд, чтобы перейти к фокусу на блоке и переместиться."
   },
   "sw": {
     "board_name_placeholder": "Jina la ubao mweupe ...",
@@ -2126,7 +2182,11 @@
     "chunk_view_for_others": "Hali ya mwonekano kwa watumiaji wengine",
     "chunk_navigation_reminder": "Bonyeza tena njia ileile ya mkato ya mshale ndani ya sekunde 2 ili kulenga sehemu moja na kusogea.",
     "board_dark_mode": "Hali ya giza ya ubao",
-    "board_theme_failed": "Mandhari ya ubao hayakuweza kuhifadhiwa. Angalia muunganisho na ruhusa zako za usimamizi, kisha ujaribu tena."
+    "board_theme_failed": "Mandhari ya ubao hayakuweza kuhifadhiwa. Angalia muunganisho na ruhusa zako za usimamizi, kisha ujaribu tena.",
+    "wheel_mode": "Vidhibiti vya kusogeza (kwako pekee)",
+    "wheel_mode_zoom": "Gurudumu: kukuza/kupunguza",
+    "wheel_mode_navigate": "Gurudumu: sogeza · Ctrl: kukuza/kupunguza",
+    "chunk_wheel_navigation_reminder": "Subiri kidogo, kisha sogeza tena upande uleule ndani ya sekunde 2 ili kulenga sehemu moja na kusogea."
   },
   "th": {
     "board_name_placeholder": "ชื่อไวท์บอร์ด ...",
@@ -2268,7 +2328,11 @@
     "chunk_view_for_others": "โหมดมุมมองสำหรับผู้ใช้อื่น",
     "chunk_navigation_reminder": "กดปุ่มลัดลูกศรเดิมอีกครั้งภายใน 2 วินาที เพื่อเปลี่ยนเป็นโหมดโฟกัสที่ช่องและเลื่อนมุมมอง",
     "board_dark_mode": "โหมดมืดของกระดาน",
-    "board_theme_failed": "บันทึกธีมกระดานไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่อและสิทธิ์ผู้ดูแล แล้วลองอีกครั้ง"
+    "board_theme_failed": "บันทึกธีมกระดานไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่อและสิทธิ์ผู้ดูแล แล้วลองอีกครั้ง",
+    "wheel_mode": "การควบคุมการเลื่อน (เฉพาะคุณ)",
+    "wheel_mode_zoom": "เลื่อน: ซูม",
+    "wheel_mode_navigate": "เลื่อน: ย้าย · Ctrl: ซูม",
+    "chunk_wheel_navigation_reminder": "หยุดสักครู่ แล้วเลื่อนในทิศทางเดิมอีกครั้งภายใน 2 วินาที เพื่อเปลี่ยนเป็นโหมดโฟกัสที่ช่องและเลื่อนมุมมอง"
   },
   "uk": {
     "white-out": "Коректор",
@@ -2410,7 +2474,11 @@
     "chunk_view_for_others": "Режим перегляду для інших користувачів",
     "chunk_navigation_reminder": "Натисніть ту саму комбінацію зі стрілкою ще раз протягом 2 секунд, щоб перейти до фокусу на блоці та переміститися.",
     "board_dark_mode": "Темний режим дошки",
-    "board_theme_failed": "Не вдалося зберегти тему дошки. Перевірте з’єднання та права модератора, а потім спробуйте знову."
+    "board_theme_failed": "Не вдалося зберегти тему дошки. Перевірте з’єднання та права модератора, а потім спробуйте знову.",
+    "wheel_mode": "Керування прокручуванням (лише для вас)",
+    "wheel_mode_zoom": "Прокручування: масштаб",
+    "wheel_mode_navigate": "Прокручування: рух · Ctrl: масштаб",
+    "chunk_wheel_navigation_reminder": "Зробіть коротку паузу й прокрутіть у тому самому напрямку ще раз протягом 2 секунд, щоб перейти до фокусу на блоці та переміститися."
   },
   "vi": {
     "white-out": "Bút xóa",
@@ -2552,7 +2620,11 @@
     "chunk_view_for_others": "Chế độ xem cho người dùng khác",
     "chunk_navigation_reminder": "Nhấn lại cùng phím tắt mũi tên trong vòng 2 giây để chuyển sang chế độ tập trung vào ô và di chuyển.",
     "board_dark_mode": "Chế độ tối cho bảng",
-    "board_theme_failed": "Không thể lưu giao diện bảng. Hãy kiểm tra kết nối và quyền điều hành rồi thử lại."
+    "board_theme_failed": "Không thể lưu giao diện bảng. Hãy kiểm tra kết nối và quyền điều hành rồi thử lại.",
+    "wheel_mode": "Điều khiển cuộn (chỉ riêng bạn)",
+    "wheel_mode_zoom": "Cuộn: thu phóng",
+    "wheel_mode_navigate": "Cuộn: di chuyển · Ctrl: thu phóng",
+    "chunk_wheel_navigation_reminder": "Dừng một chút, rồi cuộn lại cùng hướng trong vòng 2 giây để chuyển sang chế độ tập trung vào ô và di chuyển."
   },
   "zh-CN": {
     "board_name_placeholder": "白板名称",
@@ -2694,7 +2766,11 @@
     "chunk_view_for_others": "其他用户的视图模式",
     "chunk_navigation_reminder": "请在 2 秒内再次按下相同的方向键组合，切换到分块聚焦模式并移动视角。",
     "board_dark_mode": "白板深色模式",
-    "board_theme_failed": "无法保存白板主题。请检查网络连接和管理员权限，然后重试。"
+    "board_theme_failed": "无法保存白板主题。请检查网络连接和管理员权限，然后重试。",
+    "wheel_mode": "滚轮操作（仅对自己生效）",
+    "wheel_mode_zoom": "滚轮：缩放",
+    "wheel_mode_navigate": "滚轮：移动 · Ctrl：缩放",
+    "chunk_wheel_navigation_reminder": "请稍作停顿，然后在 2 秒内再次向相同方向滚动，切换到分块聚焦模式并移动视角。"
   },
   "zh-TW": {
     "board_name_placeholder": "白板名稱",
@@ -2836,7 +2912,11 @@
     "chunk_view_for_others": "其他使用者的檢視模式",
     "chunk_navigation_reminder": "請在 2 秒內再次按下相同的方向鍵組合，切換至區塊聚焦模式並移動視角。",
     "board_dark_mode": "白板深色模式",
-    "board_theme_failed": "無法儲存白板主題。請檢查網路連線和管理員權限，然後重試。"
+    "board_theme_failed": "無法儲存白板主題。請檢查網路連線和管理員權限，然後重試。",
+    "wheel_mode": "滾輪操作（僅對自己生效）",
+    "wheel_mode_zoom": "滾輪：縮放",
+    "wheel_mode_navigate": "滾輪：移動 · Ctrl：縮放",
+    "chunk_wheel_navigation_reminder": "請稍作停頓，然後在 2 秒內再次向相同方向捲動，切換至區塊聚焦模式並移動視角。"
   },
   "pl": {
     "board_name_placeholder": "Nazwa tablicy",
@@ -2978,6 +3058,10 @@
     "chunk_view_for_others": "Tryb widoku innych użytkowników",
     "chunk_navigation_reminder": "Naciśnij ponownie ten sam skrót ze strzałką w ciągu 2 sekund, aby przełączyć się na skupienie na obszarze i przesunąć widok.",
     "board_dark_mode": "Ciemny tryb tablicy",
-    "board_theme_failed": "Nie udało się zapisać motywu tablicy. Sprawdź połączenie i uprawnienia moderatora, a następnie spróbuj ponownie."
+    "board_theme_failed": "Nie udało się zapisać motywu tablicy. Sprawdź połączenie i uprawnienia moderatora, a następnie spróbuj ponownie.",
+    "wheel_mode": "Sterowanie przewijaniem (tylko dla ciebie)",
+    "wheel_mode_zoom": "Przewijanie: zoom",
+    "wheel_mode_navigate": "Przewijanie: ruch · Ctrl: zoom",
+    "chunk_wheel_navigation_reminder": "Zrób krótką przerwę, a następnie przewiń ponownie w tym samym kierunku w ciągu 2 sekund, aby skupić widok na obszarze i go przesunąć."
   }
 }

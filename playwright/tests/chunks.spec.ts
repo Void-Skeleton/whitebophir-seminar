@@ -82,6 +82,207 @@ async function settledScroll(page: Page) {
   return page.evaluate(() => ({ x: scrollX, y: scrollY }));
 }
 
+test("personal wheel controls persist across boards without changing other users", async ({
+  page,
+  boardPage,
+  browser,
+  server,
+}) => {
+  await boardPage.gotoBoard("personal-wheel", { lang: "zh-CN" });
+  const toggle = page.getByRole("combobox", {
+    name: "滚轮操作（仅对自己生效）",
+  });
+  await expect(toggle).toHaveValue("zoom");
+  await expect(page.locator("#chunkSettingsToggle")).toBeHidden();
+  await toggle.selectOption("navigate");
+  await boardPage.selectTool("hand");
+  await page.evaluate(() => {
+    const viewport = window.WBOApp.viewportState.controller;
+    viewport.setScale(0.2);
+    viewport.panTo(400, 600);
+  });
+  await page.mouse.move(500, 400);
+  await page.mouse.wheel(0, 120);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(664);
+  await settledScroll(page);
+  await page.keyboard.press("ArrowDown");
+  expect(await settledScroll(page)).toEqual({ x: 400, y: 728 });
+  await page.mouse.wheel(0, -120);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(664);
+  await settledScroll(page);
+  expect(await page.evaluate(() => window.WBOApp.viewportState.scale)).toBe(
+    0.2,
+  );
+
+  await page.keyboard.down("Control");
+  await page.mouse.wheel(0, 120);
+  await page.keyboard.up("Control");
+  await expect
+    .poll(() => page.evaluate(() => window.WBOApp.viewportState.scale))
+    .toBeLessThan(0.2);
+  const zoomed = await page.evaluate(() => ({
+    scale: window.WBOApp.viewportState.scale,
+    top: scrollY,
+  }));
+  await page.keyboard.down("Shift");
+  await page.mouse.wheel(0, 300);
+  await page.keyboard.up("Shift");
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(zoomed.top + 300);
+  expect(await page.evaluate(() => window.WBOApp.viewportState.scale)).toBe(
+    zoomed.scale,
+  );
+
+  const size = await page.evaluate(() => window.WBOApp.preferences.getSize());
+  await page.keyboard.down("s");
+  await page.mouse.wheel(0, -10);
+  await page.keyboard.up("s");
+  await expect
+    .poll(() => page.evaluate(() => window.WBOApp.preferences.getSize()))
+    .toBe(size + 5);
+  expect(await page.evaluate(() => scrollY)).toBe(zoomed.top + 300);
+
+  const peerContext = await browser.newContext();
+  try {
+    const peer = await peerContext.newPage();
+    await createBoardPage(peer, server).gotoBoard("personal-wheel");
+    await expect(peer.locator("#wheelMode")).toHaveValue("zoom");
+    await expect(peer.locator("#chunkViewMode")).toHaveValue("free");
+  } finally {
+    await peerContext.close();
+  }
+  await page.reload();
+  await boardPage.waitForSocketConnected();
+  await expect(toggle).toHaveValue("navigate");
+  await boardPage.gotoBoard("personal-wheel-other", { lang: "zh-TW" });
+  await expect(
+    page.getByRole("combobox", { name: "滾輪操作（僅對自己生效）" }),
+  ).toHaveValue("navigate");
+  await page.locator("#wheelMode").selectOption("zoom");
+  await page.reload();
+  await boardPage.waitForSocketConnected();
+  await expect(page.locator("#wheelMode")).toHaveValue("zoom");
+});
+
+test("wheel navigation respects chunk focus and requires a separate gesture to leave latest focus", async ({
+  page,
+  context,
+  server,
+  boardPage,
+}) => {
+  await page.clock.install();
+  await context.addCookies([
+    { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
+  ]);
+  await boardPage.gotoBoard("chunks");
+  await configureChunks(page);
+  await page.locator("#wheelMode").selectOption("navigate");
+  await page.locator("#chunkViewMode").selectOption("latest");
+  await settledScroll(page);
+  await page.clock.pauseAt(new Date());
+  const board = page.locator("#board");
+  const down = () =>
+    board.dispatchEvent("wheel", { deltaY: 120, cancelable: true });
+  await down();
+  await expect(page.locator("#boardStatusNotice")).toContainText(
+    "scroll in the same direction",
+  );
+  await expect(page.locator("#chunkViewMode")).toHaveValue("latest");
+  // A stream of wheel events, including momentum, acts like key auto-repeat.
+  for (let i = 0; i < 4; i++) {
+    await page.clock.runFor(150);
+    await down();
+    await expect(page.locator("#chunkViewMode")).toHaveValue("latest");
+  }
+  await page.clock.runFor(2100);
+  await down();
+  await expect(page.locator("#chunkViewMode")).toHaveValue("latest");
+  await page.clock.runFor(200);
+  await down();
+  await expect(page.locator("#chunkViewMode")).toHaveValue("chunk");
+  expect(await page.evaluate(() => window.WBOApp.chunks.focusedPoint)).toEqual({
+    x: 0,
+    y: 3000,
+  });
+  expect(
+    await page.evaluate(() =>
+      window.WBOApp.viewportState.controller.isFollowCameraMoving(),
+    ),
+  ).toBe(true);
+  const before = await page.evaluate(() => scrollY);
+  await page.clock.runFor(100);
+  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(before);
+  expect(
+    await page.evaluate(() =>
+      window.WBOApp.viewportState.controller.isFollowCameraMoving(),
+    ),
+  ).toBe(true);
+  await page.clock.runFor(200);
+  expect((await camera(page)).fits).toBe(true);
+  await board.dispatchEvent("wheel", {
+    deltaY: -1,
+    deltaMode: 1,
+    cancelable: true,
+  });
+  await page.clock.runFor(300);
+  expect(await page.evaluate(() => window.WBOApp.chunks.focusedPoint)).toEqual({
+    x: 0,
+    y: 0,
+  });
+  expect((await camera(page)).fits).toBe(true);
+});
+
+test("wheel navigation interrupts a held pencil and leaves text input alone", async ({
+  page,
+  boardPage,
+}) => {
+  await boardPage.gotoBoard("wheel-pencil");
+  await page.locator("#wheelMode").selectOption("navigate");
+  await page.evaluate(() =>
+    window.WBOApp.viewportState.controller.setScale(0.5),
+  );
+  await boardPage.selectTool("pencil");
+  await page.mouse.move(500, 300);
+  await page.mouse.down();
+  const livePath = page.locator(".wbo-pencil-live-path[d]:not([d=''])");
+  await expect(livePath).toHaveCount(1);
+  await expect
+    .poll(() => page.evaluate(() => window.WBOApp.replay.authoritativeSeq))
+    .toBe(2);
+  await page.mouse.wheel(0, 120);
+  await expect(livePath).toHaveCount(0);
+  await settledScroll(page);
+  await page.mouse.move(520, 320);
+  await page.mouse.up();
+  await expect(livePath).toHaveCount(0);
+  expect(await page.evaluate(() => window.WBOApp.replay.authoritativeSeq)).toBe(
+    2,
+  );
+  const inputResult = await page.evaluate(() => {
+    const input = document.createElement("textarea");
+    document.getElementById("board")?.append(input);
+    const before = scrollY;
+    const event = new WheelEvent("wheel", {
+      deltaY: 120,
+      bubbles: true,
+      cancelable: true,
+    });
+    input.dispatchEvent(event);
+    input.remove();
+    return {
+      prevented: event.defaultPrevented,
+      before,
+      after: scrollY,
+      moving: window.WBOApp.viewportState.controller.isFollowCameraMoving(),
+    };
+  });
+  expect(inputResult.prevented).toBe(false);
+  expect(inputResult.after).toBe(inputResult.before);
+  expect(inputResult.moving).toBe(false);
+  await page.mouse.down();
+  await expect(livePath).toHaveCount(1);
+  await page.mouse.up();
+});
+
 test("Ctrl+Arrow pans one chunk at the current zoom, easing and accumulating repeated keys", async ({
   page,
   context,

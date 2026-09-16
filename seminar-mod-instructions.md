@@ -17,7 +17,7 @@ Don't add them all at once. Only add the ones that I asked you to add:
   
 <!-- 2. The moderator can modify a setting (in some interface) that divides the canvas into chunks of a specified size. Everyone can turn on a setting that locks their perspective to be centered on the last modified chunk (with margins to be configured by the moderator). The moderator can modify and lock this setting for everyone else.  -->
 
-1. The moderator can toggle a dark mode for a board. This will change the default background color to dark gray, and the default stroke color to white. When toggling between dark and light mode, the hue and distinguishablity of strokes should be preserved. So for example, when dark mode is toggled, a white stroke should become background color, a black stroke should become white, and a light red stroke should become a dark red stroke. 
+<!-- 1. The moderator can toggle a dark mode for a board. This will change the default background color to dark gray, and the default stroke color to white. When toggling between dark and light mode, the hue and distinguishablity of strokes should be preserved. So for example, when dark mode is toggled, a white stroke should become background color, a black stroke should become white, and a light red stroke should become a dark red stroke.  -->
   
 2. The server will record the start and end timestamp of each stroke and every other kind of modification in some kind of log file. The log file between a certain time interval may be downloaded in an moderator session via the helper program. 
 
@@ -28,7 +28,9 @@ Don't add them all at once. Only add the ones that I asked you to add:
    - A stroke should be assumed to be drawn with equal speed between its start and finish timestamp. 
    - The PoV of the video should snap to the last modified chunk (with margins configured via some command line argument). Some other ways to configure the PoV that you find useful should also be added, and configurable through CLA. 
 
-4. Customizable keyboard controls through a button on the web UI, with two presets - one for the current keyboard controls, and one for an alternative control set that would be more familiar to some users with Shift+Scroll being scaling canvas, and Scroll just being vertical movement. 
+<!-- 4. Add a toggle between the following two controls:
+   - ScrollUp/ScrollDown is scaling;
+   - ScrollUp/ScrollDown is the same as Up/Down keys, and Ctrl+ScrollUp/ScrollDown is scaling.  -->
 
 Keep in mind that this project is AGPL-3.0, so as you add these feature, you should state the modifications in `README.md` and do other modifications to comply to the license requirements. 
 

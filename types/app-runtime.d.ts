@@ -651,6 +651,8 @@ export type ToolModule<T = unknown> = {
 };
 
 export type ViewportController = {
+  getWheelMode(): import("../client-data/js/board_preferences.js").WheelMode;
+  setWheelMode(mode: unknown): void;
   panByKeyboard(dx: number, dy: number, width?: number, height?: number): void;
   getViewCenter(): { x: number; y: number };
   holdFollowCamera(interrupt: () => void): { release(): void };

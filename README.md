@@ -9,8 +9,9 @@ A demonstration server is available at [wbo.ophir.dev](https://wbo.ophir.dev)
 
 This modified version adds compressed native whiteboard export/import, a Python
 command-line helper, Ed25519 moderator authentication, per-board display
-names, and moderator-controlled canvas chunks with activity following (feature 2
-in `seminar-mod-instructions.md`). Features 3–6 are not implemented.
+names, moderator-controlled canvas chunks with activity following, board dark
+mode, and personal scroll controls. Timestamped edit logs and recording/video
+generation are not implemented.
 See [NOTICE.md](NOTICE.md) for modification and license notices.
 
 Use the existing **Download** button (previously Save to SVG) to export an SVG or
@@ -107,6 +108,23 @@ accepts that same object with `X-WBO-Theme: 1` and `Content-Type: application/js
 V2 requests sign the exact body and work over HTTP and HTTPS. Updates share the
 chunk-settings rate limit. Backups can contain an optional `theme` field;
 older backups without it preserve the destination's theme.
+
+### Personal scroll controls
+
+Use the scroll selector beside the view-mode selector to choose:
+
+- **Scroll: zoom** (default): scroll up/down to zoom in/out.
+- **Scroll: move · Ctrl: zoom**: scroll up/down acts like the Up/Down arrow
+  keys; hold Ctrl while scrolling to zoom.
+
+This is your personal browser preference, remembered across boards and reloads.
+It does not change anyone else's controls or the saved board settings. In Free
+view, scrolling moves 64 screen pixels; in chunk focus, it moves one chunk with
+the usual smooth animation. In latest-edit focus, pause briefly and scroll in
+the same direction again within two seconds to switch to chunk focus and move.
+A continuous wheel/trackpad gesture cannot confirm that switch. Shift+scroll
+panning and S/O+scroll size/opacity shortcuts remain available. Focused views
+retain their existing fit-to-chunk zoom; choose Free to zoom manually.
 
 ### Canvas chunks and following activity
 

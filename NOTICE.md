@@ -84,3 +84,9 @@ board dark mode, hue-preserving reversible color presentation, white grids and
 chunk borders, and default white ink on dark canvases. Board metadata, SVG
 previews and exports, native backups, live theme synchronization, the Python
 helper, all supported UI translations, and regression tests are extended.
+
+Changes dated 2026-09-16 implement seminar feature 4: personal scroll controls
+with a browser-local zoom/navigation preference, Ctrl+scroll zoom, shared smooth
+arrow/chunk navigation, and gesture-aware latest-focus reminders. The board
+shell, viewport, preferences, chunk controls, runtime types, all supported
+translations, tests, README and AGENTS documentation are updated.

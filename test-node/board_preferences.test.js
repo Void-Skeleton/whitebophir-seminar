@@ -101,3 +101,49 @@ test("PreferenceModule persists color changes", async () => {
 
   assert.equal(storage.getItem("wbo.currentColor"), "#ff4136");
 });
+
+test("wheel preference defaults safely and keeps the session choice when storage fails", async () => {
+  const { readStoredWheelMode } = await import(
+    "../client-data/js/board_preferences.js"
+  );
+  const { createViewportController } = await import(
+    "../client-data/js/board_viewport.js"
+  );
+  for (const value of ["", "invalid", "zoom", "navigate"]) {
+    withWindow(
+      { localStorage: createLocalStorage({ "wbo.wheelMode": value }) },
+      () => {
+        assert.equal(
+          readStoredWheelMode(),
+          value === "navigate" ? "navigate" : "zoom",
+        );
+      },
+    );
+  }
+  for (const windowObject of [
+    {
+      get localStorage() {
+        throw new Error("Access denied");
+      },
+    },
+    {
+      localStorage: {
+        getItem() {
+          throw new Error("Access denied");
+        },
+        setItem() {
+          throw new Error("Quota exceeded");
+        },
+      },
+    },
+  ]) {
+    withWindow(windowObject, () => {
+      const viewport = createViewportController(/** @type {any} */ ({}));
+      assert.equal(viewport.getWheelMode(), "zoom");
+      viewport.setWheelMode("navigate");
+      assert.equal(viewport.getWheelMode(), "navigate");
+      viewport.setWheelMode("invalid");
+      assert.equal(viewport.getWheelMode(), "navigate");
+    });
+  }
+});

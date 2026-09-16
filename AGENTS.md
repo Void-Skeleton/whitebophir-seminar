@@ -191,6 +191,18 @@ The viewport owns keyboard movement, easing, bounds and cancellation; all
 keyboard camera moves interrupt Pencil and block it throughout the transition.
 Chunk focus retains its chosen chunk through edits, resize and reconnect.
 
+The personal scroll selector uses `wbo.wheelMode` in localStorage across boards;
+`zoom` is the default and `navigate` maps vertical wheel input to the same
+Up/Down actions via `ChunksModule.navigateByArrow`. Ctrl+wheel keeps viewport
+zoom; Shift+wheel pan and S/O+wheel styling are preserved. The viewport reads
+the preference during core boot, and the shell binds its selector after
+hydration. Storage failures retain the session choice. This preference is
+neither board metadata nor a moderator setting. Navigation wheel events are
+limited to one per 120 ms, with a 180 ms gap separating gestures. Continuous
+events cannot confirm leaving latest focus; a separate same-direction gesture
+within two seconds can. Keyboard and wheel confirmations remain separate.
+`playwright/tests/chunks.spec.ts` covers wheel navigation and user isolation.
+
 Moderator settings use `GET` / `POST /chunks/{board}` in
 [board_chunks.mjs](./server/routes/board_chunks.mjs). POST checks `canBan`, requires
 `X-WBO-Chunks: 1` plus JSON, and accepts only `{width,height,margin,viewMode}`.
