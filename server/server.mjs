@@ -7,6 +7,7 @@ import { route, routeHttpRequests } from "./http/dispatch.mjs";
 import observability from "./observability/index.mjs";
 import { boardArchive } from "./routes/board_archive.mjs";
 import { boardHistory } from "./routes/board_history.mjs";
+import { serverTime } from "./routes/time.mjs";
 import { boardChunks, boardTheme } from "./routes/board_chunks.mjs";
 import { authV2Challenge } from "./routes/auth_v2.mjs";
 import {
@@ -40,6 +41,7 @@ const hasDot = (value) => typeof value === "string" && value.includes(".");
  */
 function createWhiteboardHttpHandler() {
   return routeHttpRequests([
+    route("/time", serverTime, "server_time"),
     route("/auth/v2/challenge", authV2Challenge, "auth_v2_challenge"),
     route("/boards", redirectBoardQuery, "boards_redirect"),
     route("/boards/", rejectMissingBoardName, "board_page"),

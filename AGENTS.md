@@ -166,6 +166,64 @@ temporary files and child processes are cleaned up on failure/cancellation.
 `test-node/seminar_replay.test.js` exercises timeline/camera validation, invokes
 the Python CLI with real Chromium/ffmpeg, and decodes the MP4 to verify pixels,
 frame count, dimensions and failure cleanup. CI installs ffmpeg explicitly.
+
+Audio recording belongs to [seminar_audio.py](./scripts/seminar_audio.py).
+`record DIRECTORY` selects repeatable `--source`/`--process` IDs, or opens a
+numbered interactive terminal menu. `--list-sources` does not capture. Linux
+uses pactl discovery and parec per-source/per-sink-input monitoring, including
+new streams from selected PIDs. Discovery accepts `monitor_source` names or
+source indices and the separate `monitor_source_name` field; unavailable
+monitors omit affected playback streams without hiding microphone choices.
+Windows uses the bundled PowerShell/C# WASAPI
+bridge in `scripts/audio`; process-tree loopback requires build 20348+. It emits
+`WBOA` packets: little-endian uint32 frame count, uint64 QPC nanoseconds, then
+stereo s16le PCM at 48 kHz. The Python parser bounds packets to two seconds.
+Capture has no third-party Python dependencies and does not upload recordings.
+Compressed capture requires ffmpeg with libopus on Linux and Windows; `--ffmpeg`
+overrides its path. `--audio-format opus|pcm` defaults to Opus; `--audio-bitrate`
+accepts 16–256 kbps (default 64). Source listing and PCM capture do not need ffmpeg.
+
+Each source has an `.opus` (default) or `.pcm` and `.audio.jsonl` pair.
+[seminar_audio_storage.py](./scripts/seminar_audio_storage.py) owns streaming
+encoding and durable journal publication. Version-2 `whitebophir-audio` headers
+use `encoding: "opus"`; version 1 retains `encoding: "s16le"`. Both name the
+sibling file, 48 kHz sample rate and two channels. A persistent ffmpeg process
+encodes constant-bitrate Opus into Ogg pages with a 100 ms target duration.
+The output reader drains complete pages independently of the capture writer.
+`start {frames:0,atMs}` precedes audio; `checkpoint {frames,atMs}` commits audio
+after fsync once per second. Opus checkpoints wait until the granule position
+minus pre-skip covers their sample count, and add `audioBytes`, the committed
+page boundary. Capture timestamps are retained while waiting for the encoder.
+`resume` at the previous frame count preserves
+capture gaps; `end {frames}` closes clean sessions. Timestamps are server Unix
+milliseconds; checkpoints also include network uncertainty and calibration ID.
+Neither format requires successful finalization; replay uses complete journal
+records only. Encoder errors stop recording and preserve committed prefixes.
+`clock.jsonl` contains periodic minimum-RTT calibrations of the monotonic clock.
+Initial sync failure aborts; refresh failure retains the last calibration and
+warns. SIGINT/SIGTERM stop capture, drain workers and preserve committed data.
+
+[time.mjs](./server/routes/time.mjs) owns public `GET /time[?nonce=...]`, returning
+only `{now}` without board access, authentication or cacheability. It accepts
+bounded nonces, rejects other/duplicate query fields and non-GET methods. The
+helper preserves the deployment base path and refuses clock redirects.
+
+`replay --audio FILE.audio.jsonl` is repeatable up to 32 files. Validation and
+ffmpeg alignment belong to [seminar_audio_mix.mjs](./scripts/seminar_audio_mix.mjs):
+16 MiB/100,000-row metadata bounds, sibling audio paths, monotonic server anchors
+and durable byte counts are checked before Chromium starts. Opus validation
+streams the committed prefix and checks Ogg CRCs, sequence, headers and granules.
+Replay copies only that compressed prefix into its cleaned-up temporary directory
+and trims by decoded sample count, retaining compatibility with PCM recordings.
+Balanced sample-to-
+timestamp expressions plus resampling align recordings; trimming, silence,
+mixing, limiting and pitch-preserving tempo follow the requested video interval.
+No audio supplied/overlapping preserves video-only output. Windows compilation
+and portable audio tests run in a dedicated CI job; the Node suite invokes
+`test-node/seminar_audio_test.py` and tests synthetic recording against the real
+clock route, then decodes actual MP4 audio for timing/mixing assertions. Tests
+cover live encoder checkpoints, sample-exact finalization, a forcibly killed
+recorder, torn tails, damaged pages, compression size, and mixed Opus/PCM replay.
 V2 archive requests carry a one-use signature through `X-WBO-Auth-V2`; imports
 also verify the SHA-512 digest of the exact compressed body before validation
 or board mutation.

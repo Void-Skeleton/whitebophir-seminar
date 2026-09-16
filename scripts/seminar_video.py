@@ -19,6 +19,8 @@ MESSAGES = {
         "output": "New .mp4 output file (never overwritten)",
         "snapshot": "Historical .wbo snapshot within the history interval",
         "history": "Downloaded .jsonl.gz history covering the snapshot and video interval",
+        "audio": "Recording .audio.jsonl timing file; repeat to mix sources at their server timestamps",
+        "audio_done": "Mixed {count} overlapping audio recordings.",
         "snapshot_at": "Timestamp of a legacy snapshot without embedded time (Unix ms or ISO 8601 with timezone)",
         "start": "Video start, at or after the snapshot (Unix ms or ISO 8601 with timezone; default: snapshot time)",
         "end": "Video end, at or before history end (Unix ms or ISO 8601 with timezone; default: history end)",
@@ -52,6 +54,8 @@ MESSAGES = {
         "output": "新建的 .mp4 输出文件（不会覆盖已有文件）",
         "snapshot": "时间位于日志区间内的历史 .wbo 快照",
         "history": "覆盖快照时间和视频区间的 .jsonl.gz 修改日志",
+        "audio": "录音的 .audio.jsonl 时间文件；可重复指定，按服务器时间混音",
+        "audio_done": "已混入 {count} 个与视频时间重叠的录音。",
         "snapshot_at": "不含时间信息的旧版快照的时间戳（Unix 毫秒或带时区的 ISO 8601）",
         "start": "视频开始时间，不早于快照（Unix 毫秒或带时区的 ISO 8601；默认使用快照时间）",
         "end": "视频结束时间，不晚于日志结束（Unix 毫秒或带时区的 ISO 8601；默认使用日志结束时间）",
@@ -85,6 +89,8 @@ MESSAGES = {
         "output": "新建的 .mp4 輸出檔案（不會覆寫現有檔案）",
         "snapshot": "時間位於日誌區間內的歷史 .wbo 快照",
         "history": "涵蓋快照時間和影片區間的 .jsonl.gz 修改日誌",
+        "audio": "錄音的 .audio.jsonl 時間檔案；可重複指定，依伺服器時間混音",
+        "audio_done": "已混入 {count} 個與影片時間重疊的錄音。",
         "snapshot_at": "不含時間資訊的舊版快照的時間戳記（Unix 毫秒或含時區的 ISO 8601）",
         "start": "影片開始時間，不早於快照（Unix 毫秒或含時區的 ISO 8601；預設使用快照時間）",
         "end": "影片結束時間，不晚於日誌結束（Unix 毫秒或含時區的 ISO 8601；預設使用日誌結束時間）",
@@ -129,6 +135,7 @@ def add_parser(subcommands, argv):
     parser.add_argument("file", type=Path, help=text["output"])
     parser.add_argument("--snapshot", type=Path, required=True, help=text["snapshot"])
     parser.add_argument("--history", type=Path, required=True, help=text["history"])
+    parser.add_argument("--audio", type=Path, action="append", default=[], help=text["audio"])
     parser.add_argument("--snapshot-at", help=text["snapshot_at"])
     parser.add_argument("--start", help=text["start"])
     parser.add_argument("--end", help=text["end"])
@@ -165,6 +172,7 @@ def render(args):
         options = {
             "snapshot": str(args.snapshot.resolve()), "history": str(args.history.resolve()),
             "output": str(args.file.resolve()), "width": width, "height": height,
+            "audio": [str(file.resolve()) for file in args.audio],
             "fps": args.fps, "speed": args.speed, "camera": args.camera,
             "viewBox": args.view_box, "initialPoint": args.initial_point,
             "chunkWidth": args.chunk_width, "chunkHeight": args.chunk_height,
@@ -197,6 +205,8 @@ def render(args):
                 errors.seek(max(0, errors.tell() - 16384))
                 raise ValueError(errors.read().decode("utf-8", errors="replace").strip())
         print(text["finished"].format(frames=result["frames"], output=args.file))
+        if args.audio:
+            print(text["audio_done"].format(count=result.get("audioSources", 0)))
         if result.get("incompleteStrokes"):
             print(text["incomplete"].format(count=result["incompleteStrokes"]), file=sys.stderr)
         return 0

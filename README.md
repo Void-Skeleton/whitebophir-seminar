@@ -11,8 +11,8 @@ This modified version adds compressed native whiteboard export/import, a Python
 command-line helper, Ed25519 moderator authentication, per-board display
 names, moderator-controlled canvas chunks with activity following, board dark
 mode, personal scroll controls, durable timestamped edit history with
-historical snapshots, and offline canvas replay videos. Audio recording and
-audio/video synchronization are not implemented.
+historical snapshots, offline canvas replay videos, and separately recorded
+microphone/application audio synchronized to the board's server clock.
 See [NOTICE.md](NOTICE.md) for modification and license notices.
 
 Use the existing **Download** button (previously Save to SVG) to export an SVG or
@@ -284,6 +284,102 @@ These totals include stroke creation and completion records, but exclude any
 pre-existing board checkpoint or bulk imports. The new limits leave over 2.8×
 decompressed and 5.4× compressed headroom over the stress case; its 1,735,200
 records also fit below the record limit. Ordinary writing with pauses is smaller.
+
+### Seminar audio recording and replay
+
+The helper's `record` command captures selected microphones and application
+audio on **Linux and Windows**. With no `--source` or `--process`, it opens a
+numbered terminal selection menu; choose multiple numbers separated by commas,
+`r` to refresh, or `q` to cancel. `--list-sources` lists IDs without recording.
+No audio is uploaded to WBO. Clock synchronization alone contacts the server.
+
+- **Linux:** install `pactl` and `parec` (usually `pulseaudio-utils`) and use a
+  running PulseAudio or PipeWire PulseAudio-compatible server. `--source` accepts
+  a source name or `default`. `--process` accepts an application's audio PID from
+  the list. Only its matching playback streams are monitored; output routing is
+  unchanged. Streams opened later by the same PID are discovered once per second.
+  Each stream gets a separate recording; reopening a stream starts a new file.
+  Discovery handles monitor names or source indices in `pactl` JSON; missing
+  monitors omit affected playback streams while microphone choices remain available.
+  Start application playback if its PID is absent from the list. A restarted
+  application with a new PID must be selected in a new recording session.
+- **Windows:** use Python 3.10+ and Windows PowerShell 5.1 or PowerShell 7. The
+  bundled C# WASAPI bridge compiles automatically with PowerShell `Add-Type`;
+  Visual Studio and additional Python packages are unnecessary. `--source`
+  accepts a capture endpoint ID or `default`. Process capture includes the PID's
+  child processes and requires **Windows build 20348 or newer**, including Windows
+  11, following the [Microsoft process-loopback API](https://learn.microsoft.com/en-us/samples/microsoft/windows-classic-samples/applicationloopbackaudio-sample/).
+  Older Windows versions can record microphones but reject process loopback.
+  Allow microphone access for desktop apps in Windows settings. Avoid selecting
+  both a parent process and its child, which would duplicate their shared audio.
+
+Examples below use `python3`; on Windows use `python`:
+
+```sh
+python3 scripts/seminar_helper.py record --list-sources
+python3 scripts/seminar_helper.py record seminar-audio --server http://localhost:8080
+python3 scripts/seminar_helper.py record seminar-audio-cli --server http://localhost:8080 --source default --process 12345 --duration 7200
+python3 scripts/seminar_helper.py record --lang zh-CN --help
+python3 scripts/seminar_helper.py record --lang zh-TW --help
+```
+
+Repeat `--source` and `--process` to select more inputs (up to 32 selections).
+Omit `--duration` to record until Ctrl+C. The output directory must not already
+exist. `--pactl`, `--parec`, and `--powershell` override capture executable paths.
+Compressed recording requires **ffmpeg with the libopus encoder** on PATH on
+both platforms; `record --ffmpeg PATH` overrides its location. Replay has the
+same executable option. `--list-sources` does not require ffmpeg.
+
+Each source now streams to `source-NNN.opus` plus `source-NNN.audio.jsonl` timing
+metadata. The default is **64 kbps stereo Opus**, a lossy audio codec: two hours
+uses about **60 MB per source**, plus roughly 1–2 MB of timing metadata, instead
+of 1.38 GB of PCM. A microphone and one meeting stream together use about
+120–124 MB. `--audio-bitrate 32` reduces audio to about 31 MB per source at lower
+quality; the allowed range is 16–256 kbps. `--audio-format pcm` retains the old
+uncompressed 48 kHz stereo 16-bit format and needs no ffmpeg during recording.
+Existing PCM recordings remain compatible with replay and can be mixed with
+Opus recordings. History archive limits do not apply to audio.
+
+Keep audio and timing files together with their original basenames. The encoder
+runs continuously, writing Ogg pages about every 100 ms. Once per second, the
+helper queues a timing checkpoint; it commits that checkpoint only after all
+its samples have been encoded and the corresponding complete pages flushed to
+disk. An interrupted session remains replayable through its last committed
+checkpoint, normally losing about a second of recent audio plus encoder/disk
+buffering. No final container index or successful shutdown is required. Replay
+checks page integrity, accounts for Opus encoder delay, and ignores uncommitted
+trailing bytes. It uses a temporary copy of the compressed committed prefix,
+without expanding a whole recording to PCM on disk. `clock.jsonl` records clock
+calibration samples. This storage path is shared by Linux and Windows.
+
+The new public `GET /time` endpoint returns only `{now: <Unix milliseconds>}`,
+with caching disabled, and works behind the existing deployment base path.
+The helper takes five samples, chooses the lowest round-trip time, and maps
+capture timestamps through a monotonic clock. It refreshes every 30 seconds
+(`--sync-interval` changes this). A failed initial calibration stops recording;
+later outages report a warning and retain the last calibration. No moderator
+credentials are required to read the clock. Windows uses WASAPI packet timestamps;
+Linux estimates capture time from delivery and the requested `--latency-ms`
+(default 20). Reported network uncertainty excludes device and scheduling latency.
+
+Supply timing files to replay with repeated `--audio`:
+
+```sh
+python3 scripts/seminar_helper.py replay seminar-with-audio.mp4 \
+  --snapshot start.wbo --history edits.jsonl.gz \
+  --start 2026-09-16T09:30:00Z --end 2026-09-16T10:30:00Z \
+  --audio seminar-audio/source-001.audio.jsonl \
+  --audio seminar-audio/source-002.audio.jsonl
+```
+
+Replay ignores recordings outside the video interval, trims excess audio, leaves
+silence before a source starts and after it ends, and mixes overlapping sources
+with clipping protection. Timing checkpoints correct clock drift and preserve
+capture gaps. `--speed` changes audio tempo with the video while preserving pitch.
+Up to 32 recording files can be supplied; duplicate paths are used once. Audio
+metadata is bounded to 16 MiB and 100,000 records per source. Replay validates
+timestamps and committed sample counts before rendering, ignores an incomplete
+last journal line, and never overwrites the output video.
 
 ### Personal scroll controls
 

@@ -17,6 +17,7 @@ import sys
 import unicodedata
 import zlib
 import seminar_video
+import seminar_audio
 from seminar_common import MAX_HISTORY_BYTES, MAX_HISTORY_JSON_BYTES, parse_timestamp
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit, urlunsplit
@@ -187,6 +188,7 @@ def main(argv=None):
     )
     subcommands = parser.add_subparsers(dest="command", required=True)
     seminar_video.add_parser(subcommands, argv)
+    seminar_audio.add_parser(subcommands, argv)
     keygen = subcommands.add_parser("keygen", help="Generate a local Ed25519 identity")
     keygen.add_argument("file", type=Path, help="New local key file (contains the private key)")
     join = subcommands.add_parser("join-url", help="Print a board URL with a display name")
@@ -221,6 +223,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.command == "replay":
         return seminar_video.render(args)
+    if args.command == "record":
+        return seminar_audio.record(args)
     try:
         if args.command == "keygen":
             generate_key_file(args.file)

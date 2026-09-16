@@ -10,6 +10,22 @@ on:
     branches: [master]
 
 jobs:
+  windows-audio:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Compile native WASAPI bridge
+        shell: powershell
+        run: Add-Type -Path scripts/audio/WindowsCapture.cs
+      - name: Install compressed audio encoder
+        run: choco install ffmpeg --no-progress --yes
+      - name: Test clock, source selection and native audio packet handling
+        run: python test-node/seminar_audio_test.py
+      - name: Check localized capture help
+        run: python scripts/seminar_helper.py record --lang zh-CN --help
   typecheck:
     runs-on: ubuntu-latest
 

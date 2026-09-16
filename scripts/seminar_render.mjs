@@ -14,9 +14,10 @@ import {
 import { serializeStoredSvgItem } from "../server/persistence/stored_svg_item_codec.mjs";
 import { DEFAULT_CHUNKS, chunkRect } from "../client-data/js/board_chunks.js";
 import { THEME_SVG_RESOURCES } from "../client-data/js/board_theme.js";
+import { audioArguments, readRecording } from "./seminar_audio_mix.mjs";
 
 /** @typedef {{x:number,y:number,width:number,height:number}} Rect */
-/** @typedef {import("./seminar_replay.mjs").ReplayTimes & {snapshot:string,history:string,output:string,width:number,height:number,fps:number,speed:number,camera:string,viewBox?:number[],initialPoint?:number[],chunkWidth?:number,chunkHeight?:number,margin?:number,transitionMs:number,ffmpeg:string,chromium?:string,maxArchiveBytes:number,maxJsonBytes:number}} Options */
+/** @typedef {import("./seminar_replay.mjs").ReplayTimes & {snapshot:string,history:string,output:string,width:number,height:number,fps:number,speed:number,camera:string,viewBox?:number[],initialPoint?:number[],chunkWidth?:number,chunkHeight?:number,margin?:number,transitionMs:number,ffmpeg:string,chromium?:string,maxArchiveBytes:number,maxJsonBytes:number,audio?:string[]}} Options */
 
 /** @param {Rect} rect @param {number} ratio */
 export function fitRect(rect, ratio) {
@@ -207,6 +208,14 @@ function validateOptions(options) {
 /** @param {Options} options @param {AbortSignal} [signal] @param {(progress:{frame:number,total:number}) => void} [progress] */
 export async function renderVideo(options, signal, progress = () => {}) {
   validateOptions(options);
+  if (
+    options.audio !== undefined &&
+    (!Array.isArray(options.audio) || options.audio.length > 32)
+  )
+    throw new Error("At most 32 audio recordings may be supplied");
+  const recordings = await Promise.all(
+    [...new Set(options.audio || [])].map(readRecording),
+  );
   try {
     await stat(options.output);
     throw new Error("Output file already exists");
@@ -264,6 +273,15 @@ export async function renderVideo(options, signal, progress = () => {}) {
   signal?.addEventListener("abort", abort, { once: true });
   try {
     signal?.throwIfAborted();
+    const audio = await audioArguments(
+      recordings,
+      model.videoStart,
+      model.videoEnd,
+      options.speed,
+      count / options.fps,
+      directory,
+      signal,
+    );
     browser = await chromium.launch({
       headless: true,
       ...(options.chromium && { executablePath: options.chromium }),
@@ -294,7 +312,8 @@ export async function renderVideo(options, signal, progress = () => {}) {
         "png",
         "-i",
         "pipe:0",
-        "-an",
+        ...audio.inputs,
+        ...audio.output,
         "-c:v",
         "libx264",
         "-preset",
@@ -365,7 +384,11 @@ export async function renderVideo(options, signal, progress = () => {}) {
       throw new Error(`ffmpeg failed: ${encoderError}`);
     // Publish only a complete video, without overwriting a concurrently created file.
     await link(temporary, path.resolve(options.output));
-    return { frames: count, incompleteStrokes: model.incompleteStrokes };
+    return {
+      frames: count,
+      incompleteStrokes: model.incompleteStrokes,
+      audioSources: audio.used,
+    };
   } finally {
     signal?.removeEventListener("abort", abort);
     if (encoder && encoder.exitCode === null) encoder.kill("SIGKILL");

@@ -1,5 +1,25 @@
 # Modification notice
 
+Changes dated 2026-09-16 make streamed Opus compression the default for seminar
+audio recordings on Linux and Windows. The helper adds format, bitrate and
+ffmpeg options with English/Simplified/Traditional Chinese help. Complete Ogg
+pages are synced before publishing timing checkpoints; replay validates and
+recovers committed compressed prefixes while retaining PCM compatibility.
+Storage, interruption/replay tests, CI and documentation are updated.
+
+Changes dated 2026-09-16 implement seminar feature 3: per-source microphone and
+application audio capture on Linux (PulseAudio/PipeWire) and Windows (WASAPI),
+command-line and interactive selection, streamed PCM with durable timing
+journals, periodic server clock synchronization, and synchronized replay audio
+trimming/mixing. The public clock route, Python recorder, native Windows bridge,
+ffmpeg audio alignment, English/Simplified/Traditional Chinese CLI text, Windows
+CI checks, regression tests and documentation are added or updated. New files
+retain the project's AGPL-3.0-or-later license.
+
+Follow-up changes dated 2026-09-16 fix Linux audio discovery to read pactl's
+`monitor_source` field, resolve numeric source indices, and tolerate missing
+monitors. Regression tests and documentation cover the corrected lookup.
+
 Changes dated 2026-09-16 implement canvas replay video (the revised seminar
 feature 2). The Python helper adds the localized `replay` command, backed by
 offline Node timeline/camera modules, existing WBO SVG rendering, headless
