@@ -308,6 +308,15 @@ async function unsafeSaveBoard(board) {
       board.saveInProgress = true;
       board.dirtyDuringSaveFromMs = null;
       try {
+        while (board.history) {
+          const pending = board.history.pending;
+          try {
+            await pending;
+          } catch {
+            return { status: "failed" };
+          }
+          if (pending === board.history.pending) break;
+        }
         if (board.disposed) return { status: "skipped" };
         if (
           board.metadata === board.persistedMetadata &&

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""WBO seminar helper: native backups, local keys, names and presentation settings.
+"""WBO seminar helper: backups, edit history, replay video and presentation settings.
 
 SPDX-License-Identifier: AGPL-3.0-or-later
-Seminar modifications, 2026-09-15. Python 3.10+; v2 keys require cryptography.
+Seminar modifications, 2026-09-16. Python 3.10+; v2 keys require cryptography.
 """
 
 import argparse
@@ -16,12 +16,40 @@ import re
 import sys
 import unicodedata
 import zlib
+import seminar_video
+from seminar_common import MAX_HISTORY_BYTES, MAX_HISTORY_JSON_BYTES, parse_timestamp
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, HTTPRedirectHandler, build_opener
 
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_JSON_BYTES = 256 * 1024 * 1024
+
+
+def validate_history(data, max_archive_bytes, max_json_bytes):
+    if len(data) > max_archive_bytes:
+        raise ValueError("History exceeds the configured compressed limit")
+    with gzip.GzipFile(fileobj=io.BytesIO(data)) as stream:
+        consumed = 0
+        first = True
+        while True:
+            row = stream.readline(max_json_bytes - consumed + 1)
+            if not row:
+                break
+            consumed += len(row)
+            if consumed > max_json_bytes:
+                raise ValueError("History exceeds the configured decompressed limit")
+            entry = json.loads(row)
+            if first:
+                if (not isinstance(entry, dict) or entry.get("format") != "whitebophir-history"
+                        or entry.get("version") != 1):
+                    raise ValueError("Invalid history format")
+                first = False
+            elif (not isinstance(entry, dict) or entry.get("kind") not in ("mutation", "settings", "stroke", "checkpoint")
+                    or type(entry.get("atMs")) is not int):
+                raise ValueError("Invalid history entry")
+        if first:
+            raise ValueError("Empty history response")
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -155,9 +183,10 @@ def validate_chunk_response(value):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        description="Manage WBO backups, local identities, names, and presentation settings."
+        description="Manage WBO backups, edit history, local identities, names, and presentation settings."
     )
     subcommands = parser.add_subparsers(dest="command", required=True)
+    seminar_video.add_parser(subcommands, argv)
     keygen = subcommands.add_parser("keygen", help="Generate a local Ed25519 identity")
     keygen.add_argument("file", type=Path, help="New local key file (contains the private key)")
     join = subcommands.add_parser("join-url", help="Print a board URL with a display name")
@@ -165,7 +194,7 @@ def main(argv=None):
     join.add_argument("--board", required=True)
     join.add_argument("--name", required=True)
     join.add_argument("--token", help="Optional board JWT to include in the URL")
-    for name in ("export", "import", "chunks", "theme"):
+    for name in ("export", "import", "chunks", "theme", "history", "history-info"):
         command = subcommands.add_parser(name)
         if name == "chunks":
             command.add_argument("--width", type=int, help="Chunk width in board units")
@@ -174,17 +203,24 @@ def main(argv=None):
             command.add_argument("--view-mode", choices=("free", "chunk", "latest"), help="Apply a view mode to other users; they may change it afterwards")
         elif name == "theme":
             command.add_argument("--mode", choices=("light", "dark"), help="Set the board theme for everyone; omit to read it")
-        else:
-            command.add_argument("file", type=Path, help="Path to a .wbo archive")
+        elif name != "history-info":
+            command.add_argument("file", type=Path, help="Path to a .jsonl.gz log" if name == "history" else "Path to a .wbo archive")
+        if name == "export":
+            command.add_argument("--at", help="Historical snapshot: Unix milliseconds or ISO 8601 with timezone (moderator only)")
+        if name == "history":
+            command.add_argument("--from", dest="from_time", required=True, help="Inclusive start: Unix milliseconds or ISO 8601 with timezone")
+            command.add_argument("--to", dest="to_time", required=True, help="Inclusive end: Unix milliseconds or ISO 8601 with timezone")
         command.add_argument("--server", default="http://localhost:8080")
         command.add_argument("--board", required=True)
-        command.add_argument("--max-archive-bytes", type=int, default=MAX_ARCHIVE_BYTES)
-        command.add_argument("--max-json-bytes", type=int, default=MAX_JSON_BYTES)
+        command.add_argument("--max-archive-bytes", type=int, default=MAX_HISTORY_BYTES if name == "history" else MAX_ARCHIVE_BYTES)
+        command.add_argument("--max-json-bytes", type=int, default=MAX_HISTORY_JSON_BYTES if name == "history" else MAX_JSON_BYTES)
         command.add_argument("--token", default=os.environ.get("WBO_TOKEN"), help="Existing board JWT (or WBO_TOKEN)")
         command.add_argument("--user-secret", default=os.environ.get("WBO_USER_SECRET"), help="Existing user-secret cookie (or WBO_USER_SECRET)")
         command.add_argument("--private-key-file", type=Path, help="Local Ed25519 key file for v2 authentication")
         command.add_argument("--socket-id", help="Verified browser socket ID, needed for imports on Turnstile-protected boards")
     args = parser.parse_args(argv)
+    if args.command == "replay":
+        return seminar_video.render(args)
     try:
         if args.command == "keygen":
             generate_key_file(args.file)
@@ -202,6 +238,27 @@ def main(argv=None):
             headers["Cookie"] = "wbo-user-secret-v1=" + args.user_secret
         if args.socket_id:
             headers["X-WBO-Socket-Id"] = args.socket_id
+        if args.command in ("history", "history-info") or (args.command == "export" and args.at):
+            parts = urlsplit(url)
+            path = urlsplit(args.server).path.rstrip("/") + "/history/" + quote(args.board, safe="")
+            query = {"token": args.token} if args.token else {}
+            if args.command == "export":
+                query["at"] = parse_timestamp(args.at)
+            elif args.command == "history":
+                query.update({"from": parse_timestamp(args.from_time), "to": parse_timestamp(args.to_time)})
+                if query["from"] > query["to"]:
+                    raise ValueError("History start must not be after its end")
+            url = urlunsplit((parts.scheme, parts.netloc, path, urlencode(query), ""))
+            if args.command == "history-info":
+                if args.private_key_file:
+                    headers.update(authentication_v2(args, url))
+                with urlopen(Request(url, headers=headers), timeout=60) as response:
+                    info = json.loads(response.read(4096))
+                if (not isinstance(info, dict) or type(info.get("availableFrom")) is not int
+                        or type(info.get("now")) is not int or not 0 <= info["availableFrom"] <= info["now"]):
+                    raise ValueError("Invalid history information response")
+                print(json.dumps(info))
+                return 0
         if args.command == "theme":
             parts = urlsplit(url)
             path = urlsplit(args.server).path.rstrip("/") + "/theme/" + quote(args.board, safe="")
@@ -243,14 +300,17 @@ def main(argv=None):
             validate_chunk_response(result)
             print(json.dumps(result, ensure_ascii=False))
             return 0
-        if args.command == "export":
+        if args.command in ("export", "history"):
             if args.file.exists():
                 raise ValueError("Output file already exists; choose a new path")
             if args.private_key_file:
                 headers.update(authentication_v2(args, url))
             with urlopen(Request(url, headers=headers), timeout=60) as response:
                 data = response.read(args.max_archive_bytes + 1)
-            validate_archive(data, args.max_archive_bytes, args.max_json_bytes)
+            if args.command == "history":
+                validate_history(data, args.max_archive_bytes, args.max_json_bytes)
+            else:
+                validate_archive(data, args.max_archive_bytes, args.max_json_bytes)
             with args.file.open("xb") as output:
                 output.write(data)
             print(f"Exported {args.board} to {args.file}")

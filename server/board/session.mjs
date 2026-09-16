@@ -9,6 +9,8 @@ import { SerialTaskQueue } from "./serial_task_queue.mjs";
 /**
  * @typedef {{
  *   name: string,
+ *   disposed?: boolean,
+ *   history?: import("./history.mjs").BoardHistory,
  *   processMessage: (message: NormalizedMessageData) => BoardMutationResult,
  *   recordPersistentMutation: (message: NormalizedMessageData, acceptedAtMs?: number) => MutationLogEntry,
  *   consumePendingRejectedMutationEffects?: () => MutationEffect[],
@@ -23,6 +25,7 @@ import { SerialTaskQueue } from "./serial_task_queue.mjs";
  *   acceptPersistentMutation: (
  *     mutation: NormalizedMessageData,
  *     nowMs?: number,
+ *     socketId?: string,
  *   ) => Promise<
  *     | {ok: true, value: NormalizedMessageData, entry: MutationLogEntry, followup?: MutationLogEntry[]}
  *     | {ok: false, reason: string, followup?: MutationLogEntry[]}
@@ -51,8 +54,9 @@ export function createBoardSession(board) {
   return {
     board,
     runExclusive: queue.runExclusive.bind(queue),
-    async acceptPersistentMutation(mutation, nowMs = Date.now()) {
+    async acceptPersistentMutation(mutation, nowMs = Date.now(), socketId) {
       return queue.runExclusive(async () => {
+        if (board.disposed) return { ok: false, reason: "history_unavailable" };
         consumePendingMutationEffects(
           board,
           board.consumePendingRejectedMutationEffects,
@@ -80,6 +84,7 @@ export function createBoardSession(board) {
           ).map((effect) =>
             board.recordPersistentMutation(effect.mutation, nowMs),
           );
+          await board.history?.commit(followup, socketId);
           return followup.length > 0 ? { ...result, followup } : result;
         }
         const entry = board.recordPersistentMutation(acceptedMutation, nowMs);
@@ -89,6 +94,7 @@ export function createBoardSession(board) {
         ).map((effect) =>
           board.recordPersistentMutation(effect.mutation, nowMs),
         );
+        await board.history?.commit([entry, ...followup], socketId);
         return {
           ok: true,
           value: acceptedMutation,

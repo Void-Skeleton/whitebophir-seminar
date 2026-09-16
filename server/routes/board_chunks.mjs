@@ -102,10 +102,12 @@ export async function boardChunks(ctx, theme = false) {
               point: board.activityPoint,
             },
           };
+        await board.history?.commit([], "", board.metadata);
         board.delaySave();
         const saved = await board.save();
         if (saved.status !== "saved") {
-          board.metadata = previous;
+          // The settings are already durable in history; retry the SVG save.
+          if (!board.history) board.metadata = previous;
           throw new BoundaryError(
             503,
             theme ? "board_theme_save_failed" : "chunk_settings_save_failed",

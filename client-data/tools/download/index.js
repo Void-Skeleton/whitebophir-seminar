@@ -110,6 +110,115 @@ function archiveUrl(state) {
   return url;
 }
 
+/** @param {DownloadToolState} state */
+function historyUrl(state) {
+  const url = new URL(
+    `../history/${encodeURIComponent(state.identity.boardName)}`,
+    window.location.href,
+  );
+  if (state.identity.token) url.searchParams.set("token", state.identity.token);
+  return url;
+}
+
+/** @param {number} time */
+function localDateTime(time) {
+  const date = new Date(time);
+  return new Date(time - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, -1);
+}
+
+/** @param {DownloadToolState} state @param {boolean} snapshot */
+async function chooseHistoryDownload(state, snapshot) {
+  if (!state.access.canBan) throw new Error("history_forbidden");
+  const response = await state.connection.fetchBoard(historyUrl(state));
+  if (!response.ok) throw new Error("history_unavailable");
+  const info = await response.json();
+  if (
+    !Number.isSafeInteger(info.availableFrom) ||
+    !Number.isSafeInteger(info.now)
+  )
+    throw new Error("history_unavailable");
+  const dialog = document.createElement("dialog");
+  dialog.className = "wbo-dialog chunk-settings-dialog";
+  const form = document.createElement("form");
+  const title = document.createElement("h2");
+  title.id = "historyDownloadTitle";
+  title.textContent = state.i18n.t(
+    snapshot ? "history_snapshot" : "history_log",
+  );
+  dialog.setAttribute("aria-labelledby", title.id);
+  const note = document.createElement("p");
+  note.textContent = `${state.i18n.t("history_local_time")} ${new Date(info.availableFrom).toLocaleString()}`;
+  form.append(title, note);
+  /** @type {Record<string, HTMLInputElement>} */
+  const inputs = {};
+  for (const key of snapshot ? ["at"] : ["from", "to"]) {
+    const label = document.createElement("label");
+    label.textContent = state.i18n.t(`history_${key}`);
+    const input = document.createElement("input");
+    input.type = "datetime-local";
+    input.step = "0.001";
+    input.required = true;
+    input.name = key;
+    input.min = localDateTime(info.availableFrom);
+    input.value = localDateTime(key === "from" ? info.availableFrom : info.now);
+    label.append(input);
+    form.append(label);
+    inputs[key] = input;
+  }
+  const error = document.createElement("p");
+  error.setAttribute("role", "alert");
+  const download = document.createElement("button");
+  download.type = "submit";
+  download.textContent = state.i18n.t("download");
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.textContent = state.i18n.t("Cancel");
+  cancel.addEventListener("click", () => dialog.close());
+  form.append(error, download, cancel);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (download.disabled) return;
+    download.disabled = true;
+    error.textContent = "";
+    try {
+      if (!state.access.canBan) throw new Error("history_forbidden");
+      const url = historyUrl(state);
+      for (const [key, input] of Object.entries(inputs)) {
+        const value = new Date(input.value).getTime();
+        if (!Number.isSafeInteger(value))
+          throw new Error("invalid_history_time");
+        url.searchParams.set(key, String(value));
+      }
+      const result = await state.connection.fetchBoard(url);
+      if (!result.ok) throw new Error("history_download_failed");
+      downloadContent(
+        await result.blob(),
+        `${state.identity.boardName}-${url.searchParams.get(snapshot ? "at" : "from")}${snapshot ? ".wbo" : ".jsonl.gz"}`,
+      );
+      dialog.close();
+    } catch {
+      error.textContent = state.i18n.t("history_download_failed");
+    } finally {
+      download.disabled = false;
+    }
+  });
+  dialog.append(form);
+  document.body.append(dialog);
+  await new Promise((resolve) => {
+    dialog.addEventListener(
+      "close",
+      () => {
+        dialog.remove();
+        resolve(undefined);
+      },
+      { once: true },
+    );
+    dialog.showModal();
+  });
+}
+
 /** @param {DownloadToolState} state @param {string} key */
 function showNotice(state, key) {
   return state.ui.confirm({
@@ -154,6 +263,11 @@ async function chooseFileAction(state) {
       { value: "svg", label: state.i18n.t("archive_export_svg") },
       { value: "wbo", label: state.i18n.t("archive_export_wbo") },
     ];
+    if (state.access.canBan)
+      choices.push(
+        { value: "history-snapshot", label: state.i18n.t("history_snapshot") },
+        { value: "history-log", label: state.i18n.t("history_log") },
+      );
     if (state.access.canBan && state.access.canEdit)
       choices.push({
         value: "import",
@@ -171,6 +285,8 @@ async function chooseFileAction(state) {
       },
     });
     if (action?.value === "svg") downloadSvgFile(state);
+    if (action?.value === "history-snapshot" || action?.value === "history-log")
+      await chooseHistoryDownload(state, action.value === "history-snapshot");
     if (action?.value === "wbo") {
       const response = await state.connection.fetchBoard(archiveUrl(state));
       if (!response.ok) throw new Error("archive_export_failed");

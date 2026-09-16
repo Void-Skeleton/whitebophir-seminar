@@ -175,9 +175,14 @@ async function handleArchive(ctx) {
     await decodeArchive(body, ctx.runtime.config),
     ctx.runtime.config,
   );
-  const seq = await session.runExclusive(() => {
+  const seq = await session.runExclusive(async () => {
     checkAccess();
     const entries = applyArchiveImport(board, prepared);
+    await board.history?.commit(
+      entries,
+      "",
+      prepared.chunks || prepared.theme ? board.metadata : undefined,
+    );
     emitArchiveMutations(board, entries);
     if (prepared.chunks) emitChunkState(board);
     if (prepared.theme) emitThemeState(board);

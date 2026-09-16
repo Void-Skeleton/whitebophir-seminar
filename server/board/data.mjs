@@ -223,6 +223,8 @@ class BoardData {
     /** @type {SvgExtent} */
     this.svgExtent = createDefaultSvgExtent();
     this.disposed = false;
+    /** @type {import("./history.mjs").BoardHistory | undefined} */
+    this.history = undefined;
     /** @type {StaleSaveHandler | undefined} */
     this.onStaleSave = undefined;
   }

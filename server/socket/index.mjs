@@ -67,6 +67,8 @@ import { handleSetTemporaryModeratorMessage } from "./temporary_moderator_action
 import { resetTemporaryModerators } from "./temporary_moderators.mjs";
 import { handleTurnstileTokenMessage } from "./turnstile.mjs";
 import { setUserName } from "./user_names.mjs";
+import { initializeHistory } from "../board/history.mjs";
+import { getBoardSession } from "../board/session.mjs";
 
 const { Server } = socketIO;
 const { logger, metrics, tracing } = observability;
@@ -458,7 +460,8 @@ function getBoard(name, config) {
     }
     return loadedBoard;
   } else {
-    const board = BoardData.load(name, config).then((loaded) => {
+    const board = BoardData.load(name, config).then(async (loaded) => {
+      await initializeHistory(loaded);
       /**
        * @param {{actualFileSeq?: number, durationMs?: number, saveTargetSeq?: number}} details
        * @returns {Promise<void>}
@@ -749,6 +752,29 @@ async function handleSocketConnection(socket, config) {
     },
   );
 
+  let strokeEndWindow = Date.now();
+  let strokeEndCount = 0;
+  onSocketEvent(socket, "stroke_end", async (data) => {
+    if (
+      !data ||
+      typeof data !== "object" ||
+      typeof data.id !== "string" ||
+      data.id.length > 128 ||
+      Object.keys(data).length !== 1
+    )
+      return;
+    const now = Date.now();
+    if (now - strokeEndWindow >= 10000) {
+      strokeEndWindow = now;
+      strokeEndCount = 0;
+    }
+    if (++strokeEndCount > 200) return;
+    const board = await getBoard(boardName, config);
+    await getBoardSession(board).runExclusive(() =>
+      board.history?.finishStroke(socket.id, data.id, "release"),
+    );
+  });
+
   socket.on(
     "disconnecting",
     function onDisconnecting(/** @type {string} */ _reason) {
@@ -785,6 +811,17 @@ async function handleSocketConnection(socket, config) {
                 }),
               );
             }
+            await getBoardSession(board)
+              .runExclusive(() =>
+                board.history?.finishStroke(
+                  socket.id,
+                  undefined,
+                  "disconnected",
+                ),
+              )
+              .catch((error) =>
+                logger.error("history.stroke_close_failed", { error }),
+              );
             if (userCount === 0 && !shuttingDown) unloadBoard(room);
           }
         },

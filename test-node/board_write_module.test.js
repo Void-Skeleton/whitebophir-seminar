@@ -262,3 +262,45 @@ test("WriteModule preserves rate-limited writes through authoritative resync", (
     timerHarness.restore();
   }
 });
+
+test("stroke completion waits for every accepted buffered point and is discarded on disconnect", () => {
+  const timerHarness = installTimerHarness({ now: 1000 });
+  try {
+    const { writes, emittedMessages } = createWriteRuntime();
+    writes.bufferedWrites = /** @type {any} */ ([
+      {
+        message: { tool: 1, type: 1, id: "line", clientMutationId: "create" },
+        state: "inflight",
+      },
+      {
+        message: {
+          tool: 1,
+          type: 4,
+          parent: "line",
+          clientMutationId: "point",
+        },
+        state: "inflight",
+      },
+    ]);
+    writes.finishStroke("line");
+    assert.equal(emittedMessages.length, 0);
+    writes.resolveBufferedWrite("create");
+    assert.equal(emittedMessages.length, 0);
+    writes.resolveBufferedWrite("point");
+    assert.deepEqual(emittedMessages, [{ id: "line" }]);
+    writes.flushFinishedStrokes();
+    assert.equal(emittedMessages.length, 1);
+    writes.bufferedWrites = /** @type {any} */ ([
+      {
+        message: { id: "aborted", clientMutationId: "pending" },
+        state: "queued",
+      },
+    ]);
+    writes.finishStroke("aborted");
+    writes.discardBufferedWrites();
+    writes.flushFinishedStrokes();
+    assert.equal(emittedMessages.length, 1);
+  } finally {
+    timerHarness.restore();
+  }
+});

@@ -143,7 +143,14 @@
     "wheel_mode": "التحكم بالتمرير (لك فقط)",
     "wheel_mode_zoom": "التمرير: تكبير وتصغير",
     "wheel_mode_navigate": "التمرير: تنقل · Ctrl: تكبير وتصغير",
-    "chunk_wheel_navigation_reminder": "توقف قليلًا، ثم مرّر في الاتجاه نفسه خلال ثانيتين للتركيز على جزء والانتقال."
+    "chunk_wheel_navigation_reminder": "توقف قليلًا، ثم مرّر في الاتجاه نفسه خلال ثانيتين للتركيز على جزء والانتقال.",
+    "history_snapshot": "تنزيل حالة سابقة للوحة",
+    "history_log": "تنزيل سجل التعديلات",
+    "history_local_time": "الأوقات حسب منطقتك الزمنية المحلية. السجل متاح منذ:",
+    "history_at": "وقت اللقطة",
+    "history_from": "وقت البداية (شامل)",
+    "history_to": "وقت النهاية (شامل)",
+    "history_download_failed": "تعذّر تنزيل السجل. تحقق من الفترة الزمنية والاتصال وصلاحيات الإشراف."
   },
   "be": {
     "white-out": "Замазка",
@@ -289,7 +296,14 @@
     "wheel_mode": "Кіраванне пракруткай (толькі для вас)",
     "wheel_mode_zoom": "Пракрутка: маштаб",
     "wheel_mode_navigate": "Пракрутка: рух · Ctrl: маштаб",
-    "chunk_wheel_navigation_reminder": "Зрабіце кароткую паўзу і пракруціце ў тым жа кірунку на працягу 2 секунд, каб перайсці да фокусу на блоку і перамясціцца."
+    "chunk_wheel_navigation_reminder": "Зрабіце кароткую паўзу і пракруціце ў тым жа кірунку на працягу 2 секунд, каб перайсці да фокусу на блоку і перамясціцца.",
+    "history_snapshot": "Спампаваць мінулы стан дошкі",
+    "history_log": "Спампаваць журнал змен",
+    "history_local_time": "Час у вашым мясцовым часавым поясе. Гісторыя даступная з:",
+    "history_at": "Час здымка",
+    "history_from": "Пачатак (уключна)",
+    "history_to": "Канец (уключна)",
+    "history_download_failed": "Не ўдалося спампаваць гісторыю. Праверце перыяд, злучэнне і правы мадэратара."
   },
   "ca": {
     "white-out": "Corrector blanc",
@@ -435,7 +449,14 @@
     "wheel_mode": "Controls de desplaçament (només per a tu)",
     "wheel_mode_zoom": "Roda: zoom",
     "wheel_mode_navigate": "Roda: moure · Ctrl: zoom",
-    "chunk_wheel_navigation_reminder": "Fes una pausa breu i torna a desplaçar en la mateixa direcció abans de 2 segons per centrar la vista en un bloc i moure’t."
+    "chunk_wheel_navigation_reminder": "Fes una pausa breu i torna a desplaçar en la mateixa direcció abans de 2 segons per centrar la vista en un bloc i moure’t.",
+    "history_snapshot": "Baixa un estat anterior del tauler",
+    "history_log": "Baixa el registre de canvis",
+    "history_local_time": "Les hores són de la teva zona horària local. Historial disponible des de:",
+    "history_at": "Hora de la instantània",
+    "history_from": "Inici (inclòs)",
+    "history_to": "Final (inclòs)",
+    "history_download_failed": "No s’ha pogut baixar l’historial. Comprova el període, la connexió i els permisos de moderació."
   },
   "de": {
     "board_name_placeholder": "Name des Whiteboards…",
@@ -581,7 +602,14 @@
     "wheel_mode": "Scroll-Steuerung (nur für dich)",
     "wheel_mode_zoom": "Scrollen: Zoom",
     "wheel_mode_navigate": "Scrollen: Bewegen · Strg: Zoom",
-    "chunk_wheel_navigation_reminder": "Halte kurz inne und scrolle innerhalb von 2 Sekunden erneut in dieselbe Richtung, um zur Abschnittsansicht zu wechseln und dich zu bewegen."
+    "chunk_wheel_navigation_reminder": "Halte kurz inne und scrolle innerhalb von 2 Sekunden erneut in dieselbe Richtung, um zur Abschnittsansicht zu wechseln und dich zu bewegen.",
+    "history_snapshot": "Früheren Boardstand herunterladen",
+    "history_log": "Änderungsprotokoll herunterladen",
+    "history_local_time": "Die Zeiten gelten in deiner lokalen Zeitzone. Verlauf verfügbar ab:",
+    "history_at": "Zeitpunkt des Boardstands",
+    "history_from": "Beginn (einschließlich)",
+    "history_to": "Ende (einschließlich)",
+    "history_download_failed": "Der Verlauf konnte nicht heruntergeladen werden. Prüfe Zeitraum, Verbindung und Moderationsrechte."
   },
   "en": {
     "white-out": "White-out",
@@ -727,7 +755,14 @@
     "wheel_mode": "Scroll controls (only you)",
     "wheel_mode_zoom": "Scroll: zoom",
     "wheel_mode_navigate": "Scroll: move · Ctrl: zoom",
-    "chunk_wheel_navigation_reminder": "Pause briefly, then scroll in the same direction again within 2 seconds to switch to chunk focus and move."
+    "chunk_wheel_navigation_reminder": "Pause briefly, then scroll in the same direction again within 2 seconds to switch to chunk focus and move.",
+    "history_snapshot": "Download historical board",
+    "history_log": "Download modification log",
+    "history_local_time": "Times use your local timezone. History available from:",
+    "history_at": "Snapshot time",
+    "history_from": "Start time (inclusive)",
+    "history_to": "End time (inclusive)",
+    "history_download_failed": "Could not download history. Check the time range, connection, and moderator access."
   },
   "es": {
     "board_name_placeholder": "Nombre de la pizarra …",
@@ -873,7 +908,14 @@
     "wheel_mode": "Controles de desplazamiento (solo para ti)",
     "wheel_mode_zoom": "Rueda: zoom",
     "wheel_mode_navigate": "Rueda: mover · Ctrl: zoom",
-    "chunk_wheel_navigation_reminder": "Haz una pausa breve y vuelve a desplazar en la misma dirección antes de 2 segundos para centrar la vista en un bloque y moverte."
+    "chunk_wheel_navigation_reminder": "Haz una pausa breve y vuelve a desplazar en la misma dirección antes de 2 segundos para centrar la vista en un bloque y moverte.",
+    "history_snapshot": "Descargar un estado anterior de la pizarra",
+    "history_log": "Descargar el registro de cambios",
+    "history_local_time": "Las horas usan tu zona horaria local. Historial disponible desde:",
+    "history_at": "Hora de la instantánea",
+    "history_from": "Inicio (incluido)",
+    "history_to": "Fin (incluido)",
+    "history_download_failed": "No se pudo descargar el historial. Comprueba el intervalo, la conexión y los permisos de moderación."
   },
   "fr": {
     "board_name_placeholder": "Nom du tableau…",
@@ -1018,7 +1060,14 @@
     "wheel_mode": "Commandes de défilement (pour vous uniquement)",
     "wheel_mode_zoom": "Molette : zoom",
     "wheel_mode_navigate": "Molette : déplacer · Ctrl : zoom",
-    "chunk_wheel_navigation_reminder": "Marquez une courte pause, puis faites défiler à nouveau dans le même sens sous 2 secondes pour centrer la vue sur un bloc et vous déplacer."
+    "chunk_wheel_navigation_reminder": "Marquez une courte pause, puis faites défiler à nouveau dans le même sens sous 2 secondes pour centrer la vue sur un bloc et vous déplacer.",
+    "history_snapshot": "Télécharger un état antérieur du tableau",
+    "history_log": "Télécharger le journal des modifications",
+    "history_local_time": "Les heures sont dans votre fuseau horaire local. Historique disponible depuis :",
+    "history_at": "Date et heure de l’instantané",
+    "history_from": "Début (inclus)",
+    "history_to": "Fin (incluse)",
+    "history_download_failed": "Impossible de télécharger l’historique. Vérifiez la période, la connexion et vos droits de modération."
   },
   "hu": {
     "white-out": "Lefedő",
@@ -1164,7 +1213,14 @@
     "wheel_mode": "Görgetés vezérlése (csak neked)",
     "wheel_mode_zoom": "Görgetés: nagyítás",
     "wheel_mode_navigate": "Görgetés: mozgatás · Ctrl: nagyítás",
-    "chunk_wheel_navigation_reminder": "Tarts rövid szünetet, majd 2 másodpercen belül görgess újra ugyanabba az irányba a szakaszra fókuszáláshoz és a mozgáshoz."
+    "chunk_wheel_navigation_reminder": "Tarts rövid szünetet, majd 2 másodpercen belül görgess újra ugyanabba az irányba a szakaszra fókuszáláshoz és a mozgáshoz.",
+    "history_snapshot": "Korábbi táblaállapot letöltése",
+    "history_log": "Módosítási napló letöltése",
+    "history_local_time": "Az időpontok a helyi időzónádban értendők. Az előzmények kezdete:",
+    "history_at": "Pillanatkép időpontja",
+    "history_from": "Kezdet (beleértve)",
+    "history_to": "Vég (beleértve)",
+    "history_download_failed": "Nem sikerült letölteni az előzményeket. Ellenőrizd az időszakot, a kapcsolatot és a moderátori jogosultságot."
   },
   "id": {
     "white-out": "Cairan koreksi",
@@ -1310,7 +1366,14 @@
     "wheel_mode": "Kontrol gulir (hanya untuk Anda)",
     "wheel_mode_zoom": "Gulir: zoom",
     "wheel_mode_navigate": "Gulir: pindah · Ctrl: zoom",
-    "chunk_wheel_navigation_reminder": "Berhenti sebentar, lalu gulir lagi ke arah yang sama dalam 2 detik untuk beralih ke fokus petak dan berpindah."
+    "chunk_wheel_navigation_reminder": "Berhenti sebentar, lalu gulir lagi ke arah yang sama dalam 2 detik untuk beralih ke fokus petak dan berpindah.",
+    "history_snapshot": "Unduh keadaan papan sebelumnya",
+    "history_log": "Unduh log perubahan",
+    "history_local_time": "Waktu menggunakan zona waktu lokal Anda. Riwayat tersedia sejak:",
+    "history_at": "Waktu snapshot",
+    "history_from": "Waktu mulai (inklusif)",
+    "history_to": "Waktu akhir (inklusif)",
+    "history_download_failed": "Tidak dapat mengunduh riwayat. Periksa rentang waktu, koneksi, dan akses moderator."
   },
   "it": {
     "board_name_placeholder": "Nome della lavagna…",
@@ -1456,7 +1519,14 @@
     "wheel_mode": "Controlli di scorrimento (solo per te)",
     "wheel_mode_zoom": "Rotella: zoom",
     "wheel_mode_navigate": "Rotella: sposta · Ctrl: zoom",
-    "chunk_wheel_navigation_reminder": "Fai una breve pausa, poi scorri di nuovo nella stessa direzione entro 2 secondi per centrare la vista su un riquadro e spostarti."
+    "chunk_wheel_navigation_reminder": "Fai una breve pausa, poi scorri di nuovo nella stessa direzione entro 2 secondi per centrare la vista su un riquadro e spostarti.",
+    "history_snapshot": "Scarica uno stato precedente della lavagna",
+    "history_log": "Scarica il registro delle modifiche",
+    "history_local_time": "Gli orari usano il tuo fuso orario locale. Cronologia disponibile dal:",
+    "history_at": "Data e ora dell’istantanea",
+    "history_from": "Inizio (incluso)",
+    "history_to": "Fine (inclusa)",
+    "history_download_failed": "Impossibile scaricare la cronologia. Controlla l’intervallo, la connessione e i permessi di moderazione."
   },
   "ja": {
     "board_name_placeholder": "ボードの名前",
@@ -1602,7 +1672,14 @@
     "wheel_mode": "スクロール操作（自分のみ）",
     "wheel_mode_zoom": "スクロール：拡大・縮小",
     "wheel_mode_navigate": "スクロール：移動 · Ctrl：拡大・縮小",
-    "chunk_wheel_navigation_reminder": "少し間を置き、2秒以内に同じ方向にもう一度スクロールすると、区画にフォーカスするモードに切り替わり、移動します。"
+    "chunk_wheel_navigation_reminder": "少し間を置き、2秒以内に同じ方向にもう一度スクロールすると、区画にフォーカスするモードに切り替わり、移動します。",
+    "history_snapshot": "過去のボードをダウンロード",
+    "history_log": "変更ログをダウンロード",
+    "history_local_time": "時刻はローカルタイムゾーンで表示されます。履歴の開始日時：",
+    "history_at": "スナップショットの日時",
+    "history_from": "開始日時（含む）",
+    "history_to": "終了日時（含む）",
+    "history_download_failed": "履歴をダウンロードできませんでした。期間、接続、モデレーター権限を確認してください。"
   },
   "my": {
     "board_name_placeholder": "ဝှိုက်ဘုတ်အမည် ... ",
@@ -1748,7 +1825,14 @@
     "wheel_mode": "လှိမ့်ခြင်း ထိန်းချုပ်မှုများ (သင့်အတွက်သာ)",
     "wheel_mode_zoom": "လှိမ့်ရန်: ချဲ့/ချုံ့",
     "wheel_mode_navigate": "လှိမ့်ရန်: ရွှေ့ · Ctrl: ချဲ့/ချုံ့",
-    "chunk_wheel_navigation_reminder": "ခဏရပ်ပြီး ၂ စက္ကန့်အတွင်း တူညီသောဘက်သို့ ထပ်လှိမ့်ပါ။ အကွက်အာရုံစိုက်မုဒ်သို့ ပြောင်းပြီး ရွှေ့ပါမည်။"
+    "chunk_wheel_navigation_reminder": "ခဏရပ်ပြီး ၂ စက္ကန့်အတွင်း တူညီသောဘက်သို့ ထပ်လှိမ့်ပါ။ အကွက်အာရုံစိုက်မုဒ်သို့ ပြောင်းပြီး ရွှေ့ပါမည်။",
+    "history_snapshot": "ယခင်ဘုတ်အခြေအနေကို ဒေါင်းလုဒ်လုပ်ရန်",
+    "history_log": "ပြောင်းလဲမှုမှတ်တမ်းကို ဒေါင်းလုဒ်လုပ်ရန်",
+    "history_local_time": "အချိန်များသည် သင့်ဒေသစံတော်ချိန်ကို သုံးသည်။ မှတ်တမ်းရရှိသည့် စတင်ချိန်:",
+    "history_at": "လျှပ်တစ်ပြက်အခြေအနေ အချိန်",
+    "history_from": "စတင်ချိန် (အပါအဝင်)",
+    "history_to": "ဆုံးချိန် (အပါအဝင်)",
+    "history_download_failed": "မှတ်တမ်းကို ဒေါင်းလုဒ်မလုပ်နိုင်ပါ။ အချိန်အပိုင်းအခြား၊ ချိတ်ဆက်မှုနှင့် ကြီးကြပ်သူခွင့်ပြုချက်ကို စစ်ဆေးပါ။"
   },
   "pt": {
     "white-out": "Branquejar",
@@ -1894,7 +1978,14 @@
     "wheel_mode": "Controlos de deslocamento (só para si)",
     "wheel_mode_zoom": "Roda: zoom",
     "wheel_mode_navigate": "Roda: mover · Ctrl: zoom",
-    "chunk_wheel_navigation_reminder": "Faça uma breve pausa e volte a deslocar no mesmo sentido dentro de 2 segundos para centrar a vista num bloco e mover-se."
+    "chunk_wheel_navigation_reminder": "Faça uma breve pausa e volte a deslocar no mesmo sentido dentro de 2 segundos para centrar a vista num bloco e mover-se.",
+    "history_snapshot": "Descarregar um estado anterior do quadro",
+    "history_log": "Descarregar o registo de alterações",
+    "history_local_time": "As horas usam o seu fuso horário local. Histórico disponível desde:",
+    "history_at": "Data e hora do estado",
+    "history_from": "Início (inclusive)",
+    "history_to": "Fim (inclusive)",
+    "history_download_failed": "Não foi possível descarregar o histórico. Verifique o intervalo, a ligação e as permissões de moderação."
   },
   "ru": {
     "board_name_placeholder": "Название доски",
@@ -2040,7 +2131,14 @@
     "wheel_mode": "Управление прокруткой (только для вас)",
     "wheel_mode_zoom": "Прокрутка: масштаб",
     "wheel_mode_navigate": "Прокрутка: движение · Ctrl: масштаб",
-    "chunk_wheel_navigation_reminder": "Сделайте короткую паузу и прокрутите в том же направлении ещё раз в течение 2 секунд, чтобы перейти к фокусу на блоке и переместиться."
+    "chunk_wheel_navigation_reminder": "Сделайте короткую паузу и прокрутите в том же направлении ещё раз в течение 2 секунд, чтобы перейти к фокусу на блоке и переместиться.",
+    "history_snapshot": "Скачать прежнее состояние доски",
+    "history_log": "Скачать журнал изменений",
+    "history_local_time": "Время указано в вашем местном часовом поясе. История доступна с:",
+    "history_at": "Время снимка",
+    "history_from": "Начало (включительно)",
+    "history_to": "Конец (включительно)",
+    "history_download_failed": "Не удалось скачать историю. Проверьте период, соединение и права модератора."
   },
   "sw": {
     "board_name_placeholder": "Jina la ubao mweupe ...",
@@ -2186,7 +2284,14 @@
     "wheel_mode": "Vidhibiti vya kusogeza (kwako pekee)",
     "wheel_mode_zoom": "Gurudumu: kukuza/kupunguza",
     "wheel_mode_navigate": "Gurudumu: sogeza · Ctrl: kukuza/kupunguza",
-    "chunk_wheel_navigation_reminder": "Subiri kidogo, kisha sogeza tena upande uleule ndani ya sekunde 2 ili kulenga sehemu moja na kusogea."
+    "chunk_wheel_navigation_reminder": "Subiri kidogo, kisha sogeza tena upande uleule ndani ya sekunde 2 ili kulenga sehemu moja na kusogea.",
+    "history_snapshot": "Pakua hali ya zamani ya ubao",
+    "history_log": "Pakua kumbukumbu ya mabadiliko",
+    "history_local_time": "Saa hutumia eneo lako la saa. Historia inapatikana kuanzia:",
+    "history_at": "Wakati wa picha ya hali",
+    "history_from": "Mwanzo (pamoja na wakati huo)",
+    "history_to": "Mwisho (pamoja na wakati huo)",
+    "history_download_failed": "Imeshindikana kupakua historia. Angalia kipindi, muunganisho na ruhusa za msimamizi."
   },
   "th": {
     "board_name_placeholder": "ชื่อไวท์บอร์ด ...",
@@ -2332,7 +2437,14 @@
     "wheel_mode": "การควบคุมการเลื่อน (เฉพาะคุณ)",
     "wheel_mode_zoom": "เลื่อน: ซูม",
     "wheel_mode_navigate": "เลื่อน: ย้าย · Ctrl: ซูม",
-    "chunk_wheel_navigation_reminder": "หยุดสักครู่ แล้วเลื่อนในทิศทางเดิมอีกครั้งภายใน 2 วินาที เพื่อเปลี่ยนเป็นโหมดโฟกัสที่ช่องและเลื่อนมุมมอง"
+    "chunk_wheel_navigation_reminder": "หยุดสักครู่ แล้วเลื่อนในทิศทางเดิมอีกครั้งภายใน 2 วินาที เพื่อเปลี่ยนเป็นโหมดโฟกัสที่ช่องและเลื่อนมุมมอง",
+    "history_snapshot": "ดาวน์โหลดกระดานย้อนหลัง",
+    "history_log": "ดาวน์โหลดบันทึกการแก้ไข",
+    "history_local_time": "เวลาใช้เขตเวลาท้องถิ่นของคุณ มีประวัติตั้งแต่:",
+    "history_at": "เวลาของภาพสถานะ",
+    "history_from": "เวลาเริ่มต้น (รวม)",
+    "history_to": "เวลาสิ้นสุด (รวม)",
+    "history_download_failed": "ดาวน์โหลดประวัติไม่ได้ โปรดตรวจสอบช่วงเวลา การเชื่อมต่อ และสิทธิ์ผู้ดูแล"
   },
   "uk": {
     "white-out": "Коректор",
@@ -2478,7 +2590,14 @@
     "wheel_mode": "Керування прокручуванням (лише для вас)",
     "wheel_mode_zoom": "Прокручування: масштаб",
     "wheel_mode_navigate": "Прокручування: рух · Ctrl: масштаб",
-    "chunk_wheel_navigation_reminder": "Зробіть коротку паузу й прокрутіть у тому самому напрямку ще раз протягом 2 секунд, щоб перейти до фокусу на блоці та переміститися."
+    "chunk_wheel_navigation_reminder": "Зробіть коротку паузу й прокрутіть у тому самому напрямку ще раз протягом 2 секунд, щоб перейти до фокусу на блоці та переміститися.",
+    "history_snapshot": "Завантажити попередній стан дошки",
+    "history_log": "Завантажити журнал змін",
+    "history_local_time": "Час указано у вашому місцевому часовому поясі. Історія доступна з:",
+    "history_at": "Час знімка",
+    "history_from": "Початок (включно)",
+    "history_to": "Кінець (включно)",
+    "history_download_failed": "Не вдалося завантажити історію. Перевірте період, з’єднання та права модератора."
   },
   "vi": {
     "white-out": "Bút xóa",
@@ -2624,7 +2743,14 @@
     "wheel_mode": "Điều khiển cuộn (chỉ riêng bạn)",
     "wheel_mode_zoom": "Cuộn: thu phóng",
     "wheel_mode_navigate": "Cuộn: di chuyển · Ctrl: thu phóng",
-    "chunk_wheel_navigation_reminder": "Dừng một chút, rồi cuộn lại cùng hướng trong vòng 2 giây để chuyển sang chế độ tập trung vào ô và di chuyển."
+    "chunk_wheel_navigation_reminder": "Dừng một chút, rồi cuộn lại cùng hướng trong vòng 2 giây để chuyển sang chế độ tập trung vào ô và di chuyển.",
+    "history_snapshot": "Tải trạng thái bảng trước đây",
+    "history_log": "Tải nhật ký thay đổi",
+    "history_local_time": "Thời gian dùng múi giờ địa phương của bạn. Lịch sử có từ:",
+    "history_at": "Thời điểm chụp trạng thái",
+    "history_from": "Thời gian bắt đầu (bao gồm)",
+    "history_to": "Thời gian kết thúc (bao gồm)",
+    "history_download_failed": "Không thể tải lịch sử. Hãy kiểm tra khoảng thời gian, kết nối và quyền điều hành."
   },
   "zh-CN": {
     "board_name_placeholder": "白板名称",
@@ -2770,7 +2896,14 @@
     "wheel_mode": "滚轮操作（仅对自己生效）",
     "wheel_mode_zoom": "滚轮：缩放",
     "wheel_mode_navigate": "滚轮：移动 · Ctrl：缩放",
-    "chunk_wheel_navigation_reminder": "请稍作停顿，然后在 2 秒内再次向相同方向滚动，切换到分块聚焦模式并移动视角。"
+    "chunk_wheel_navigation_reminder": "请稍作停顿，然后在 2 秒内再次向相同方向滚动，切换到分块聚焦模式并移动视角。",
+    "history_snapshot": "下载历史白板",
+    "history_log": "下载修改日志",
+    "history_local_time": "时间使用本地时区。可查询历史的起始时间：",
+    "history_at": "快照时间",
+    "history_from": "开始时间（含）",
+    "history_to": "结束时间（含）",
+    "history_download_failed": "无法下载历史记录。请检查时间范围、网络连接和版主权限。"
   },
   "zh-TW": {
     "board_name_placeholder": "白板名稱",
@@ -2916,7 +3049,14 @@
     "wheel_mode": "滾輪操作（僅對自己生效）",
     "wheel_mode_zoom": "滾輪：縮放",
     "wheel_mode_navigate": "滾輪：移動 · Ctrl：縮放",
-    "chunk_wheel_navigation_reminder": "請稍作停頓，然後在 2 秒內再次向相同方向捲動，切換至區塊聚焦模式並移動視角。"
+    "chunk_wheel_navigation_reminder": "請稍作停頓，然後在 2 秒內再次向相同方向捲動，切換至區塊聚焦模式並移動視角。",
+    "history_snapshot": "下載歷史白板",
+    "history_log": "下載修改紀錄",
+    "history_local_time": "時間使用本地時區。可查詢歷史的起始時間：",
+    "history_at": "快照時間",
+    "history_from": "開始時間（含）",
+    "history_to": "結束時間（含）",
+    "history_download_failed": "無法下載歷史紀錄。請檢查時間範圍、網路連線及管理員權限。"
   },
   "pl": {
     "board_name_placeholder": "Nazwa tablicy",
@@ -3062,6 +3202,13 @@
     "wheel_mode": "Sterowanie przewijaniem (tylko dla ciebie)",
     "wheel_mode_zoom": "Przewijanie: zoom",
     "wheel_mode_navigate": "Przewijanie: ruch · Ctrl: zoom",
-    "chunk_wheel_navigation_reminder": "Zrób krótką przerwę, a następnie przewiń ponownie w tym samym kierunku w ciągu 2 sekund, aby skupić widok na obszarze i go przesunąć."
+    "chunk_wheel_navigation_reminder": "Zrób krótką przerwę, a następnie przewiń ponownie w tym samym kierunku w ciągu 2 sekund, aby skupić widok na obszarze i go przesunąć.",
+    "history_snapshot": "Pobierz wcześniejszy stan tablicy",
+    "history_log": "Pobierz dziennik zmian",
+    "history_local_time": "Czas jest podany w twojej lokalnej strefie czasowej. Historia dostępna od:",
+    "history_at": "Czas migawki",
+    "history_from": "Początek (włącznie)",
+    "history_to": "Koniec (włącznie)",
+    "history_download_failed": "Nie udało się pobrać historii. Sprawdź zakres czasu, połączenie i uprawnienia moderatora."
   }
 }

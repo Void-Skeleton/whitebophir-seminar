@@ -650,6 +650,7 @@ function createHarness() {
       },
     },
     writes: {
+      finishStroke() {},
       drawAndSend: (/** @type {any} */ data) => {
         const toolName = MessageToolMetadata.getToolId(data.tool);
         if (!toolName) throw new Error(`Unknown tool '${data.tool}'.`);
@@ -940,6 +941,7 @@ function createInputTools(overrides = {}) {
     ...overrides,
   };
   tools.writes = {
+    finishStroke() {},
     drawAndSend: (/** @type {any} */ data) => {
       const toolName = MessageToolMetadata.getToolId(data.tool);
       tools.sentMessages.push({
@@ -1066,6 +1068,7 @@ function createInputToolRuntime(tools) {
     viewport: createUnavailableViewportRuntime(),
     writes: {
       drawAndSend: tools.writes.drawAndSend,
+      finishStroke() {},
       send: () => unavailableCapability("writes.send"),
       canBufferWrites: () => unavailableCapability("writes.canBufferWrites"),
       whenBoardWritable: () =>

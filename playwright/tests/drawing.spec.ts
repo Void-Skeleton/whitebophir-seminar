@@ -9,7 +9,9 @@ const bufferedModeratorTest = test.extend({
   serverOptions: {
     useJWT: true,
     env: {
-      WBO_MAX_EMIT_COUNT: "*:2/1s",
+      // Create consumes the budget, so the first point is always buffered.
+      // Later pointer moves can legitimately be suppressed by Pencil throttling.
+      WBO_MAX_EMIT_COUNT: "*:1/1s",
     },
   },
 });
@@ -503,6 +505,16 @@ test.describe("drawing and persistence", () => {
       await page.mouse.move(360, 300);
       await page.mouse.move(420, 300);
       await expect(visibleStroke).toHaveCount(1);
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            window.WBOApp.writes.bufferedWrites.some(
+              ({ message, state }) =>
+                state === "queued" && "type" in message && message.type === 4,
+            ),
+          ),
+        )
+        .toBe(true);
       await expect(boardPage.statusIndicator).toBeVisible();
 
       await peerBoard.tool("clear").click();

@@ -800,6 +800,7 @@ function commitActiveStroke(state) {
  */
 function finishActiveStroke(state) {
   commitActiveStroke(state);
+  if (state.curLineId) state.writes.finishStroke(state.curLineId);
   clearActiveStrokeState(state, true);
 }
 

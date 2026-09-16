@@ -12,7 +12,7 @@ agents changing the repository.
 ## project contract
 
 - CI is the source of truth for required checks: [.github/workflows/CI.yml](./.github/workflows/CI.yml).
-- Local baseline: `npm install`, `python3 -m pip install -r scripts/requirements-seminar.txt`, then `npm test`.
+- Local baseline: `npm install`, `python3 -m pip install -r scripts/requirements-seminar.txt`, `npx playwright install chromium`, ffmpeg/ffprobe on PATH, then `npm test`.
 - `npm test` runs the Node suite, Playwright suite, and Biome lint. It does not run typecheck or benchmarks.
 - Use `npm run typecheck` for the unified JS typecheck.
 - Use `npm run bench` before and after changes, only for suspected hot-path, persistence, replay, or broadcast-throughput changes.
@@ -90,6 +90,82 @@ Archives may also carry `theme: "light" | "dark"`; importing it restores the
 board theme and emits `theme_state`. Without `theme`, destination mode is kept.
 Item colors remain canonical light-palette values in both modes.
 Archive metadata never grants access or replaces destination permissions.
+Timestamped history uses moderator-only `GET /history/{board}` in
+[board_history.mjs](./server/routes/board_history.mjs): no time parameters returns
+`{availableFrom,now}`, `at=<Unix milliseconds>` exports an ordinary `.wbo`, and
+`from=<ms>&to=<ms>` streams gzip JSON Lines with inclusive bounds. Invalid or
+future times return 400; times before the initial checkpoint return 416. Current
+`canBan` is checked before reading and before export; v2 uses the existing GET
+proof. Two exports may run concurrently per runtime.
+
+[history.mjs](./server/board/history.mjs) owns compressed journaling and replay.
+Cold socket-board load creates an initial SVG checkpoint and recovers accepted
+mutations missing from SVG. Paths append `.history.jsonl.gz` to the board SVG
+path. Transactions are standard concatenated gzip members with a 20-byte header:
+the `WB` extra field holds total compressed member length as uint32 little-endian.
+Contents are JSON Lines. Appends are datasync'd before publication. Incomplete
+final members are truncated; corrupt complete members reject loading. Append
+failures dispose the board and prevent SVG saves of unjournaled state. Newer SVGs
+written externally add a `checkpoint` record with `reason: external_snapshot`.
+No retention/deletion policy is imposed. Native `.wbo` transfers state, not logs.
+Archive encoding shared with history lives in
+[archive_codec.mjs](./server/board/archive_codec.mjs), without startup configuration
+imports; archive API defaults/validation remain in archive.mjs.
+
+Sessions journal mutations and eviction effects before broadcast; imports journal
+mutations and settings together; chunk/theme changes journal before saving SVG.
+SVG saves wait for pending journal writes. Connection replay captures state under
+the session queue. Snapshot exports replay in an isolated in-memory board and
+omit empty Pencil placeholders. Mutation/settings records have server `atMs`,
+`startAtMs`, `endAtMs`; `stroke` records carry whole Pencil intervals. Internal
+`active_stroke` records preserve interruption timing and are excluded from
+downloads. Ranges select by `atMs`. The Python helper adds `history-info`,
+`history FILE --from ... --to ...`, and `export FILE --at ...`. Coverage lives in
+`test-node/board_history*.test.js` and `playwright/tests/history.spec.ts`.
+Historical `.wbo` snapshots also include optional `replay` context:
+`{board,atMs,seq,point,emptyPencils}`. Imports ignore it; the offline renderer uses
+it to validate the starting time/sequence and preserve pending empty Pencils.
+The native format/version and import capabilities are unchanged.
+
+The helper's offline `replay OUTPUT.mp4 --snapshot ... --history ...` command is
+owned by [seminar_video.py](./scripts/seminar_video.py), with English, Simplified
+Chinese and Traditional Chinese CLI help/status. It invokes
+[seminar_render.mjs](./scripts/seminar_render.mjs) through Node, which owns the
+headless Chromium canvas, camera, SVG frame rendering, and ffmpeg PNG pipe.
+[seminar_replay.mjs](./scripts/seminar_replay.mjs) validates bounded gzip inputs,
+uses native archive validation and BoardData's mutation engine, and builds the
+timeline. It never saves a BoardData or connects to a live board. SVG serializers,
+theme resources, activity geometry, and chunk fitting use existing owners.
+Chromium makes no network requests and embedded scripts are disabled.
+
+Shared timestamp parsing and history/replay size defaults belong to
+[seminar_common.py](./scripts/seminar_common.py): 256 MiB compressed and 1 GiB
+decompressed per file, overridable by CLI. Native snapshot downloads retain their
+64/256 MiB limits. Python history validation and Node replay history parsing
+decompress incrementally; replay retains parsed future events, not a full text
+copy. Replay caps histories at four million records and output at ten million
+frames. README documents measured two-hour 50/240-point-per-second sizes.
+
+Replay requires `history start <= snapshot <= video start <= video end <= history
+end`. `--start`/`--end` accept Unix milliseconds or timezone-bearing ISO timestamps,
+defaulting to snapshot/history end. `--snapshot-at` supplies missing legacy time;
+it cannot contradict embedded time. Edits through the inclusive snapshot are
+validated and skipped; intervening edits are applied before the first video frame.
+Sequence checks still cover the full log and its boundary with the snapshot.
+Pencil animation interpolates by path distance, preserving any snapshot prefix;
+clip boundaries use the original stroke interval, including later completion
+records in the supplied log. Missing completion records fall back to the last
+point time and are reported.
+Other edits keep their timestamp/order. Metadata and explicit SVG checkpoints
+are replayed. `latest` follows chunks with a 240 ms easing, `fixed` uses a view
+box, and `fit` uses all observed content bounds. Geometry defaults to board
+settings (or DEFAULT_CHUNKS), with persistent CLI overrides. Borders render in
+all modes. Output resolution, FPS, speed, transition, and executable paths are
+configurable. Output is published without overwrite only after ffmpeg succeeds;
+temporary files and child processes are cleaned up on failure/cancellation.
+`test-node/seminar_replay.test.js` exercises timeline/camera validation, invokes
+the Python CLI with real Chromium/ffmpeg, and decodes the MP4 to verify pixels,
+frame count, dimensions and failure cleanup. CI installs ffmpeg explicitly.
 V2 archive requests carry a one-use signature through `X-WBO-Auth-V2`; imports
 also verify the SHA-512 digest of the exact compressed body before validation
 or board mutation.
@@ -423,6 +499,13 @@ The server validates client messages, rejects malformed writes with
 `mutation_rejected`, and rebroadcasts accepted persistent writes as sequenced
 `broadcast` frames.
 
+Pencil completion uses `stroke_end {id}` after the client's final buffered write
+for that stroke has been accepted. Only the sending socket's tracked stroke can
+be closed; attempts are bounded to 200 per ten seconds. Client timestamps are
+not accepted. Disconnects and interrupted processes close timing at the last
+accepted point. A new stroke closes an unfinished predecessor as `superseded`.
+These records do not change board sequence or broadcast drawing mutations.
+
 Display-name changes use `set_user_name { name, socketId? }` with acknowledgement
 `{ok: true, name}` or `{ok: false, error}`. The omitted target means self;
 renaming another identity requires current `canBan` access. Validation and
@@ -726,7 +809,8 @@ When touching hot paths:
 - Profiling: `npm run profile -- <e2e|load|persist|broadcast>`.
 
 `npm test` needs Python 3.10+, the Python dependency in
-`scripts/requirements-seminar.txt`, Chromium and local browser/network capability.
+`scripts/requirements-seminar.txt`, Chromium, ffmpeg/ffprobe (including libx264),
+and local browser/network capability.
 The Node archive and v2 tests exercise the Python helper against a local server.
 The v2 browser suite uses `http://0.0.0.0` and explicitly verifies that the origin
 is not a secure context, so localhost Web Crypto support cannot mask regressions.

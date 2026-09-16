@@ -1,5 +1,19 @@
 # Modification notice
 
+Changes dated 2026-09-16 implement canvas replay video (the revised seminar
+feature 2). The Python helper adds the localized `replay` command, backed by
+offline Node timeline/camera modules, existing WBO SVG rendering, headless
+Chromium, and ffmpeg. Historical native snapshots gain optional replay context
+without changing their import format. Replay tests, CI encoder setup, README,
+and AGENTS documentation cover rendering, validation and output cleanup.
+
+Follow-up changes dated 2026-09-16 raise helper history/replay limits to 256 MiB
+compressed and 1 GiB decompressed based on two-hour writing estimates. History
+validation streams decompressed lines. Replay accepts snapshots anywhere within
+the log interval, adds localized video start/end and legacy snapshot timestamp
+options, and preserves stroke timing across clip boundaries. Shared CLI parsing,
+regression tests and documentation are updated.
+
 This is a modified version of WBO, originally developed by Ophir Lojkine and
 contributors. The project's GNU Affero General Public License, version 3 or
 later, remains in effect; see [LICENSE](LICENSE). Existing copyright and license
@@ -90,3 +104,11 @@ with a browser-local zoom/navigation preference, Ctrl+scroll zoom, shared smooth
 arrow/chunk navigation, and gesture-aware latest-focus reminders. The board
 shell, viewport, preferences, chunk controls, runtime types, all supported
 translations, tests, README and AGENTS documentation are updated.
+
+Changes dated 2026-09-16 implement the new seminar feature 1: compressed durable
+edit journals, millisecond server timestamps and Pencil completion records,
+crash recovery, moderator historical `.wbo` snapshots and streamed JSON Lines
+exports. Mutation sessions, persistence, socket replay, archive/settings routes,
+the existing Download dialog, all supported translations, the Python helper,
+tests and documentation are extended. Complete gzip members are synchronized
+before accepted changes are published.

@@ -48,6 +48,7 @@ export class WriteModule {
   constructor(getTools) {
     this.getTools = getTools;
     this.bufferedWrites = /** @type {BufferedWrite[]} */ ([]);
+    this.finishedStrokes = new Set();
     this.bufferedWriteTimer = /** @type {number | null} */ (null);
     this.writeReadyWaiters = /** @type {Array<() => void>} */ ([]);
     this.serverRateLimitedUntil = 0;
@@ -313,6 +314,7 @@ export class WriteModule {
     );
     if (index < 0) return false;
     this.bufferedWrites.splice(index, 1);
+    this.flushFinishedStrokes();
     this.scheduleBufferedWriteFlush();
     return true;
   }
@@ -356,6 +358,7 @@ export class WriteModule {
   discardBufferedWrites() {
     const Tools = this.getTools();
     this.bufferedWrites = [];
+    this.finishedStrokes.clear();
     this.localRateLimitedUntil = 0;
     this.clearBufferedWriteTimer();
     Tools.status.syncWriteStatusIndicator();
@@ -410,6 +413,32 @@ export class WriteModule {
     const liveData = /** @type {LiveBoardMessage} */ (data);
     Tools.messages.applyHooks(Tools.messages.hooks, liveData);
     return this.sendBufferedWrite(liveData);
+  }
+
+  /** @param {string} id */
+  finishStroke(id) {
+    this.finishedStrokes.add(id);
+    this.flushFinishedStrokes();
+  }
+
+  flushFinishedStrokes() {
+    const socket = this.getTools().connection.socket;
+    if (!socket?.connected) {
+      this.finishedStrokes.clear();
+      return;
+    }
+    for (const id of this.finishedStrokes) {
+      if (
+        this.bufferedWrites.some(
+          ({ message }) =>
+            ("id" in message && message.id === id) ||
+            ("parent" in message && message.parent === id),
+        )
+      )
+        continue;
+      this.finishedStrokes.delete(id);
+      socket.emit(SocketEvents.STROKE_END, { id });
+    }
   }
 
   /**

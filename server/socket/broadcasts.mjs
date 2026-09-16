@@ -359,6 +359,7 @@ async function persistBoardBroadcast(
   const handleResult = await getBoardSession(board).acceptPersistentMutation(
     data,
     now,
+    socket.id,
   );
   if (handleResult.ok === false) {
     rejectBoardMessageWrite(

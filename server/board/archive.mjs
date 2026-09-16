@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Seminar modifications, 2026-09-16: compressed backups with chunk settings.
 import { randomBytes, randomUUID } from "node:crypto";
-import { Readable } from "node:stream";
 import { promisify } from "node:util";
-import { gunzip, gzip } from "node:zlib";
+import { gunzip } from "node:zlib";
 import { validateChunkSettings } from "../../client-data/js/board_chunks.js";
 import { isBoardTheme } from "../../client-data/js/board_theme.js";
 import MessageCommon from "../../client-data/js/message_common.js";
@@ -11,29 +10,16 @@ import { MutationType } from "../../client-data/js/mutation_type.js";
 import { TOOL_BY_ID } from "../../client-data/tools/index.js";
 import * as configuration from "../configuration.mjs";
 import { badRequest, BoundaryError } from "../http/boundary_errors.mjs";
-import { parseStoredSvgItem } from "../persistence/stored_svg_item_codec.mjs";
-import { streamStoredSvgStructure } from "../persistence/streaming_stored_svg_scan.mjs";
-import { readRawAttribute } from "../persistence/svg_envelope.mjs";
 import { normalizeIncomingMessage } from "../socket/message_validation.mjs";
 
-export const ARCHIVE_FORMAT = "whitebophir-board";
+import {
+  ARCHIVE_FORMAT,
+  ARCHIVE_ITEM_FIELDS,
+  encodeArchive as encodeArchiveData,
+} from "./archive_codec.mjs";
+export { ARCHIVE_FORMAT, itemsFromSvg } from "./archive_codec.mjs";
 const MAX_ARCHIVE_MUTATIONS = 1000000;
-const compress = promisify(gzip);
 const decompress = promisify(gunzip);
-const ITEM_FIELDS = new Set([
-  "id",
-  "tool",
-  "color",
-  "size",
-  "opacity",
-  "x",
-  "y",
-  "x2",
-  "y2",
-  "txt",
-  "transform",
-  "_children",
-]);
 
 /** @import { ServerConfig, NormalizedMessageData } from "../../types/server-runtime.d.ts" */
 /** @import { ChunkSettings } from "../../client-data/js/board_chunks.js" */
@@ -46,57 +32,9 @@ function isRecord(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-/** @param {string} svg @returns {Promise<ArchiveItem[]>} */
-export async function itemsFromSvg(svg) {
-  const items = [];
-  for await (const event of streamStoredSvgStructure(Readable.from([svg]))) {
-    if (event.type !== "item") continue;
-    const item = parseStoredSvgItem(event.entry);
-    if (!item) throw badRequest("unsupported_archive_item");
-    if (item.tool === "pencil") {
-      // The stored codec deliberately only summarizes Pencil. Materialize its
-      // canonical relative path here, solely for an explicit native export.
-      const path = readRawAttribute(event.entry.rawAttributes, "d");
-      if (typeof path !== "string") throw badRequest("invalid_archive_path");
-      let x = 0;
-      let y = 0;
-      item._children = [];
-      for (const match of path.matchAll(/([Ml]) (-?\d+) (-?\d+)/g)) {
-        x = match[1] === "M" ? Number(match[2]) : x + Number(match[2]);
-        y = match[1] === "M" ? Number(match[3]) : y + Number(match[3]);
-        const last = item._children.at(-1);
-        if (!last || last.x !== x || last.y !== y)
-          item._children.push({ x, y });
-      }
-    }
-    items.push(item);
-  }
-  return items;
-}
-
-/** @param {ArchiveItem[]} items @param {ArchiveLimits} [limits] @param {ChunkSettings} [chunks] @param {BoardTheme} [theme] @returns {Promise<Buffer>} */
-export async function encodeArchive(
-  items,
-  limits = configuration,
-  chunks,
-  theme,
-) {
-  const json = Buffer.from(
-    JSON.stringify({
-      format: ARCHIVE_FORMAT,
-      version: 1,
-      items,
-      // Export board settings without the source board's revision or activity.
-      ...(chunks && { chunks: validateChunkSettings(chunks) }),
-      ...(theme && { theme }),
-    }),
-  );
-  if (json.length > limits.MAX_ARCHIVE_JSON_BYTES)
-    throw new BoundaryError(413, "archive_too_large");
-  const data = await compress(json);
-  if (data.length > limits.MAX_ARCHIVE_BYTES)
-    throw new BoundaryError(413, "archive_too_large");
-  return data;
+/** @param {ArchiveItem[]} items @param {ArchiveLimits} [limits] @param {ChunkSettings} [chunks] @param {BoardTheme} [theme] */
+export function encodeArchive(items, limits = configuration, chunks, theme) {
+  return encodeArchiveData(items, limits, chunks, theme);
 }
 
 /** @param {Buffer} data @param {ArchiveLimits} [limits] @returns {Promise<unknown>} */
@@ -164,7 +102,7 @@ export function prepareArchiveImport(archive, config) {
   for (const raw of archive.items) {
     if (
       !isRecord(raw) ||
-      Object.keys(raw).some((key) => !ITEM_FIELDS.has(key)) ||
+      Object.keys(raw).some((key) => !ARCHIVE_ITEM_FIELDS.has(key)) ||
       MessageCommon.normalizeId(raw.id) === null ||
       sourceIds.has(raw.id)
     ) {

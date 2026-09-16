@@ -10,8 +10,9 @@ A demonstration server is available at [wbo.ophir.dev](https://wbo.ophir.dev)
 This modified version adds compressed native whiteboard export/import, a Python
 command-line helper, Ed25519 moderator authentication, per-board display
 names, moderator-controlled canvas chunks with activity following, board dark
-mode, and personal scroll controls. Timestamped edit logs and recording/video
-generation are not implemented.
+mode, personal scroll controls, durable timestamped edit history with
+historical snapshots, and offline canvas replay videos. Audio recording and
+audio/video synchronization are not implemented.
 See [NOTICE.md](NOTICE.md) for modification and license notices.
 
 Use the existing **Download** button (previously Save to SVG) to export an SVG or
@@ -108,6 +109,181 @@ accepts that same object with `X-WBO-Theme: 1` and `Content-Type: application/js
 V2 requests sign the exact body and work over HTTP and HTTPS. Updates share the
 chunk-settings rate limit. Backups can contain an optional `theme` field;
 older backups without it preserve the destination's theme.
+
+### Edit history and historical snapshots
+
+Moderators can open **Download** and choose **Download historical board** or
+**Download modification log**. Time fields use the browser's local timezone and
+accept milliseconds. A historical board is an ordinary `.wbo` backup that can be
+uploaded through the existing import action. Downloading does not change the
+live board. Logs are gzip-compressed UTF-8 JSON Lines (`.jsonl.gz`), readable with
+`gzip -dc` and standard JSON tools.
+
+The server records accepted persistent changes: stroke points, text, shapes,
+transforms, copies, erases, clears, imports, and chunk/theme settings. Cursors
+and rejected edits are excluded. Timestamps are integer Unix milliseconds from
+the server clock. Each mutation has `startAtMs` and `endAtMs` equal to its
+acceptance time; a separate `stroke` record describes the complete Pencil
+interval. Release is reported after the final point is accepted. Disconnects,
+interrupted processes, and older clients use the last accepted point as the
+bounded end, with an explicit reason. These are server observation times, so
+network latency and queued writes affect them.
+
+Snapshots include all changes accepted at or before the selected timestamp;
+an unfinished stroke contains its accepted points. Operations in the same
+millisecond retain sequence order. Empty Pencil placeholders are omitted.
+Ranges include both endpoints and select records by `atMs`; a completed stroke
+record may refer to a start before the requested range. Snapshots include chunk
+and theme settings. Log headers describe the format, board, range, and earliest
+available time; each subsequent line is a `mutation`, `settings`, `stroke`, or
+`checkpoint` record.
+
+History begins when a board is first loaded by this version. An initial SVG
+checkpoint preserves existing content; earlier edits cannot be reconstructed.
+The dialog shows the earliest available time. There is no automatic retention
+limit, so provision disk space for the full log. History retains erased content
+and is downloadable only by current permanent or temporary moderators.
+
+Each board has an append-only `*.svg.history.jsonl.gz` file beside its SVG in
+`WBO_HISTORY_DIR`. Transactions are complete gzip members whose `WB` extra
+field stores the compressed length. Appends are synchronized before accepted
+changes are broadcast or saved to SVG. Restart recovery replays accepted edits
+missing from SVG and truncates only an incomplete final member. Corrupt complete
+members stop loading; append failures stop new edits for that loaded board.
+An externally replaced SVG with a newer sequence adds an explicit checkpoint;
+its intermediate edits are unknown. Keep SVG and journal together in filesystem
+backups. Native `.wbo` files transfer state without the source history.
+
+```sh
+# Returns availableFrom and now as Unix milliseconds.
+python3 scripts/seminar_helper.py history-info --server http://localhost:8080 \
+  --board seminar --private-key-file moderator.json
+
+python3 scripts/seminar_helper.py export snapshot.wbo --server http://localhost:8080 \
+  --board seminar --private-key-file moderator.json --at 2026-09-16T10:00:00.123Z
+
+python3 scripts/seminar_helper.py history edits.jsonl.gz --server http://localhost:8080 \
+  --board seminar --private-key-file moderator.json \
+  --from 2026-09-16T09:00:00Z --to 2026-09-16T10:00:00Z
+```
+
+CLI timestamps accept Unix milliseconds or ISO 8601 with a timezone. Existing
+`--user-secret` and `--token` authentication also work. Output files are never
+overwritten. History downloads default to 256 MiB compressed / 1 GiB decompressed;
+`--max-archive-bytes` and `--max-json-bytes` override these limits. Native snapshot
+downloads retain their separate 64 MiB / 256 MiB defaults.
+`GET /history/{board}` returns `{availableFrom, now}`; add `?at=<ms>` for a
+snapshot or `?from=<ms>&to=<ms>` for a log. Times before history starts return
+416; malformed, reversed, or future times return 400. Requests require `canBan`,
+support v2 proofs over HTTP/HTTPS, and are not cached. At most two exports run
+concurrently per server runtime. Log exports stream with backpressure and a
+fixed upper file offset so ongoing edits cannot change the selected result.
+
+### Canvas replay video
+
+The Python helper's `replay` command renders a historical `.wbo` snapshot and a
+downloaded `.jsonl.gz` history into an MP4 video. The snapshot time must fall
+within the history interval. It renders only the canvas, including
+chunk borders, colors, text, shapes, transforms, copies, erasures, clears, and
+later chunk/theme changes. It runs locally without a running WBO server.
+
+The renderer uses the repository's Node.js code and Playwright Chromium to keep
+the drawing appearance consistent with WBO. Install the repository's npm
+dependencies and Chromium with `npm install` and `npx playwright install chromium`.
+Install **ffmpeg** with the `libx264` encoder on PATH, or pass `--ffmpeg /path/to/ffmpeg`.
+Use `--node` or `--chromium` to select other executable paths. Fonts are supplied
+by the rendering machine; install fonts for the languages used on the board.
+
+```sh
+# Download matching inputs (use the same authentication options as history/export).
+python3 scripts/seminar_helper.py export start.wbo --server http://localhost:8080 \
+  --board seminar --private-key-file moderator.json --at 2026-09-16T09:15:00Z
+python3 scripts/seminar_helper.py history edits.jsonl.gz --server http://localhost:8080 \
+  --board seminar --private-key-file moderator.json \
+  --from 2026-09-16T09:00:00Z --to 2026-09-16T11:00:00Z
+
+python3 scripts/seminar_helper.py replay seminar.mp4 \
+  --snapshot start.wbo --history edits.jsonl.gz --resolution 1920x1080 --fps 30
+
+# Render a selected interval from those same inputs.
+python3 scripts/seminar_helper.py replay excerpt.mp4 \
+  --snapshot start.wbo --history edits.jsonl.gz \
+  --start 2026-09-16T09:30:00Z --end 2026-09-16T10:30:00Z
+
+# Override the board's chunk dimensions and margins.
+python3 scripts/seminar_helper.py replay custom.mp4 \
+  --snapshot start.wbo --history edits.jsonl.gz \
+  --chunk-width 10000 --chunk-height 7000 --margin 500
+
+# Other camera choices: a fixed region, or a stable view of all replayed content.
+python3 scripts/seminar_helper.py replay fixed.mp4 --snapshot start.wbo \
+  --history edits.jsonl.gz --camera fixed --view-box 0 0 16000 9000
+python3 scripts/seminar_helper.py replay overview.mp4 --snapshot start.wbo \
+  --history edits.jsonl.gz --camera fit --speed 4
+
+python3 scripts/seminar_helper.py replay --lang zh-CN --help
+python3 scripts/seminar_helper.py replay --lang zh-TW --help
+```
+
+`--start` defaults to the snapshot time; `--end` defaults to the history end.
+Both accept Unix milliseconds or ISO 8601 with a timezone. Bounds are inclusive:
+`history start ≤ snapshot time ≤ video start ≤ video end ≤ history end`.
+Edits through the snapshot time are already present and are not reapplied.
+Edits between the snapshot and video start are applied before the first frame.
+Cutting a video in the middle of a stroke preserves its original timing, using
+completion records later in the supplied history.
+
+The default `--camera latest` follows the last edited chunk, like a participant
+using latest-edit focus. Geometry defaults to the saved board settings and
+follows changes in the log; explicit width, height, or margin overrides remain
+in effect. Without saved chunk settings, WBO's 10000 × 7000, margin 500 defaults
+apply. Camera changes ease over 240 ms; `--transition-ms 0` makes immediate cuts.
+`fixed` preserves a region given in board coordinates, and `fit` keeps all content
+seen during the replay in view. Aspect ratios are preserved by extending the
+visible region. Borders remain visible in every camera mode, white in dark mode.
+
+Pencil strokes progress at constant distance per unit time between their start
+and end timestamps. A snapshot taken mid-stroke stays intact; its remaining
+points animate at constant speed over the remaining interval. If a log ends
+before a completion record, the last recorded point bounds that stroke and the
+helper reports this fallback. Other edits occur at their recorded timestamps.
+The selected final state is included as a frame; duration is rounded
+up to the frame interval, with one final frame. `--speed` changes playback speed.
+
+New historical snapshots carry optional `replay` context (board, timestamp,
+sequence, activity point, and empty Pencil placeholders) in the existing version-1
+`.wbo` format. Ordinary imports ignore it. Replay checks that context against the
+log. For older snapshots without an embedded timestamp, `--snapshot-at` supplies
+their time in the same format; if omitted, the history start is assumed. It cannot
+override a known embedded timestamp. Their initial camera defaults to the origin,
+overridable with `--initial-point X Y`.
+An older snapshot omitting a pending empty Pencil may need to be downloaded again.
+
+Replay never overwrites output files and publishes the MP4 only after encoding
+succeeds. Replay input limits default to **256 MiB compressed and 1 GiB decompressed
+per file**, adjustable with `--max-archive-bytes` and `--max-json-bytes`. History
+parsing streams lines instead of keeping the entire decompressed text in memory.
+Images are piped to ffmpeg with backpressure rather than saved as a directory of
+frames. Resolution
+dimensions must be even, 2–7680; frame rate is 1–120. The renderer rejects malformed
+history, sequence gaps, mismatched snapshots, histories exceeding four million
+records, and jobs exceeding ten million frames.
+Rendering time and memory depend on board complexity, duration, and resolution.
+The parsed timeline and board still occupy memory while rendering.
+
+For capacity planning, a synthetic two-hour run using the actual history record
+format, 3,600 two-second Pencil strokes, randomized integer coordinates, and
+conservatively long IDs measured:
+
+| Point rate | Points | Uncompressed JSON | Downloaded gzip |
+| --- | ---: | ---: | ---: |
+| 50/second (approximately the default write-rate ceiling) | 360,000 | 76.9 MiB | 10.3 MiB |
+| 240/second (stress case above the default rate) | 1,728,000 | 365.5 MiB | 47.2 MiB |
+
+These totals include stroke creation and completion records, but exclude any
+pre-existing board checkpoint or bulk imports. The new limits leave over 2.8×
+decompressed and 5.4× compressed headroom over the stress case; its 1,735,200
+records also fit below the record limit. Ordinary writing with pauses is smaller.
 
 ### Personal scroll controls
 

@@ -3,6 +3,7 @@ export const SocketEvents = Object.freeze({
   CHUNK_STATE: "chunk_state",
   THEME_STATE: "theme_state",
   BROADCAST: "broadcast",
+  STROKE_END: "stroke_end",
   CONNECT: "connect",
   CONNECT_ERROR: "connect_error",
   DISCONNECT: "disconnect",

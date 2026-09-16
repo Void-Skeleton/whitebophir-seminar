@@ -19,7 +19,16 @@ Don't add them all at once. Only add the ones that I asked you to add:
 
 <!-- 1. The moderator can toggle a dark mode for a board. This will change the default background color to dark gray, and the default stroke color to white. When toggling between dark and light mode, the hue and distinguishablity of strokes should be preserved. So for example, when dark mode is toggled, a white stroke should become background color, a black stroke should become white, and a light red stroke should become a dark red stroke.  -->
   
-2. The server will record the start and end timestamp of each stroke and every other kind of modification in some kind of log file. The log file between a certain time interval may be downloaded in an moderator session via the helper program. 
+1. The server will record the start and end timestamp of each stroke and every other kind of modification in some kind of log file. The timestamps only need to be accurate to the precision of milliseconds. The log file should be stored in stream to avoid data loss in case of an unexpected incident. Via an option in the download button in a moderator session, or via the helper program, the state of the board at any given timestamp, and all modification entries between any given start/end timestamp may be downloaded. A board state snapshot should share the same `.wbo` format that the download/upload board feature already uses. The modification log should be machine and human readable, but compressed when downloaded or stored. 
+
+2. The helper program should be able to take a historical board snapshot, and a history archive starting at the snapshot time, and generate a replay video that should faithfully reflect what a dummy participant would have seen. 
+   - Just render the canvas - the UI need not be rendered. Chunk borders should be rendered. 
+
+   - A stroke should be assumed to be drawn with equal speed between its start and finish timestamp.
+ 
+   - The PoV of the video should snap to the last modified chunk. Chunk settings should be configurable via CLA and default to the board's chunk settings. Some other ways to configure the PoV that you find useful should also be added, and configurable through CLA. The resolution of the video should also be configured via CLA. 
+
+   - Assume that `ffmpeg` is available on path, or otherwise has path specified by a CLA. 
 
 3. The helper program can be configured to capture the voice input from the machine's microphone and a selected set of processes (intended to be a meeting software, so that the voices of both the speaker and the participants of a seminar can be recorded). It should automatically mark the recorded voice with timestamps, and also sync time with the server so that the server timestamp and client timestamp can reasonably match. 
 

@@ -1,3 +1,4 @@
+import { getBoardSession } from "../board/session.mjs";
 import { MutationType } from "../../client-data/js/message_tool_metadata.js";
 import { normalizeUserName } from "../../client-data/js/user_name.js";
 import observability from "../observability/index.mjs";
@@ -163,50 +164,55 @@ async function prepareConnectionReplay(
             minReplayableSeq = board.minReplayableSeq();
           }
         }
-        if (baselineSeq > latestSeq || baselineSeq < minReplayableSeq) {
-          outcome =
-            baselineSeq > latestSeq
-              ? "future_baseline"
-              : BASELINE_NOT_REPLAYABLE;
-          logger.warn(
-            "socket.connection_replay_rejected",
-            boardDebugFields(board, {
-              socket: socket.id,
-              "wbo.socket.baseline_seq": baselineSeq,
-              "wbo.socket.latest_seq": latestSeq,
-              "wbo.socket.min_replayable_seq": minReplayableSeq,
-              "wbo.board.persisted_file_seq": persistedFileSeq,
+        return await getBoardSession(board).runExclusive(() => {
+          if (board.disposed) throw new Error("History board unavailable");
+          latestSeq = board.getSeq();
+          minReplayableSeq = board.minReplayableSeq();
+          if (baselineSeq > latestSeq || baselineSeq < minReplayableSeq) {
+            outcome =
+              baselineSeq > latestSeq
+                ? "future_baseline"
+                : BASELINE_NOT_REPLAYABLE;
+            logger.warn(
+              "socket.connection_replay_rejected",
+              boardDebugFields(board, {
+                socket: socket.id,
+                "wbo.socket.baseline_seq": baselineSeq,
+                "wbo.socket.latest_seq": latestSeq,
+                "wbo.socket.min_replayable_seq": minReplayableSeq,
+                "wbo.board.persisted_file_seq": persistedFileSeq,
+                reason: BASELINE_NOT_REPLAYABLE,
+              }),
+            );
+            return {
+              ok: false,
               reason: BASELINE_NOT_REPLAYABLE,
-            }),
+              boardName,
+              baselineSeq,
+              latestSeq,
+              minReplayableSeq,
+            };
+          }
+
+          const replayEntries = board.readMutationsAfter(baselineSeq);
+          const replayBatch = buildConnectionReplayBatch(
+            baselineSeq,
+            latestSeq,
+            replayEntries,
           );
+          replayCount = replayBatch._children.length;
+          outcome = replayCount > 0 ? "replayed" : "empty";
           return {
-            ok: false,
-            reason: BASELINE_NOT_REPLAYABLE,
+            ok: true,
             boardName,
+            board,
             baselineSeq,
             latestSeq,
             minReplayableSeq,
+            replayBatch,
+            outcome,
           };
-        }
-
-        const replayEntries = board.readMutationsAfter(baselineSeq);
-        const replayBatch = buildConnectionReplayBatch(
-          baselineSeq,
-          latestSeq,
-          replayEntries,
-        );
-        replayCount = replayBatch._children.length;
-        outcome = replayCount > 0 ? "replayed" : "empty";
-        return {
-          ok: true,
-          boardName,
-          board,
-          baselineSeq,
-          latestSeq,
-          minReplayableSeq,
-          replayBatch,
-          outcome,
-        };
+        });
       } catch (error) {
         return {
           ok: false,

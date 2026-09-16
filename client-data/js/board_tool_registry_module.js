@@ -686,6 +686,10 @@ export function createToolRuntimeModules(mountedTools, ownerToolName = "") {
       canBufferWrites() {
         return mountedTools.writes.canBufferWrites();
       },
+      /** @param {string} id */
+      finishStroke(id) {
+        mountedTools.writes.finishStroke(id);
+      },
       whenBoardWritable() {
         return mountedTools.writes.whenBoardWritable();
       },
