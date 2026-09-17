@@ -324,12 +324,20 @@ origin can have margins; page-to-board conversion subtracts that inset. The
 chunk grid stays outside drawingArea and is never a persistent board item.
 Configured chunk borders stay prominent regardless of the Grid tool's fill mode
 or the user's view mode. Focus changes ease over
-240 ms, honoring reduced-motion preferences. Pencil holds a viewport lease to
-defer camera movement from its own accepted edits until the stroke ends. Other
-camera changes interrupt and commit the active stroke before moving. Pencil
-ignores input while the follow camera moves and requires a fresh press after an
-interruption; a held pointer must never restart drawing. The chunks module uses
-the accepted frame's authoritative `mutation.socket` to identify the drawer.
+240 ms, honoring reduced-motion preferences. The animation clock starts on its
+first rendered frame and caps each elapsed step at 50 ms, so slow remote-edit
+rendering cannot consume the transition before it is displayed. Pencil holds a
+viewport lease to defer camera movement from its own accepted edits until the
+stroke ends. Other camera changes interrupt and commit the active stroke before
+moving. Pencil ignores input while the follow camera moves and requires a fresh
+press after an interruption; a held pointer must never restart drawing. The
+chunks module uses the accepted frame's authoritative `mutation.socket` to
+identify the drawer.
+Pencil's local SVG preview follows `wbo:viewport-layout` while selected, keeping
+its dimensions and dark-theme filter bounds aligned after canvas growth or zoom.
+Pen-input pixel coverage is in `playwright/tests/pencil-preview.spec.ts`; delayed
+camera frames and remote-viewer transitions are covered by the viewport Node
+tests and `playwright/tests/chunks.spec.ts`.
 The view modes are `free`, `chunk`, and `latest`. Free-mode arrows move 64 screen
 pixels; Ctrl+Arrow moves one configured chunk without changing zoom. Both arrow
 forms move one chunk in chunk focus. Latest-edit focus shows a status reminder

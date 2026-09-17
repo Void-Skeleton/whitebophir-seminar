@@ -748,6 +748,41 @@ test("viewport hash sync waits for zoom debounce", async () => {
   }
 });
 
+test("follow camera keeps intermediate frames when rendering is delayed", async () => {
+  const env = createViewportHashTestEnvironment();
+  const browser = getBrowserHarness();
+  try {
+    const { createViewportController } = await loadViewportModule();
+    const tools = createViewportHashTestTools();
+    attachViewportDom(tools);
+    Object.assign(env.document, { getElementById: () => null });
+    const viewport = createViewportController(tools);
+    const frame = { x: 0, y: 0, width: 100, height: 100, margin: 0 };
+    viewport.setFollowFrame(frame);
+    const initial = env.document.documentElement.scrollLeft;
+    viewport.setFollowFrame({ ...frame, x: 500 });
+
+    // Receiving/rendering a burst of remote edits can delay the first paint
+    // longer than the whole transition. That delay must not consume it.
+    browser.advanceTime(400);
+    assert.equal(env.document.documentElement.scrollLeft, initial);
+    assert.equal(viewport.isFollowCameraMoving(), true);
+    browser.advanceTime(16);
+    assert.ok(env.document.documentElement.scrollLeft > initial);
+    assert.ok(env.document.documentElement.scrollLeft < initial + 500);
+
+    // A later slow frame must not skip all remaining intermediate positions.
+    browser.advanceTime(400);
+    assert.ok(env.document.documentElement.scrollLeft < initial + 500);
+    assert.equal(viewport.isFollowCameraMoving(), true);
+    for (let i = 0; i < 20; i++) browser.advanceTime(16);
+    assert.equal(env.document.documentElement.scrollLeft, initial + 500);
+    assert.equal(viewport.isFollowCameraMoving(), false);
+  } finally {
+    env.restore();
+  }
+});
+
 test("viewport pinch prevents default until all touches end", async () => {
   const env = createViewportHashTestEnvironment("#0,0,0.100");
   try {

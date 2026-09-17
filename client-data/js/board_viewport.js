@@ -24,6 +24,7 @@ const WHEEL_GESTURE_GAP_MS = 180;
 const SCALE_WILL_CHANGE_TIMEOUT_MS = 1000;
 const VIEWPORT_HASH_SYNC_DELAY_MS = 200;
 const FOLLOW_TRANSITION_MS = 240;
+const MAX_CAMERA_FRAME_MS = 50;
 const VIEWPORT_HASH_PUSH_INTERVAL_MS = 5000;
 const PINCH_MIN_DISTANCE = 16;
 const BOARD_EXTENT_MARGIN = 20000;
@@ -1108,15 +1109,22 @@ export function createViewportController(Tools) {
       chunkPanTarget = null;
       return;
     }
-    const startedAt = performance.now();
+    let previousFrame = /** @type {number | null} */ (null);
+    let elapsed = 0;
     renderCamera(start);
     /** @param {number} now */
     const advance = (now) => {
       followAnimationFrame = null;
-      const progress = Math.min(
-        1,
-        Math.max(0, (now - startedAt) / FOLLOW_TRANSITION_MS),
-      );
+      // Start the clock at the first rendered frame. Receiving and painting
+      // remote edits can stall the main thread; that time must not consume the
+      // whole transition or make a later frame jump straight to its endpoint.
+      if (previousFrame !== null)
+        elapsed += Math.min(
+          MAX_CAMERA_FRAME_MS,
+          Math.max(0, now - previousFrame),
+        );
+      previousFrame = now;
+      const progress = Math.min(1, elapsed / FOLLOW_TRANSITION_MS);
       const eased = progress * progress * (3 - 2 * progress);
       renderCamera({
         left: start.left + (target.left - start.left) * eased,

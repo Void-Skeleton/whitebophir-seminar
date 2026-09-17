@@ -24,6 +24,7 @@
  * @licend
  */
 
+import { VIEWPORT_LAYOUT_EVENT } from "../../js/board_viewport.js";
 import { logFrontendEvent } from "../../js/frontend_logging.js";
 import { LIMITS } from "../../js/message_common.js";
 import { MutationType } from "../../js/mutation_type.js";
@@ -410,9 +411,10 @@ class PencilLiveOverlay {
     this.overlay?.classList.add(LIVE_OVERLAY_ACTIVE_CLASS);
     this.syncGeometry();
     if (!wasActive) {
-      window.addEventListener("resize", this.refreshGeometry, {
-        passive: true,
-      });
+      this.board.board.addEventListener(
+        VIEWPORT_LAYOUT_EVENT,
+        this.refreshGeometry,
+      );
     }
   }
 
@@ -421,13 +423,16 @@ class PencilLiveOverlay {
     this.clear();
     this.active = false;
     this.overlay?.classList.remove(LIVE_OVERLAY_ACTIVE_CLASS);
-    window.removeEventListener("resize", this.refreshGeometry);
+    this.board.board.removeEventListener(
+      VIEWPORT_LAYOUT_EVENT,
+      this.refreshGeometry,
+    );
   }
 
   /**
-   * Keeps the overlay sized like the board without doing that work on the first
-   * stroke point. Width/height writes can trigger style work, so they belong to
-   * tool activation and resize, not pointer-down.
+   * Keeps the overlay sized like the board. Width/height writes can trigger
+   * style work, so they belong to tool activation and viewport layout changes.
+   * Board growth also resizes the preview and its dark-mode filter bounds.
    */
   syncGeometry() {
     if (!this.overlay) return;

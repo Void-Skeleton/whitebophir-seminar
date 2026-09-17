@@ -840,6 +840,58 @@ test("chunk transitions ease through intermediate positions and block pencil inp
   ]);
 });
 
+test("a viewer eases to a remote edit through intermediate camera positions", async ({
+  page,
+  context,
+  browser,
+  server,
+  boardPage,
+}) => {
+  await context.addCookies([
+    { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
+  ]);
+  await boardPage.gotoBoard("chunks");
+  await configureChunks(page);
+  const viewerContext = await browser.newContext({
+    viewport: { width: 800, height: 600 },
+    reducedMotion: "no-preference",
+  });
+  try {
+    const viewer = await viewerContext.newPage();
+    await createBoardPage(viewer, server).gotoBoard("chunks");
+    await viewer.locator("#chunkViewMode").selectOption("latest");
+    await settledScroll(viewer);
+    const samplesPromise = viewer.evaluate(
+      () =>
+        new Promise<number[]>((resolve) => {
+          const app = window.WBOApp;
+          const positions = [scrollX];
+          const sample = () => {
+            positions.push(scrollX);
+            if (
+              app.chunks.state.point.x > 20000 &&
+              !app.viewportState.controller.isFollowCameraMoving()
+            )
+              resolve(positions);
+            else requestAnimationFrame(sample);
+          };
+          requestAnimationFrame(sample);
+        }),
+    );
+    await rectangle(page, "remote-smooth-rect", 20100, 100);
+    const samples = await samplesPromise;
+    const first = samples[0] ?? 0;
+    const last = samples[samples.length - 1] ?? 0;
+    expect(last - first).toBeGreaterThan(100);
+    expect(
+      samples.filter((x) => x > first + 2 && x < last - 2).length,
+    ).toBeGreaterThan(2);
+    expect((await camera(viewer)).centerErrorX).toBeLessThan(2);
+  } finally {
+    await viewerContext.close();
+  }
+});
+
 test("a peer's camera move finishes the pencil stroke and a held pointer cannot resume it", async ({
   page,
   context,
