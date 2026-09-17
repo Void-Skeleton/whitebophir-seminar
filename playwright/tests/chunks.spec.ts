@@ -283,13 +283,13 @@ test("wheel navigation interrupts a held pencil and leaves text input alone", as
   await page.mouse.up();
 });
 
-test("Ctrl+Arrow pans one chunk at the current zoom, easing and accumulating repeated keys", async ({
+test("Ctrl+Arrow eases and accumulates repeated keys even with reduced motion enabled", async ({
   page,
   context,
   server,
   boardPage,
 }) => {
-  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await context.addCookies([
     { name: "wbo-user-secret-v1", value: secret, url: server.serverUrl },
   ]);
@@ -546,7 +546,8 @@ test("chunk shortcuts require configuration and leave form and text editing alon
         scale: window.WBOApp.viewportState.scale,
       };
     }),
-  ).toEqual({ moving: false, delta: 400, scale: 0.1 });
+  ).toEqual({ moving: true, delta: 0, scale: 0.1 });
+  expect(await settledScroll(page)).toEqual({ x: before.x + 400, y: before.y });
 });
 
 test("chunk navigation pauses personal following and interrupts a held pencil stroke", async ({
@@ -840,7 +841,7 @@ test("chunk transitions ease through intermediate positions and block pencil inp
   ]);
 });
 
-test("a viewer eases to a remote edit through intermediate camera positions", async ({
+test("a viewer eases to a remote edit even with reduced motion enabled", async ({
   page,
   context,
   browser,
@@ -854,11 +855,16 @@ test("a viewer eases to a remote edit through intermediate camera positions", as
   await configureChunks(page);
   const viewerContext = await browser.newContext({
     viewport: { width: 800, height: 600 },
-    reducedMotion: "no-preference",
+    reducedMotion: "reduce",
   });
   try {
     const viewer = await viewerContext.newPage();
     await createBoardPage(viewer, server).gotoBoard("chunks");
+    expect(
+      await viewer.evaluate(
+        () => matchMedia("(prefers-reduced-motion: reduce)").matches,
+      ),
+    ).toBe(true);
     await viewer.locator("#chunkViewMode").selectOption("latest");
     await settledScroll(viewer);
     const samplesPromise = viewer.evaluate(

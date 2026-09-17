@@ -1099,16 +1099,12 @@ export function createViewportController(Tools) {
 
   /**
    * Shared by activity following and manual chunk navigation. Both block Pencil
-   * until the last animation frame and honor reduced-motion preferences.
+   * until the last animation frame. Camera movement always animates, including
+   * when the device requests reduced motion.
    * @param {{left: number, top: number, scale: number}} start
    * @param {{left: number, top: number, scale: number}} target
    */
   function animateCamera(start, target) {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      renderCamera(target);
-      chunkPanTarget = null;
-      return;
-    }
     let previousFrame = /** @type {number | null} */ (null);
     let elapsed = 0;
     renderCamera(start);
