@@ -15,6 +15,11 @@ const {
   ReplayPlayer,
 } = require("../scripts/seminar_replay.mjs");
 const run = promisify(execFile);
+const {
+  pencilCurve,
+  pencilCurvePath,
+} = require("../client-data/tools/pencil/curve.js");
+const { measureCurve, revealCurve } = require("../scripts/seminar_curves.mjs");
 const snapshot = {
   format: "whitebophir-board",
   version: 1,
@@ -61,6 +66,193 @@ const records = [
   edit(1400, 4, { tool: 1, type: 4, parent: "p1", x: 220, y: 50 }),
   { kind: "stroke", id: "p1", startAtMs: 1100, endAtMs: 2100, atMs: 2100 },
 ];
+
+const curvedPoints = [
+  { x: 20, y: 100 },
+  { x: 100, y: 20 },
+  { x: 180, y: 100 },
+];
+/** @type {any[]} */
+const curvedRecords = [
+  edit(1100, 1, pencil),
+  ...curvedPoints.map((point, i) =>
+    edit(1110 + i * 100, i + 2, { tool: 1, type: 4, parent: "p1", ...point }),
+  ),
+  {
+    kind: "stroke",
+    id: "p1",
+    startAtMs: 1100,
+    endAtMs: 2100,
+    atMs: 2100,
+    curve: pencilCurve(curvedPoints),
+  },
+];
+
+test("stored and legacy curves render identically, preserve snapshot prefixes and reject malformed geometry", async () => {
+  const legacy = curvedRecords.map(({ curve: _curve, ...row }) => row);
+  const current = new ReplayPlayer(
+    await compileReplay(snapshot, log(curvedRecords)),
+  );
+  const old = new ReplayPlayer(await compileReplay(snapshot, log(legacy)));
+  try {
+    for (const at of [1100, 1350, 1600, 2100]) {
+      const frame = current.frame(at),
+        before = old.frame(at);
+      assert.deepEqual(
+        frame.items[0]?.replayCurve,
+        before.items[0]?.replayCurve,
+      );
+    }
+    const path = pencilCurvePath(
+      current.frame(2100).items[0]?.replayCurve || [],
+    );
+    assert.match(path, /C 20 100 62 20 100 20 C 138 20 180 100 180 100/);
+  } finally {
+    current.dispose();
+    old.dispose();
+  }
+  const partial = {
+    ...snapshot,
+    items: [
+      {
+        id: pencil.id,
+        color: pencil.color,
+        size: pencil.size,
+        tool: "pencil",
+        _children: curvedPoints.slice(0, 2),
+      },
+    ],
+    replay: { ...snapshot.replay, atMs: 1210, seq: 3 },
+  };
+  const player = new ReplayPlayer(
+    await compileReplay(partial, log(curvedRecords)),
+  );
+  try {
+    const prefix = player.frame(1210).items[0]?.replayCurve || [];
+    assert.equal(prefix.length, 3);
+    assert.deepEqual(
+      player.frame(1700).items[0]?.replayCurve.slice(0, prefix.length),
+      prefix,
+    );
+  } finally {
+    player.dispose();
+  }
+  const repeated = [{ x: 20, y: 100 }, ...curvedPoints];
+  const duplicateLog = [
+    edit(1100, 1, pencil),
+    ...repeated.map((point, i) =>
+      edit(1110 + 100 * i, i + 2, { tool: 1, type: 4, parent: "p1", ...point }),
+    ),
+    {
+      ...curvedRecords[curvedRecords.length - 1],
+      curve: pencilCurve(repeated),
+    },
+  ];
+  const deduplicated = {
+    ...partial,
+    items: [{ ...partial.items[0], _children: [curvedPoints[0]] }],
+  };
+  const duplicatePlayer = new ReplayPlayer(
+    await compileReplay(deduplicated, log(duplicateLog)),
+  );
+  try {
+    const final = duplicatePlayer.frame(2100).items[0];
+    assert.match(pencilCurvePath(final?.replayCurve || []), /C/);
+    assert.deepEqual(
+      final?._children[final._children.length - 1],
+      curvedPoints[2],
+    );
+  } finally {
+    duplicatePlayer.dispose();
+  }
+  for (const curve of [
+    { version: 9, segments: [] },
+    {
+      version: 1,
+      segments: [
+        { type: "M", values: [0, "<script>"] },
+        { type: "L", values: [0, 0] },
+      ],
+    },
+    pencilCurve([
+      { x: 1, y: 2 },
+      { x: 3, y: 4 },
+    ]),
+  ])
+    await assert.rejects(
+      compileReplay(
+        snapshot,
+        log([
+          ...curvedRecords.slice(0, -1),
+          { ...curvedRecords[curvedRecords.length - 1], curve },
+        ]),
+      ),
+      /curve/,
+    );
+});
+
+test("Bézier reveal follows arc length and keeps curved tips, dots and reversals finite", () => {
+  // Independent dense sampling measures the drawn geometry, rather than using
+  // the production quadrature or merely checking its stored length table.
+  /** @param {{type:string,values:number[]}[]} segments */
+  function sampledLength(segments) {
+    let x = 0,
+      y = 0,
+      total = 0;
+    for (const segment of segments) {
+      const v = segment.values;
+      if (segment.type !== "C") {
+        x = v[0] || 0;
+        y = v[1] || 0;
+        continue;
+      }
+      const startX = x,
+        startY = y;
+      for (let i = 1; i <= 2000; i++) {
+        const t = i / 2000,
+          s = 1 - t;
+        const nextX =
+          s ** 3 * startX +
+          3 * s * s * t * (v[0] || 0) +
+          3 * s * t * t * (v[2] || 0) +
+          t ** 3 * (v[4] || 0);
+        const nextY =
+          s ** 3 * startY +
+          3 * s * s * t * (v[1] || 0) +
+          3 * s * t * t * (v[3] || 0) +
+          t ** 3 * (v[5] || 0);
+        total += Math.hypot(nextX - x, nextY - y);
+        x = nextX;
+        y = nextY;
+      }
+    }
+    return total;
+  }
+  for (const points of [
+    curvedPoints,
+    [{ x: 5, y: 5 }],
+    [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 0, y: 0 },
+      { x: 1, y: 1 },
+    ],
+  ]) {
+    const curve = measureCurve(pencilCurve(points).segments);
+    const length = sampledLength(curve.segments);
+    for (let step = 0; step <= 10; step++) {
+      const revealed = revealCurve(curve, step / 10);
+      assert.ok(
+        revealed.every((segment) => segment.values.every(Number.isFinite)),
+      );
+      assert.ok(
+        Math.abs(sampledLength(revealed) - (length * step) / 10) < 0.02,
+      );
+      if (step > 0 && points.length > 1)
+        assert.equal(revealed[revealed.length - 1]?.type, "C");
+    }
+  }
+});
 
 test("replay uses distance-based stroke speed, preserves a partial snapshot and includes the final frame", async () => {
   const player = new ReplayPlayer(await compileReplay(snapshot, log(records)));
@@ -233,9 +425,9 @@ test("history and replay defaults have headroom for two hours at 240 points per 
   assert.equal(limits[0], limits[2]);
   assert.equal(limits[1], limits[3]);
   // 1,728,000 points + 3,600 creates + 3,600 completions. Budget 512 bytes
-  // per JSON record, over twice the measured 221-byte average.
+  // per JSON record, above the measured average including Bézier controls.
   assert.ok(limits[1] > (240 * 7200 + 7200) * 512);
-  assert.ok(limits[0] > 49444174 * 4); // Four times the measured gzip size.
+  assert.ok(limits[0] > 72.9 * 1024 * 1024 * 3); // Three times the measured gzip size.
 });
 
 test("replay handles empty Pencil context, inclusive start, transforms, copies, text, delete, clear and settings", async () => {
@@ -468,6 +660,66 @@ test("checkpoints replace the canvas at their timestamp and compressed inputs ar
   await fs.writeFile(input, gzipSync("x".repeat(4096)));
   await assert.rejects(readCompressed(input, 1, 8192), /compressed limit/);
   await assert.rejects(readCompressed(input, 1024, 100), /larger than|buffer/i);
+});
+
+test("a real replay video draws smooth cubic strokes instead of angular line segments", {
+  timeout: 60000,
+}, async (t) => {
+  const directory = await fs.mkdtemp(
+    path.join(os.tmpdir(), "wbo-curve-video-"),
+  );
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const initial = path.join(directory, "start.wbo"),
+    history = path.join(directory, "history.gz");
+  const output = path.join(directory, "curve.mp4");
+  await fs.writeFile(initial, gzipSync(JSON.stringify(snapshot)));
+  await fs.writeFile(history, gzipSync(log(curvedRecords)));
+  await run("python3", [
+    "scripts/seminar_helper.py",
+    "replay",
+    output,
+    "--snapshot",
+    initial,
+    "--history",
+    history,
+    "--resolution",
+    "200x140",
+    "--fps",
+    "5",
+    "--camera",
+    "fixed",
+    "--view-box",
+    "0",
+    "0",
+    "200",
+    "140",
+  ]);
+  const raw = (
+    await run(
+      "ffmpeg",
+      [
+        "-v",
+        "error",
+        "-i",
+        output,
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgb24",
+        "pipe:1",
+      ],
+      { encoding: "buffer", maxBuffer: 2 * 1024 * 1024 },
+    )
+  ).stdout;
+  const frames = raw.length / (200 * 140 * 3);
+  /** @param {number} frame @param {number} x @param {number} y */
+  const pixel = (frame, x, y) =>
+    raw[(frame * 200 * 140 + y * 200 + x) * 3] || 0;
+  assert.equal(frames, 7);
+  assert.ok(pixel(6, 71, 33) < 60); // The cubic bends above the old straight chord.
+  assert.ok(pixel(6, 71, 49) > 220); // The old angular segment is gone.
+  assert.ok(pixel(2, 156, 64) > 220); // The far half has not been drawn yet.
+  assert.ok(pixel(6, 156, 64) < 60);
 });
 
 test("Python replay exports a real MP4 with progressive strokes, white dark-mode borders, final state and no overwrite", {

@@ -117,7 +117,13 @@ mutations and settings together; chunk/theme changes journal before saving SVG.
 SVG saves wait for pending journal writes. Connection replay captures state under
 the session queue. Snapshot exports replay in an isolated in-memory board and
 omit empty Pencil placeholders. Mutation/settings records have server `atMs`,
-`startAtMs`, `endAtMs`; `stroke` records carry whole Pencil intervals. Internal
+`startAtMs`, `endAtMs`; `stroke` records carry whole Pencil intervals and optional
+`curve: {version:1,segments:[{type,values}]}` cubic geometry. Geometry uses the
+live Pencil's smoothing through [curve.js](./client-data/tools/pencil/curve.js).
+Active curves are maintained independently of evictable SVG point payloads and
+written once on release, supersession or disconnect. Recovery rebuilds unfinished
+curves from accepted point mutations before closing their intervals. Point
+mutations and native snapshots remain compatible with existing readers. Internal
 `active_stroke` records preserve interruption timing and are excluded from
 downloads. Ranges select by `atMs`. The Python helper adds `history-info`,
 `history FILE --from ... --to ...`, and `export FILE --at ...`. Coverage lives in
@@ -152,8 +158,17 @@ defaulting to snapshot/history end. `--snapshot-at` supplies missing legacy time
 it cannot contradict embedded time. Edits through the inclusive snapshot are
 validated and skipped; intervening edits are applied before the first video frame.
 Sequence checks still cover the full log and its boundary with the snapshot.
-Pencil animation interpolates by path distance, preserving any snapshot prefix;
-clip boundaries use the original stroke interval, including later completion
+Pencil animation follows cubic Bézier arc length through
+[seminar_curves.mjs](./scripts/seminar_curves.mjs), preserving any snapshot prefix;
+the animated tip is split with De Casteljau subdivision. Replay validates saved
+controls and endpoint agreement; older logs, snapshots and incomplete strokes
+derive the same smoothing from their samples. Repeated snapshot points need not
+survive SVG round trips. Completed paths are cached, and fit bounds include curve
+control hulls, stroke widths and observed transforms. No extra browser boot module
+is loaded. The history and replay tests cover saved controls across SVG saves and
+restarts, legacy logs, partial snapshots, malformed curves, arc-length timing and
+actual MP4 pixels.
+Clip boundaries use the original stroke interval, including later completion
 records in the supplied log. Missing completion records fall back to the last
 point time and are reported.
 Other edits keep their timestamp/order. Metadata and explicit SVG checkpoints

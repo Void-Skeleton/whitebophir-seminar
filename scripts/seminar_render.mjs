@@ -11,7 +11,15 @@ import {
   readHistoryLines,
   ReplayPlayer,
 } from "./seminar_replay.mjs";
-import { serializeStoredSvgItem } from "../server/persistence/stored_svg_item_codec.mjs";
+import {
+  serializeStoredSvgItem,
+  storedSvgSerializeHelpers,
+} from "../server/persistence/stored_svg_item_codec.mjs";
+import { serializeStoredPencilPath } from "../client-data/tools/pencil/index.js";
+import {
+  pencilCurve,
+  pencilCurvePath,
+} from "../client-data/tools/pencil/curve.js";
 import { DEFAULT_CHUNKS, chunkRect } from "../client-data/js/board_chunks.js";
 import { THEME_SVG_RESOURCES } from "../client-data/js/board_theme.js";
 import { audioArguments, readRecording } from "./seminar_audio_mix.mjs";
@@ -128,6 +136,20 @@ export function renderFrameSvg(frame, rect, chunks, options) {
   const dark = frame.metadata.theme === "dark";
   const theme = dark ? "dark" : "light";
   const box = `${rect.x} ${rect.y} ${rect.width} ${rect.height}`;
+  const drawing = frame.items
+    .map((item) =>
+      item.tool === "pencil"
+        ? serializeStoredPencilPath(
+            item,
+            item.replayPath ??
+              pencilCurvePath(
+                item.replayCurve || pencilCurve(item._children || []).segments,
+              ),
+            storedSvgSerializeHelpers,
+          )
+        : serializeStoredSvgItem(item),
+    )
+    .join("");
   const gridX = Math.max(0, rect.x),
     gridY = Math.max(0, rect.y);
   // Explicit world bounds keep filtering visible when the camera is far from
@@ -140,7 +162,7 @@ export function renderFrameSvg(frame, rect, chunks, options) {
 ${resources}<style>text {font-family:Arial,Helvetica,sans-serif} path,line {stroke-linecap:round;stroke-linejoin:round}</style>
 <defs><pattern id="activityChunkGrid" width="${chunks.width}" height="${chunks.height}" patternUnits="userSpaceOnUse"><path d="M ${chunks.width} 0 L 0 0 0 ${chunks.height}" fill="none" stroke="${dark ? "#ffffff" : "#475569"}" stroke-width="8" vector-effect="non-scaling-stroke"/></pattern></defs>
 <rect x="${gridX}" y="${gridY}" width="${Math.max(0, rect.x + rect.width - gridX)}" height="${Math.max(0, rect.y + rect.height - gridY)}" fill="url(#activityChunkGrid)"/>
-<g id="drawingArea">${frame.items.map(serializeStoredSvgItem).join("")}</g></svg>`;
+<g id="drawingArea">${drawing}</g></svg>`;
 }
 
 /** @param {Options} options */

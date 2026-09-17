@@ -21,6 +21,7 @@ const { createConfig } = require("./test_helpers.js");
 const { promisify } = require("node:util");
 const { execFile } = require("node:child_process");
 const runProcess = promisify(execFile);
+const { pencilCurve } = require("../client-data/tools/pencil/curve.js");
 
 /** @param {import("node:test").TestContext} t */
 async function setup(t) {
@@ -145,6 +146,67 @@ test("history preserves partial strokes, text, transforms, copies, erasure and c
   await assert.rejects(snapshot(board, config, initial - 1), {
     reason: "history_before_start",
   });
+});
+
+test("history stores complete Bézier controls across SVG saves, erasure and interrupted strokes", async (t) => {
+  const { board, config } = await setup(t);
+  const points = [
+    { x: 20, y: 100 },
+    { x: 100, y: 20 },
+    { x: 180, y: 100 },
+  ];
+  await write(board, {
+    tool: 1,
+    type: 1,
+    id: "curve",
+    color: "#000000",
+    size: 10,
+  });
+  for (const point of points.slice(0, 2))
+    await write(board, { tool: 1, type: 4, parent: "curve", ...point });
+  await board.save();
+  assert.equal(board.get("curve")?._children, undefined); // Payload has moved to SVG.
+  await write(board, { tool: 1, type: 4, parent: "curve", ...points[2] });
+  board.dispose();
+  const recovered = await BoardData.load("history", config);
+  t.after(() => recovered.dispose());
+  await initializeHistory(recovered);
+  const readRows = async () => {
+    const rows = [];
+    for await (const member of readHistory(board.history.path))
+      rows.push(...member.records);
+    return rows;
+  };
+  const interrupted = (await readRows()).find((row) => row.kind === "stroke");
+  assert.equal(interrupted?.reason, "interrupted");
+  assert.deepEqual(interrupted?.curve, pencilCurve(points));
+  assert.equal(recovered.history?.curves.size, 0);
+  await write(recovered, {
+    tool: 1,
+    type: 1,
+    id: "erased",
+    color: "#000000",
+    size: 10,
+  });
+  for (const [index, point] of points.entries())
+    await write(
+      recovered,
+      { tool: 1, type: 4, parent: "erased", ...point },
+      index === 2 ? "another-editor" : "socket-a",
+    );
+  await write(recovered, { tool: 6, type: 3, id: "erased" }, "eraser");
+  await recovered.history?.finishStroke("socket-a", "erased", "release");
+  const rows = await readRows();
+  assert.deepEqual(
+    rows.find((row) => row.kind === "stroke" && row.id === "erased")?.curve,
+    pencilCurve(points),
+  );
+  assert.ok(
+    rows
+      .filter((row) => row.kind === "active_stroke")
+      .every((row) => !row.stroke || !("curve" in row.stroke)),
+  );
+  assert.equal(recovered.history?.curves.size, 0);
 });
 
 test("history recovers accepted unsaved edits and settings and truncates only an incomplete tail", async (t) => {

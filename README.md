@@ -124,7 +124,11 @@ transforms, copies, erases, clears, imports, and chunk/theme settings. Cursors
 and rejected edits are excluded. Timestamps are integer Unix milliseconds from
 the server clock. Each mutation has `startAtMs` and `endAtMs` equal to its
 acceptance time; a separate `stroke` record describes the complete Pencil
-interval. Release is reported after the final point is accepted. Disconnects,
+interval and cubic Bézier control points (`curve: {version: 1, segments: [...]}`).
+The controls use the same smoothing as the live Pencil tool. Active curves remain
+in memory across SVG saves and are journaled once when the stroke closes;
+accepted point mutations still stream durably for recovery and older readers.
+Release is reported after the final point is accepted. Disconnects,
 interrupted processes, and older clients use the last accepted point as the
 bounded end, with an explicit reason. These are server observation times, so
 network latency and queued writes affect them.
@@ -242,11 +246,14 @@ apply. Camera changes ease over 240 ms; `--transition-ms 0` makes immediate cuts
 seen during the replay in view. Aspect ratios are preserved by extending the
 visible region. Borders remain visible in every camera mode, white in dark mode.
 
-Pencil strokes progress at constant distance per unit time between their start
-and end timestamps. A snapshot taken mid-stroke stays intact; its remaining
-points animate at constant speed over the remaining interval. If a log ends
-before a completion record, the last recorded point bounds that stroke and the
-helper reports this fallback. Other edits occur at their recorded timestamps.
+Pencil strokes render as cubic Bézier curves, using saved controls or deriving
+the same smoothing from older point-only logs and snapshots. Replay advances at
+constant distance along the curves between the stroke's start and end timestamps;
+partial strokes keep a curved tip instead of joining samples with straight lines.
+A snapshot taken mid-stroke stays intact; its remaining curve animates over the
+remaining interval. Fit mode includes curve overshoot and stroke width. If a log
+ends before a completion record, the last recorded point bounds that stroke and
+the helper reports this fallback. Other edits occur at their recorded timestamps.
 The selected final state is included as a frame; duration is rounded
 up to the frame interval, with one final frame. `--speed` changes playback speed.
 
@@ -277,12 +284,12 @@ conservatively long IDs measured:
 
 | Point rate | Points | Uncompressed JSON | Downloaded gzip |
 | --- | ---: | ---: | ---: |
-| 50/second (approximately the default write-rate ceiling) | 360,000 | 76.9 MiB | 10.3 MiB |
-| 240/second (stress case above the default rate) | 1,728,000 | 365.5 MiB | 47.2 MiB |
+| 50/second (approximately the default write-rate ceiling) | 360,000 | 91.8 MiB | 15.5 MiB |
+| 240/second (stress case above the default rate) | 1,728,000 | 436.9 MiB | 72.9 MiB |
 
-These totals include stroke creation and completion records, but exclude any
-pre-existing board checkpoint or bulk imports. The new limits leave over 2.8×
-decompressed and 5.4× compressed headroom over the stress case; its 1,735,200
+These totals include stroke creation, completion and Bézier controls, but exclude
+any pre-existing board checkpoint or bulk imports. The limits leave over 2.3×
+decompressed and 3.5× compressed headroom over the stress case; its 1,735,200
 records also fit below the record limit. Ordinary writing with pauses is smaller.
 
 ### Seminar audio recording and replay

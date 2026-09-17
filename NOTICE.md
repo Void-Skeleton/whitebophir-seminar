@@ -2,7 +2,7 @@
 
 This is a modified version of WBO, originally developed by Ophir Lojkine and
 contributors. The seminar extensions below were added between 2026-09-14 and
-2026-09-16.
+2026-09-17.
 
 The project's GNU Affero General Public License, version 3 or later, remains in
 effect; see [LICENSE](LICENSE). Existing copyright and license notices are
@@ -31,13 +31,14 @@ Added features include:
 - **Personal scroll controls:** a browser-local choice between wheel zoom and
   vertical navigation, with Ctrl+wheel zoom and chunk-aware movement.
 - **Timestamped board history:** compressed, streamed edit journals with
-  millisecond server timestamps, stroke intervals and crash recovery.
+  millisecond server timestamps, stroke intervals, Bézier control points and
+  crash recovery.
   Moderators can download historical board snapshots and edit ranges through
   the Download dialog or Python helper.
 - **Canvas replay video:** offline video generation from a historical snapshot
-  and edit history, with animated strokes, chunk boundaries, configurable
-  camera behavior, resolution, playback speed and time interval. Input limits
-  accommodate two-hour seminar histories and can be overridden.
+  and edit history, with smooth Bézier stroke animation, chunk boundaries,
+  configurable camera behavior, resolution, playback speed and time interval.
+  Input limits accommodate two-hour seminar histories and can be overridden.
 - **Seminar audio recording:** microphone and application audio capture on
   Linux and Windows, selected through CLI options or an interactive terminal
   menu. Each source streams to a separate Opus recording with durable timing

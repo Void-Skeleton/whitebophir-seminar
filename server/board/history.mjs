@@ -16,6 +16,8 @@ import {
 } from "./archive_codec.mjs";
 import { BoardData } from "./data.mjs";
 import { createMutationLog } from "./mutation_log.mjs";
+import { pencilCurve } from "../../client-data/tools/pencil/curve.js";
+import { wboPencilPoint } from "../../client-data/tools/pencil/wbo_pencil_point.js";
 
 const compress = promisify(gzip);
 const decompress = promisify(gunzip);
@@ -24,7 +26,7 @@ const HEADER_SIZE = 20;
 /** @typedef {import("./data.mjs").BoardMetadata} Metadata */
 /** @typedef {import("../../types/server-runtime.d.ts").MutationLogEntry} MutationLogEntry */
 /** @typedef {{id:string, startAtMs:number, endAtMs:number}} Stroke */
-/** @typedef {{kind:string, atMs:number, seq?:number, mutation?:any, metadata?:Metadata, svg?:string, startAtMs?:number, endAtMs?:number, id?:string, reason?:string, socketId?:string, stroke?:Stroke | null}} HistoryRecord */
+/** @typedef {{kind:string, atMs:number, seq?:number, mutation?:any, metadata?:Metadata, svg?:string, startAtMs?:number, endAtMs?:number, id?:string, reason?:string, socketId?:string, stroke?:Stroke | null, curve?:import("../../client-data/tools/pencil/curve.js").PencilCurve}} HistoryRecord */
 
 /**
  * Each transaction is a complete gzip member containing JSON Lines. A standard
@@ -135,12 +137,32 @@ export class BoardHistory {
     this.lastAtMs = 0;
     /** @type {Map<string, Stroke>} */
     this.strokes = new Map();
+    /** Active geometry survives SVG saves, which discard in-memory point payloads.
+     * It is stored once on completion, never duplicated in each timing record.
+     * @type {Map<string, import("../../client-data/tools/pencil/curve.js").PencilCurve>}
+     */
+    this.curves = new Map();
     this.pending = Promise.resolve();
   }
 
   /** @param {number} [time] */
   timestamp(time = Date.now()) {
     return Math.max(this.lastAtMs, Math.trunc(time));
+  }
+
+  /** Save the browser's cubic controls once per completed stroke. Point mutations
+   * remain authoritative for board recovery and older readers.
+   * @param {Stroke} stroke @param {number} atMs @param {string} reason @returns {HistoryRecord}
+   */
+  strokeRecord(stroke, atMs, reason) {
+    return {
+      kind: "stroke",
+      ...stroke,
+      atMs,
+      reason,
+      endAtMs: reason === "release" ? atMs : stroke.endAtMs,
+      ...(this.curves.has(stroke.id) && { curve: this.curves.get(stroke.id) }),
+    };
   }
 
   /** @param {HistoryRecord[]} records */
@@ -180,27 +202,23 @@ export class BoardHistory {
       const { socket: _socket, userId: _user, ...data } = mutation;
       if (socketId && data.tool === 1 && data.type === 1 && "id" in data) {
         const previous = this.strokes.get(socketId);
-        if (previous)
-          records.push({
-            kind: "stroke",
-            atMs,
-            ...previous,
-            reason: "superseded",
-          });
+        if (previous) {
+          records.push(this.strokeRecord(previous, atMs, "superseded"));
+          this.curves.delete(previous.id);
+        }
         this.strokes.set(socketId, {
           id: String(data.id),
           startAtMs: atMs,
           endAtMs: atMs,
         });
+        this.curves.set(String(data.id), pencilCurve([]));
       }
       const stroke = this.strokes.get(socketId);
-      if (
-        stroke &&
-        data.tool === 1 &&
-        "parent" in data &&
-        data.parent === stroke.id
-      )
-        stroke.endAtMs = atMs;
+      if (data.tool === 1 && data.type === 4 && "parent" in data) {
+        if (stroke && data.parent === stroke.id) stroke.endAtMs = atMs;
+        const curve = this.curves.get(data.parent);
+        if (curve) wboPencilPoint(curve.segments, data.x, data.y);
+      }
       records.push({
         kind: "mutation",
         atMs,
@@ -236,14 +254,10 @@ export class BoardHistory {
     if (!stroke || (id !== undefined && stroke.id !== id)) return this.pending;
     this.strokes.delete(socketId);
     const atMs = this.timestamp();
+    const record = this.strokeRecord(stroke, atMs, reason);
+    this.curves.delete(stroke.id);
     return this.append([
-      {
-        kind: "stroke",
-        ...stroke,
-        endAtMs: reason === "release" ? atMs : stroke.endAtMs,
-        atMs,
-        reason,
-      },
+      record,
       { kind: "active_stroke", atMs, socketId, stroke: null },
     ]);
   }
@@ -351,6 +365,10 @@ async function loadHistory(board) {
         if (record.seq !== latestSeq + 1)
           throw new Error("History sequence gap");
         latestSeq = record.seq;
+        const mutation = record.mutation;
+        const curve = history.curves.get(mutation?.parent);
+        if (curve && mutation.tool === 1 && mutation.type === 4)
+          wboPencilPoint(curve.segments, mutation.x, mutation.y);
         if (record.seq > savedSeq) {
           const prepared = await board.preparePersistentMutation(
             record.mutation,
@@ -374,8 +392,14 @@ async function loadHistory(board) {
           recovered = true;
         }
       } else if (record.kind === "active_stroke" && record.socketId) {
-        if (record.stroke) history.strokes.set(record.socketId, record.stroke);
-        else history.strokes.delete(record.socketId);
+        const previous = history.strokes.get(record.socketId);
+        if (previous && previous.id !== record.stroke?.id)
+          history.curves.delete(previous.id);
+        if (record.stroke) {
+          history.strokes.set(record.socketId, record.stroke);
+          if (!history.curves.has(record.stroke.id))
+            history.curves.set(record.stroke.id, pencilCurve([]));
+        } else history.strokes.delete(record.socketId);
       } else if (record.kind !== "stroke")
         throw new Error("Unknown history record");
     }
