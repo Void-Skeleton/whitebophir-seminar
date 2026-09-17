@@ -7,6 +7,8 @@ export const MutationType = Object.freeze(
     BATCH: 5,
     CLEAR: 6,
     COPY: 7,
+    // Server-generated undo/redo; never accepted as a client drawing command.
+    RESTORE: 8,
   }),
 );
 /** @typedef {typeof MutationType[keyof typeof MutationType]} MessageType */
@@ -18,7 +20,7 @@ export const MutationType = Object.freeze(
 export function getMutationTypeCode(type) {
   return typeof type === "number" &&
     type >= MutationType.CREATE &&
-    type <= MutationType.COPY
+    type <= MutationType.RESTORE
     ? /** @type {MessageType} */ (type)
     : undefined;
 }

@@ -74,6 +74,7 @@ export class BoardShellModule {
   }
 
   initializePageChrome() {
+    this.getTools().writes.installShortcuts();
     document.documentElement.dataset.activeToolSecondary = "false";
     this.trackRecentBoardsOnPageShow();
     this.bindRenderedTools();

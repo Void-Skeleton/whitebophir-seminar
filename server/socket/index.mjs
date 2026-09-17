@@ -1,3 +1,4 @@
+import { reverseEdit } from "./edit_history.mjs";
 import { chunkState } from "../board/chunks.mjs";
 // Modified 2026-09-14: publish validated archive imports to synced viewers.
 import * as socketIO from "socket.io";
@@ -658,6 +659,18 @@ async function handleSocketConnection(socket, config) {
     socket,
     "broadcast",
     async function onBroadcast(/** @type {MessageData | undefined} */ data) {
+      const editGroup = data?.editGroup;
+      if (
+        editGroup !== undefined &&
+        (typeof editGroup !== "string" ||
+          !/^[a-zA-Z0-9_-]{1,128}$/.test(editGroup))
+      ) {
+        socket.emit("mutation_rejected", {
+          clientMutationId: data?.clientMutationId,
+          reason: "invalid edit group",
+        });
+        return;
+      }
       const now = Date.now();
       const normalizedName = boardName;
 
@@ -669,6 +682,7 @@ async function handleSocketConnection(socket, config) {
           now,
           config,
           socketBroadcastRuntime,
+          typeof editGroup === "string" ? editGroup : undefined,
         );
       }
 
@@ -751,6 +765,40 @@ async function handleSocketConnection(socket, config) {
       });
     },
   );
+
+  let undoWindow = Date.now();
+  let undoCount = 0;
+  onSocketEvent(socket, "edit_history", async (data, ack) => {
+    const respond = (/** @type {any} */ value) => {
+      if (typeof ack === "function") ack(value);
+    };
+    if (Date.now() - undoWindow >= 10000) {
+      undoWindow = Date.now();
+      undoCount = 0;
+    }
+    if (
+      ++undoCount > 20 ||
+      !data ||
+      typeof data !== "object" ||
+      typeof data.redo !== "boolean" ||
+      Object.keys(data).length !== 1
+    ) {
+      respond({ ok: false, error: "undo_unavailable" });
+      return;
+    }
+    if (!syncedPersistentSockets.has(socket.id)) {
+      respond({ ok: false, error: "undo_unavailable" });
+      return;
+    }
+    try {
+      const board = await getBoard(boardName, config);
+      const result = await reverseEdit(socket, board, data.redo, config);
+      if (result.ok) emitArchiveMutations(board, result.entries);
+      respond(result.ok ? { ok: true } : { ok: false, error: result.error });
+    } catch {
+      respond({ ok: false, error: "undo_unavailable" });
+    }
+  });
 
   let strokeEndWindow = Date.now();
   let strokeEndCount = 0;

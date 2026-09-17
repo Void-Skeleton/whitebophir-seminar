@@ -108,7 +108,7 @@ final members are truncated; corrupt complete members reject loading. Append
 failures dispose the board and prevent SVG saves of unjournaled state. Newer SVGs
 written externally add a `checkpoint` record with `reason: external_snapshot`.
 No retention/deletion policy is imposed. Native `.wbo` transfers state, not logs.
-Archive encoding shared with history lives in
+Archive encoding and item validation shared with history and undo live in
 [archive_codec.mjs](./server/board/archive_codec.mjs), without startup configuration
 imports; archive API defaults/validation remain in archive.mjs.
 
@@ -347,6 +347,12 @@ mode change. Inputs, editable content, dialogs and extra modifiers are excluded.
 The viewport owns keyboard movement, easing, bounds and cancellation; all
 keyboard camera moves interrupt Pencil and block it throughout the transition.
 Chunk focus retains its chosen chunk through edits, resize and reconnect.
+Shift+Left/Right multiplies movement by five (320 pixels or five chunks), with
+the Shift modifier included in latest-focus confirmation; Ctrl+Shift remains
+excluded. Viewport capture listeners own middle-button panning with any tool,
+finish active gestures first, suppress browser autoscroll, grow the canvas, and
+release on mouseup/blur. In either focused mode, `ChunksModule.requestFreePan`
+requires two middle presses within two seconds before switching to Free mode.
 
 The personal scroll selector uses `wbo.wheelMode` in localStorage across boards;
 `zoom` is the default and `navigate` maps vertical wheel input to the same
@@ -450,6 +456,32 @@ optimistic rollback, draws locally, applies message hooks such as extent growth,
 and sends the message through
 [board_transport.js](./client-data/js/board_transport.js) as a Socket.IO
 `broadcast` event on the active socket.
+
+Personal undo/redo uses `editGroup` metadata on outgoing writes, removed during
+normalization. The tool registry brackets gestures; WriteModule handles Ctrl+Z/Y
+(and Ctrl+Shift+Z), finishes active gestures, waits for accepted buffered writes,
+and serializes rapid shortcut requests. Native text fields retain their own undo.
+The `edit_history {redo:boolean}` socket event has an acknowledgement, is limited
+to 20 attempts per socket per ten seconds, and only operates on the caller's
+verified identity (socket identity fallback), under the board session queue.
+Current edit/clear, blocked-tool and Turnstile policies are rechecked.
+[edit_history.mjs](./server/board/edit_history.mjs) retains up to 100 actions and
+32 MiB per loaded board; stacks survive reconnects but not unload/restart.
+An action restores at most 1,000 objects and 8 MiB. Other users' overlapping edits
+invalidate affected actions; new personal edits discard redo. Rejected writes
+are excluded. Settings and imports are not undoable and invalidate overlapping
+undo entries. Disk-backed before-images are resolved by sequence from the journal
+only on undo, never by reading source SVG in normal write admission.
+[restore.mjs](./server/board/restore.mjs) validates complete native item payloads
+through the archive codec and applies them atomically, preserving IDs and layers.
+Undo/redo emits a server-only mutation `{tool:7,type:8,items:[{id,item,order,beforeId}]}`;
+`item:null` removes an item. Client-originated type 8 is rejected. These mutations
+are journaled before broadcast and understood by recovery and offline replay.
+[board_restore.js](./client-data/js/board_restore.js) loads only when needed and
+renders through existing tools. SVG rewriting inserts restored objects at their
+original layer without hydrating unrelated Pencil payloads. Coverage lives in
+`test-node/edit_history.test.js`, the replay tests, and
+`playwright/tests/shortcuts.spec.ts`.
 
 ### socket connection, replay, and writes
 
@@ -576,6 +608,7 @@ Live board writes are JSON messages sent on the `broadcast` event. They use
 numeric `tool` codes from [client-data/tools/manifest.js](./client-data/tools/manifest.js)
 and numeric mutation `type` codes from [client-data/js/mutation_type.js](./client-data/js/mutation_type.js):
 `1` create, `2` update, `3` delete, `4` append, `5` batch, `6` clear, `7` copy.
+Server-generated undo/redo additionally uses `8` restore; clients cannot submit it.
 The server validates client messages, rejects malformed writes with
 `mutation_rejected`, and rebroadcasts accepted persistent writes as sequenced
 `broadcast` frames.

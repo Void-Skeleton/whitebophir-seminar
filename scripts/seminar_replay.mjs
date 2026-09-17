@@ -1,3 +1,4 @@
+import { validateRestore } from "../server/board/restore.mjs";
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Seminar modifications, 2026-09-16: offline, validated canvas replay.
 import { readFile, stat } from "node:fs/promises";
@@ -304,7 +305,10 @@ export async function compileReplay(snapshot, log, options = {}) {
         )
           throw new Error("History sequence gap");
         previousSeq = raw.seq;
-        const normalized = normalizeIncomingMessage(replayConfig, raw.mutation);
+        const normalized =
+          raw.mutation?.type === 8
+            ? { ok: true, value: validateRestore(raw.mutation, replayConfig) }
+            : normalizeIncomingMessage(replayConfig, raw.mutation);
         if (!normalized.ok || normalized.value.tool === 12)
           throw new Error("Invalid historical mutation");
         if (raw.atMs <= start) seqAtSnapshot = raw.seq;
@@ -457,7 +461,8 @@ export async function compileReplay(snapshot, log, options = {}) {
             }
           }
           apply(board, m);
-          const children = m._children || [m];
+          if (m.type === 8) for (const item of m.items) active.delete(item.id);
+          const children = m._children || m.items || [m];
           includeBounds(
             children.flatMap((/** @type {any} */ child) =>
               [child.id, child.newid, child.parent].filter(Boolean),
@@ -561,6 +566,8 @@ export class ReplayPlayer {
         const m = event.mutation;
         if (m.tool === 1 && m.type === 1) this.strokes.set(m.id, event.stroke);
         if (m.type === 6) this.strokes.clear();
+        if (m.type === 8)
+          for (const item of m.items) this.strokes.delete(item.id);
         for (const child of m._children || [m])
           if (child.type === 3) this.strokes.delete(child.id);
         if (!event.stroke) {

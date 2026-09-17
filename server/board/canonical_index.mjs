@@ -141,7 +141,7 @@ function finalizePersistedCanonicalItems(
       return item ? Math.max(max, item.paintOrder + 1) : max;
     }, 0);
     state.paintOrder = paintOrder;
-    state.nextPaintOrder = nextPaintOrder;
+    state.nextPaintOrder = Math.max(state.nextPaintOrder, nextPaintOrder);
     rebuildLiveItemCount(state);
     state.trimPaintOrderIndex = 0;
   }

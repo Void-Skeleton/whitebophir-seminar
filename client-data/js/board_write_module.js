@@ -49,6 +49,14 @@ export class WriteModule {
     this.getTools = getTools;
     this.bufferedWrites = /** @type {BufferedWrite[]} */ ([]);
     this.finishedStrokes = new Set();
+    this.editSequence = 0;
+    this.editGroup = "";
+    /** @type {(() => void) | null} */
+    this.finishEdit = null;
+    /** @type {{redo:boolean, sent:boolean} | null} */
+    this.pendingUndo = null;
+    /** @type {boolean[]} */
+    this.queuedUndo = [];
     this.bufferedWriteTimer = /** @type {number | null} */ (null);
     this.writeReadyWaiters = /** @type {Array<() => void>} */ ([]);
     this.serverRateLimitedUntil = 0;
@@ -59,6 +67,105 @@ export class WriteModule {
       destructive: RateLimitCommon.createRateLimitState(Date.now()),
       text: RateLimitCommon.createRateLimitState(Date.now()),
     };
+  }
+
+  beginEdit() {
+    this.editGroup = `edit-${Date.now().toString(36)}-${++this.editSequence}`;
+  }
+
+  endEdit() {
+    this.finishEdit = null;
+    this.editGroup = "";
+  }
+
+  /** @param {LiveBoardMessage} message */
+  tagEdit(message) {
+    if (message.tool === 12 || message.editGroup) return;
+    const id =
+      "parent" in message ? message.parent : "id" in message ? message.id : "";
+    message.editGroup =
+      (message.tool === 1 || message.tool === 5) && id
+        ? `item-${id}`
+        : this.editGroup ||
+          `edit-${Date.now().toString(36)}-${++this.editSequence}`;
+  }
+
+  installShortcuts() {
+    window.addEventListener("keydown", (event) => {
+      if (
+        !event.ctrlKey ||
+        event.altKey ||
+        event.metaKey ||
+        event.isComposing ||
+        event.defaultPrevented ||
+        !["z", "y"].includes(event.key.toLowerCase()) ||
+        (event.shiftKey && event.key.toLowerCase() !== "z")
+      )
+        return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest(
+          "input, textarea, select, [contenteditable]:not([contenteditable='false']), [role='textbox'], dialog",
+        )
+      )
+        return;
+      event.preventDefault();
+      if (event.repeat || !this.canBufferWrites()) return;
+      const redo = event.key.toLowerCase() === "y" || event.shiftKey;
+      if (this.pendingUndo) {
+        if (this.queuedUndo.length < 20) this.queuedUndo.push(redo);
+        return;
+      }
+      this.finishEdit?.();
+      this.endEdit();
+      this.pendingUndo = { redo, sent: false };
+      this.flushPendingUndo();
+    });
+  }
+
+  flushPendingUndo() {
+    const request = this.pendingUndo;
+    const Tools = this.getTools();
+    const socket = Tools.connection.socket;
+    if (
+      !request ||
+      request.sent ||
+      this.bufferedWrites.length ||
+      !socket?.connected
+    )
+      return;
+    request.sent = true;
+    socket.emit(
+      "edit_history",
+      { redo: request.redo },
+      (/** @type {any} */ result) => {
+        if (this.pendingUndo !== request) return;
+        this.pendingUndo = null;
+        if (this.queuedUndo.length) {
+          this.pendingUndo = {
+            redo: this.queuedUndo.shift() === true,
+            sent: false,
+          };
+          this.flushPendingUndo();
+        }
+        if (!result?.ok) {
+          const key = ["undo_empty", "redo_empty", "undo_conflict"].includes(
+            result?.error,
+          )
+            ? result.error
+            : "undo_unavailable";
+          Tools.status.showBoardStatus(
+            {
+              hidden: false,
+              state: "paused",
+              title: Tools.i18n.t(key),
+              detail: "",
+            },
+            3000,
+          );
+        }
+      },
+    );
   }
 
   clearBufferedWriteTimer() {
@@ -315,6 +422,7 @@ export class WriteModule {
     if (index < 0) return false;
     this.bufferedWrites.splice(index, 1);
     this.flushFinishedStrokes();
+    this.flushPendingUndo();
     this.scheduleBufferedWriteFlush();
     return true;
   }
@@ -326,6 +434,7 @@ export class WriteModule {
   enqueueBufferedWrite(message) {
     const Tools = this.getTools();
     const liveMessage = /** @type {LiveBoardMessage} */ (message);
+    this.tagEdit(liveMessage);
     this.bufferedWrites.push(
       createBufferedWrite(
         liveMessage,
@@ -342,7 +451,11 @@ export class WriteModule {
   sendBufferedWrite(message) {
     const Tools = this.getTools();
     const liveMessage = /** @type {LiveBoardMessage} */ (message);
-    if (!this.canBufferWrites()) {
+    this.tagEdit(liveMessage);
+    if (
+      !this.canBufferWrites() ||
+      (this.pendingUndo && liveMessage.tool !== 12)
+    ) {
       return false;
     }
     this.bufferedWrites.push(
@@ -359,6 +472,9 @@ export class WriteModule {
     const Tools = this.getTools();
     this.bufferedWrites = [];
     this.finishedStrokes.clear();
+    this.pendingUndo = null;
+    this.queuedUndo = [];
+    this.endEdit();
     this.localRateLimitedUntil = 0;
     this.clearBufferedWriteTimer();
     Tools.status.syncWriteStatusIndicator();
@@ -459,6 +575,7 @@ export class WriteModule {
    */
   drawAndSend(data) {
     const Tools = this.getTools();
+    if (this.pendingUndo && data.tool !== 12) return false;
     const toolName = TOOL_ID_BY_CODE[data.tool];
     if (!toolName) throw new Error(`Unknown tool '${data.tool}'.`);
     const mountedTool = Tools.toolRegistry.mounted[toolName];

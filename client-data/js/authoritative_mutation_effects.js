@@ -12,6 +12,16 @@ export function optimisticPrunePlanForAuthoritativeMessage(message) {
     message
   );
   const mutationType = getMutationType(normalizedMessage);
+  if (
+    mutationType === MutationType.RESTORE &&
+    "items" in message &&
+    Array.isArray(message.items)
+  ) {
+    return {
+      reset: false,
+      invalidatedIds: message.items.map((entry) => entry.id),
+    };
+  }
   if (mutationType === MutationType.CLEAR) {
     return { reset: true, invalidatedIds: [] };
   }

@@ -1,3 +1,4 @@
+import { getSocketUserSecret } from "./request.mjs";
 import WBOMessageCommon from "../../client-data/js/message_common.js";
 import {
   formatMessageTypeTag,
@@ -333,6 +334,7 @@ function finishSuccessfulPersistentBoardWrite(
  * @param {number} now
  * @param {ServerConfig} config
  * @param {SocketBroadcastRuntime} runtime
+ * @param {string} [editGroup]
  * @returns {Promise<void>}
  */
 async function persistBoardBroadcast(
@@ -345,6 +347,7 @@ async function persistBoardBroadcast(
   now,
   config,
   runtime,
+  editGroup,
 ) {
   if (!socket.rooms.has(boardName)) socket.join(boardName);
   if (!canApplyBoardMessage(config, board, data, socket)) {
@@ -360,6 +363,10 @@ async function persistBoardBroadcast(
     data,
     now,
     socket.id,
+    {
+      owner: getSocketUserSecret(socket) || socket.id,
+      group: editGroup || data.clientMutationId || `${now}`,
+    },
   );
   if (handleResult.ok === false) {
     rejectBoardMessageWrite(
@@ -402,6 +409,7 @@ async function persistBoardBroadcast(
  * @param {number} now
  * @param {ServerConfig} config
  * @param {SocketBroadcastRuntime} runtime
+ * @param {string} [editGroup]
  * @returns {Promise<void>}
  */
 async function handleBroadcastWriteMessage(
@@ -411,6 +419,7 @@ async function handleBroadcastWriteMessage(
   now,
   config,
   runtime,
+  editGroup,
 ) {
   const clientIp = runtime.resolveClientIp(socket, boardName, config);
   const userName = runtime.getSocketUserName(socket, clientIp);
@@ -483,6 +492,7 @@ async function handleBroadcastWriteMessage(
     now,
     config,
     runtime,
+    editGroup,
   );
 }
 

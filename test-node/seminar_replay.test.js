@@ -928,3 +928,61 @@ test("Python replay exports a real MP4 with progressive strokes, white dark-mode
     false,
   );
 });
+
+test("offline replay applies personal undo/redo with validated geometry and fit bounds", async () => {
+  const restore = {
+    tool: 7,
+    type: 8,
+    items: [
+      {
+        id: "restored",
+        order: 0,
+        beforeId: null,
+        item: {
+          id: "restored",
+          tool: "pencil",
+          color: "#000000",
+          size: 10,
+          _children: [
+            { x: 100, y: 200 },
+            { x: 200, y: 250 },
+            { x: 300, y: 200 },
+          ],
+        },
+      },
+    ],
+  };
+  const model = await compileReplay(
+    snapshot,
+    log([
+      edit(1100, 1, restore),
+      edit(1500, 2, {
+        tool: 7,
+        type: 8,
+        items: [{ id: "restored", order: 0, item: null }],
+      }),
+      edit(1900, 3, restore),
+    ]),
+  );
+  const player = new ReplayPlayer(model);
+  try {
+    assert.equal(player.frame(1000).items.length, 0);
+    assert.equal(player.frame(1200).items[0]?._children.length, 3);
+    assert.equal(player.frame(1600).items.length, 0);
+    assert.equal(player.frame(2000).items[0]?._children.length, 3);
+  } finally {
+    player.dispose();
+  }
+  await assert.rejects(
+    compileReplay(
+      snapshot,
+      log([
+        edit(1100, 1, {
+          ...restore,
+          items: [{ id: "bad", order: -1, item: null }],
+        }),
+      ]),
+    ),
+    /Invalid restored/,
+  );
+});

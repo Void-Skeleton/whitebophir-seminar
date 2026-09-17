@@ -13,6 +13,7 @@ const MUTATION_TYPE_NAME_BY_CODE = Object.freeze({
   [MutationType.BATCH]: "batch",
   [MutationType.CLEAR]: "clear",
   [MutationType.COPY]: "copy",
+  [MutationType.RESTORE]: "restore",
 });
 
 /**

@@ -519,3 +519,56 @@ export async function downloadHistory(history, from, to, limit, output) {
   }
   await pipeline(Readable.from(lines()), createGzip(), output);
 }
+
+/** Materialize only requested undo snapshots; sequence bounds distinguish writes
+ * accepted in the same millisecond. Called for an explicit undo, never a write.
+ * @param {BoardHistory} history
+ * @param {import("./edit_history.mjs").Snapshot[]} requests
+ */
+export async function historicalItems(history, requests) {
+  const { archiveItem } = await import("./edit_history.mjs");
+  const { MAX_RESTORE_BYTES } = await import("./restore.mjs");
+  let bytes = 0;
+  const board = new BoardData("undo-snapshot", history.board.config);
+  board.delaySave = () => {};
+  board.maxItemCount = Number.MAX_SAFE_INTEGER;
+  board.maxChildren = Number.MAX_SAFE_INTEGER;
+  board.maxBoardSize = Number.MAX_SAFE_INTEGER;
+  const pending = requests.slice().sort((a, b) => a.seq - b.seq);
+  let index = 0;
+  const collect = () => {
+    while (index < pending.length && pending[index]?.seq === board.getSeq()) {
+      const request = pending[index++];
+      if (!request) break;
+      const item = board.get(request.id);
+      request.item = item ? structuredClone(archiveItem(item)) : null;
+      bytes += JSON.stringify(request.item).length * 2;
+      if (bytes > MAX_RESTORE_BYTES) throw new Error("Undo snapshot too large");
+    }
+  };
+  try {
+    for await (const { records } of readHistory(history.path, history.offset)) {
+      for (const record of records) {
+        if (record.kind === "baseline" || record.kind === "checkpoint") {
+          board.board = Object.fromEntries(
+            (await itemsFromSvg(record.svg || "")).map((item) => [
+              item.id,
+              item,
+            ]),
+          );
+          board.mutationLog = createMutationLog(record.seq);
+        } else if (record.kind === "mutation") {
+          if (!board.processMessage(record.mutation).ok)
+            throw new Error("Invalid undo history");
+          board.recordPersistentMutation(record.mutation, record.atMs);
+          board.mutationLog.trimBefore(board.getSeq() + 1);
+        } else continue;
+        collect();
+        if (index === pending.length) return;
+      }
+    }
+    throw new Error("Undo snapshot unavailable");
+  } finally {
+    board.dispose();
+  }
+}

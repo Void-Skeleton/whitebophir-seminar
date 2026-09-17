@@ -28,6 +28,10 @@ Added features include:
 - **Shared dark mode:** moderator-controlled canvas themes with hue-preserving
   color presentation, white grids and chunk borders on dark canvases, and
   consistent appearance in previews, SVG exports and native backups.
+- **Personal undo and redo:** Ctrl+Z/Y reverses the user's drawing gestures,
+  preserves other participants' later edits, and records results in board history.
+  Middle-button dragging and faster Shift+Left/Right navigation work alongside
+  the focused-view confirmation controls.
 - **Personal scroll controls:** a browser-local choice between wheel zoom and
   vertical navigation, with Ctrl+wheel zoom and chunk-aware movement.
 - **Timestamped board history:** compressed, streamed edit journals with

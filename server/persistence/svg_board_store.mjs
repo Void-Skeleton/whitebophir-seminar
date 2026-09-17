@@ -900,6 +900,31 @@ async function rewriteStoredSvgFromCanonical(
   const bufferedTextContents = new Map();
   const bufferedPencilPaths = new Map();
   const persistedIds = new Set();
+  const insertedItems = paintOrder
+    .map((id) => itemsById.get(id))
+    .filter(
+      (item) =>
+        item &&
+        !item.deleted &&
+        !persistedItemIds.has(item.id) &&
+        !item.copySource,
+    );
+  let insertedIndex = 0;
+  /** @param {number} order */
+  async function insertBefore(order) {
+    while (
+      insertedIndex < insertedItems.length &&
+      insertedItems[insertedIndex].paintOrder < order
+    ) {
+      const item = insertedItems[insertedIndex++];
+      const tag = serializeCanonicalItemForStorage(item, {
+        isPersistedItem: false,
+      });
+      if (!tag) continue;
+      persistedIds.add(item.id);
+      if (!output.write(tag)) await once(output, "drain");
+    }
+  }
   const closeOutput = () =>
     new Promise((resolve, reject) => {
       output.on("error", reject);
@@ -940,7 +965,12 @@ async function rewriteStoredSvgFromCanonical(
       if (event.type === "suffix") {
         for (const id of paintOrder) {
           const item = itemsById.get(id);
-          if (!item || item.deleted === true || persistedItemIds.has(id)) {
+          if (
+            !item ||
+            item.deleted === true ||
+            persistedItemIds.has(id) ||
+            persistedIds.has(id)
+          ) {
             continue;
           }
           const tag = serializeCanonicalItemForStorage(item, {
@@ -988,6 +1018,7 @@ async function rewriteStoredSvgFromCanonical(
       }
 
       const item = itemsById.get(id);
+      if (item) await insertBefore(item.paintOrder);
       if (!item || item.deleted === true) {
         continue;
       }

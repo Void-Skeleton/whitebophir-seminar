@@ -11,6 +11,7 @@ import { SerialTaskQueue } from "./serial_task_queue.mjs";
  *   name: string,
  *   disposed?: boolean,
  *   history?: import("./history.mjs").BoardHistory,
+ *   editHistory?: import("./edit_history.mjs").EditHistory,
  *   processMessage: (message: NormalizedMessageData) => BoardMutationResult,
  *   recordPersistentMutation: (message: NormalizedMessageData, acceptedAtMs?: number) => MutationLogEntry,
  *   consumePendingRejectedMutationEffects?: () => MutationEffect[],
@@ -26,6 +27,7 @@ import { SerialTaskQueue } from "./serial_task_queue.mjs";
  *     mutation: NormalizedMessageData,
  *     nowMs?: number,
  *     socketId?: string,
+ *     editContext?: {owner:string, group:string},
  *   ) => Promise<
  *     | {ok: true, value: NormalizedMessageData, entry: MutationLogEntry, followup?: MutationLogEntry[]}
  *     | {ok: false, reason: string, followup?: MutationLogEntry[]}
@@ -54,7 +56,12 @@ export function createBoardSession(board) {
   return {
     board,
     runExclusive: queue.runExclusive.bind(queue),
-    async acceptPersistentMutation(mutation, nowMs = Date.now(), socketId) {
+    async acceptPersistentMutation(
+      mutation,
+      nowMs = Date.now(),
+      socketId,
+      editContext,
+    ) {
       return queue.runExclusive(async () => {
         if (board.disposed) return { ok: false, reason: "history_unavailable" };
         consumePendingMutationEffects(
@@ -76,8 +83,10 @@ export function createBoardSession(board) {
             acceptedMutation = prepared.mutation;
           }
         }
+        board.editHistory?.begin(acceptedMutation, editContext);
         const result = board.processMessage(acceptedMutation);
         if (result.ok === false) {
+          board.editHistory?.finish(false);
           const followup = consumePendingMutationEffects(
             board,
             board.consumePendingRejectedMutationEffects,
@@ -95,6 +104,7 @@ export function createBoardSession(board) {
           board.recordPersistentMutation(effect.mutation, nowMs),
         );
         await board.history?.commit([entry, ...followup], socketId);
+        board.editHistory?.finish(true);
         return {
           ok: true,
           value: acceptedMutation,

@@ -78,6 +78,7 @@ export type MessageData = Partial<
     | "color"
     | "size"
     | "txt"
+    | "editGroup"
     | "clientMutationId"
     | "transform"
     | "_children",

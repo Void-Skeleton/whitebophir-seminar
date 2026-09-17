@@ -38,6 +38,7 @@ export type BoardCapabilities = {
 };
 
 export type MessageMetadata = {
+  editGroup?: string;
   seq?: number;
   socket?: string;
   userId?: string;
@@ -125,6 +126,7 @@ export type ClearMessage = WithMessageMetadata<ClearTool.ClearMessage>;
 export type CursorMessage = WithMessageMetadata<CursorTool.CursorMessage>;
 
 export type BoardMessage =
+  | RestoreMessage
   | PencilCreateMessage
   | PencilAppendMessage
   | StraightLineCreateMessage
@@ -144,6 +146,18 @@ export type BoardMessage =
   | CursorMessage;
 
 export type LiveBoardMessage = BoardMessage;
+
+export type RestoredItem = {
+  id: string;
+  item: Record<string, any> | null;
+  order: number;
+  beforeId?: string | null;
+};
+export type RestoreMessage = WithMessageMetadata<{
+  tool: 7;
+  type: 8;
+  items: RestoredItem[];
+}>;
 
 export type ClientTrackedMessage = LiveBoardMessage &
   Required<Pick<MessageMetadata, "clientMutationId">>;

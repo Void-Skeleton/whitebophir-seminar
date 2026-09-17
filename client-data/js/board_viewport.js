@@ -106,7 +106,7 @@ const TOUCH_EVENT_NAMES = [
 
 /** @typedef {"app-gesture" | "native-pan"} ViewportTouchPolicy */
 /** @typedef {"none" | "browser" | "viewport-gesture"} TouchGestureOwner */
-/** @typedef {Pick<import("../../types/app-runtime").AppToolsState, "config" | "coordinates" | "dom" | "preferences" | "toolRegistry" | "viewportState"> & Partial<Pick<import("../../types/app-runtime").AppToolsState, "chunks">>} ViewportRuntime */
+/** @typedef {Pick<import("../../types/app-runtime").AppToolsState, "config" | "coordinates" | "dom" | "preferences" | "toolRegistry" | "viewportState"> & Partial<Pick<import("../../types/app-runtime").AppToolsState, "chunks" | "writes">>} ViewportRuntime */
 /** @typedef {{startPinchPan(event: TouchEvent): void, updatePinchPan(event: TouchEvent): void, endPinchPan(): void, cancelPinchPan(): void}} GestureCoordinatorHandlers */
 /** @typedef {"touchstart" | "touchmove" | "touchend" | "touchcancel"} GestureCoordinatorEventName */
 /** @typedef {Record<GestureCoordinatorEventName, (event: TouchEvent) => void>} GestureCoordinatorEventHandlers */
@@ -468,6 +468,8 @@ export function createViewportController(Tools) {
   let touchPolicy = "app-gesture";
   /** @type {{x: number, y: number, scrollLeft: number, scrollTop: number} | null} */
   let activePan = null;
+  let middleButtonHeld = false;
+  let middlePanning = false;
   /** @type {{distance: number, scale: number, boardX: number, boardY: number} | null} */
   let activePinchPan = null;
   /** @type {(() => void) | null} */
@@ -1144,6 +1146,34 @@ export function createViewportController(Tools) {
     }
   }
 
+  function endMiddlePan() {
+    if (middlePanning) controller.endPan();
+    middleButtonHeld = false;
+    middlePanning = false;
+  }
+
+  /** @param {MouseEvent} event */
+  function handleMiddlePan(event) {
+    if (event.type === "mousedown" && event.button === 1) {
+      // Capture before the selected tool or the browser's auto-scroll handler.
+      interruptStroke();
+      Tools.writes?.finishEdit?.();
+      Tools.writes?.endEdit();
+      middleButtonHeld = true;
+      middlePanning = Tools.chunks?.requestFreePan() !== false;
+      if (middlePanning) {
+        stopFollowAnimation();
+        controller.beginPan(event.clientX, event.clientY);
+      }
+    } else if (!middleButtonHeld) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (event.type === "mousemove") {
+      if (!(event.buttons & 4)) endMiddlePan();
+      else if (middlePanning) controller.movePan(event.clientX, event.clientY);
+    } else if (event.type === "mouseup" && event.button === 1) endMiddlePan();
+  }
+
   // A uniform page inset allows negative board-space margins at the origin.
   // Own edits wait for stroke completion; other camera changes finish the stroke.
   /** @param {boolean} [interruptDrawing] */
@@ -1305,7 +1335,9 @@ export function createViewportController(Tools) {
       };
     },
     isFollowCameraMoving() {
-      return followAnimationFrame !== null || applyingFollowFrame;
+      return (
+        middleButtonHeld || followAnimationFrame !== null || applyingFollowFrame
+      );
     },
     setFollowFrame(frame, deferUntilStrokeEnd = false) {
       const current = followFrame;
@@ -1368,10 +1400,13 @@ export function createViewportController(Tools) {
     },
     movePan(clientX, clientY) {
       if (!activePan) return;
-      panTo(
-        activePan.scrollLeft + activePan.x - clientX,
-        activePan.scrollTop + activePan.y - clientY,
+      const left = activePan.scrollLeft + activePan.x - clientX;
+      const top = activePan.scrollTop + activePan.y - clientY;
+      ensureBoardExtentForPoint(
+        (left + window.innerWidth) / getScale(),
+        (top + window.innerHeight) / getScale(),
       );
+      panTo(left, top);
     },
     endPan() {
       const wasPanning = !!activePan;
@@ -1382,6 +1417,14 @@ export function createViewportController(Tools) {
       const dom = getAttachedDom();
       if (installed || !dom) return;
       installed = true;
+      dom.board.addEventListener("mousedown", handleMiddlePan, true);
+      dom.board.addEventListener("mouseleave", handleMiddlePan, true);
+      window.addEventListener("mousemove", handleMiddlePan, true);
+      window.addEventListener("mouseup", handleMiddlePan, true);
+      window.addEventListener("blur", endMiddlePan);
+      dom.board.addEventListener("auxclick", (event) => {
+        if (event.button === 1) event.preventDefault();
+      });
       window.addEventListener("resize", () => {
         syncLayoutSize();
         if (followFrame || followCamera) applyFollowFrame(true);

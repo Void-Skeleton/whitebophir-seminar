@@ -561,7 +561,14 @@ function getRenderedToolNames() {
  */
 export function addToolShortcut(key, callback) {
   window.addEventListener("keydown", (e) => {
-    if (e.key === key && !isTextEntryTarget(e.target)) {
+    if (
+      e.key === key &&
+      !e.ctrlKey &&
+      !e.metaKey &&
+      !e.altKey &&
+      !e.defaultPrevented &&
+      !isTextEntryTarget(e.target)
+    ) {
       callback();
     }
   });
@@ -828,6 +835,8 @@ function createMountedTool(toolModule, toolState, toolName) {
   const touchListenerOptions = toolModule.touchListenerOptions;
   const getTouchPolicy = toolModule.getTouchPolicy;
   const toolDefinition = TOOL_BY_ID[toolName];
+  let lastX = 0;
+  let lastY = 0;
   /** @type {MountedAppTool} */
   const tool = {
     name: toolName,
@@ -839,13 +848,38 @@ function createMountedTool(toolModule, toolState, toolName) {
       : undefined,
     serverRenderedElementSelector: toolModule.serverRenderedElementSelector,
     press: press
-      ? (x, y, evt, isTouchEvent) => press(toolState, x, y, evt, isTouchEvent)
+      ? (x, y, evt, isTouchEvent) => {
+          lastX = x;
+          lastY = y;
+          if (tool === Tools.toolRegistry.current) Tools.writes.beginEdit();
+          if (tool === Tools.toolRegistry.current)
+            Tools.writes.finishEdit = () => {
+              release?.(
+                toolState,
+                lastX,
+                lastY,
+                new MouseEvent("mouseup"),
+                false,
+              );
+            };
+          return press(toolState, x, y, evt, isTouchEvent);
+        }
       : undefined,
     move: move
-      ? (x, y, evt, isTouchEvent) => move(toolState, x, y, evt, isTouchEvent)
+      ? (x, y, evt, isTouchEvent) => {
+          lastX = x;
+          lastY = y;
+          return move(toolState, x, y, evt, isTouchEvent);
+        }
       : undefined,
     release: release
-      ? (x, y, evt, isTouchEvent) => release(toolState, x, y, evt, isTouchEvent)
+      ? (x, y, evt, isTouchEvent) => {
+          try {
+            return release(toolState, x, y, evt, isTouchEvent);
+          } finally {
+            if (tool === Tools.toolRegistry.current) Tools.writes.endEdit();
+          }
+        }
       : undefined,
     cancelTouchGesture: cancelTouchGesture
       ? (evt) => cancelTouchGesture(toolState, evt)

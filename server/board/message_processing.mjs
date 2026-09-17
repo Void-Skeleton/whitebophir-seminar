@@ -1,3 +1,4 @@
+import { applyRestore } from "./restore.mjs";
 import {
   hasMessageChildren,
   hasMessageId,
@@ -412,6 +413,8 @@ function processMessage(board, message) {
     result = board.processMessageBatch(message._children, message);
   } else {
     const id = hasMessageId(message) ? message.id : "";
+    if (message.type === MutationType.RESTORE)
+      return applyRestore(board, message);
     switch (getMutationType(message)) {
       case MutationType.DELETE:
         result = id ? board.delete(id) : { ok: false, reason: "missing id" };

@@ -56,6 +56,17 @@ export function mutationActivityPoint(board, message) {
     return null;
   }
   if (!("type" in message)) return null;
+  if (message.type === MutationType.RESTORE) {
+    for (const entry of message.items.slice().reverse()) {
+      const point = mutationActivityPoint(board, {
+        tool: 6,
+        type: MutationType.DELETE,
+        id: entry.id,
+      });
+      if (point) return point;
+    }
+    return null;
+  }
   if (message.type === MutationType.CLEAR) return { x: 0, y: 0 };
   const id =
     "newid" in message

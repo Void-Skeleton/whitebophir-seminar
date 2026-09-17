@@ -27,6 +27,7 @@
 
 import MessageCommon from "../../client-data/js/message_common.js";
 import { hasMessageId } from "../../client-data/js/message_shape.js";
+import { EditHistory } from "./edit_history.mjs";
 import {
   getMutationType,
   getTool,
@@ -225,6 +226,7 @@ class BoardData {
     this.disposed = false;
     /** @type {import("./history.mjs").BoardHistory | undefined} */
     this.history = undefined;
+    this.editHistory = new EditHistory(this);
     /** @type {StaleSaveHandler | undefined} */
     this.onStaleSave = undefined;
   }
@@ -304,6 +306,7 @@ class BoardData {
    * @returns {MutationLogEntry}
    */
   recordPersistentMutation(mutation, acceptedAtMs = Date.now()) {
+    this.editHistory.observe(mutation);
     const activityPoint =
       mutationActivityPoint(this, mutation) || this.activityPoint;
     this.activityPoint = activityPoint;

@@ -36,6 +36,10 @@ export class MessageModule {
    * @returns {Promise<void>}
    */
   async messageForTool(message) {
+    if ("type" in message && message.type === MutationType.RESTORE) {
+      const { drawRestoredItems } = await import("./board_restore.js");
+      return drawRestoredItems(this, message);
+    }
     const state =
       /** @type {{toolRegistry: ToolRegistryModule, identity: IdentityModule}} */ (
         messageModuleState.get(this)

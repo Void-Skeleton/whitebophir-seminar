@@ -241,6 +241,8 @@ function normalizeTransform(value) {
  */
 function normalizeObject(raw, fields, maxBoardSize) {
   if (!isPlainObject(raw)) return rejected("expected object");
+  if (raw.type === MutationType.RESTORE)
+    return rejected("server-only mutation");
 
   /** @type {RawRecord} */
   const normalized = {};
@@ -422,6 +424,8 @@ const LIVE_BATCH_CHILD_SCHEMAS = Object.fromEntries(
  */
 function normalizeIncomingBatch(raw, maxBoardSize, maxChildren, capabilities) {
   if (!isPlainObject(raw)) return rejected("expected object");
+  if (raw.type === MutationType.RESTORE)
+    return rejected("server-only mutation");
   if (!Object.prototype.hasOwnProperty.call(raw, "tool")) {
     return rejected("missing tool");
   }
@@ -477,6 +481,8 @@ function normalizeIncomingMessage(config, raw, capabilities) {
   const maxChildren = config.MAX_CHILDREN;
 
   if (!isPlainObject(raw)) return rejected("expected object");
+  if (raw.type === MutationType.RESTORE)
+    return rejected("server-only mutation");
   if (Array.isArray(raw._children)) {
     return normalizeIncomingBatch(raw, maxBoardSize, maxChildren, capabilities);
   }

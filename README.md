@@ -405,6 +405,23 @@ A continuous wheel/trackpad gesture cannot confirm that switch. Shift+scroll
 panning and S/O+scroll size/opacity shortcuts remain available. Focused views
 retain their existing fit-to-chunk zoom; choose Free to zoom manually.
 
+### Undo and redo
+
+**Ctrl+Z** undoes your latest drawing gesture; **Ctrl+Y** (or **Ctrl+Shift+Z**)
+redoes it. Strokes, shapes, text edits, moves, copies, erasing and clearing are
+supported. The active stroke finishes first and queued writes are accepted
+before undo runs. Text fields retain their normal text-editing shortcuts.
+Everyone sees the result. Undo cannot overwrite a later change by another user
+to the same objects, and current editing permissions still apply. New edits
+clear your redo stack. Moderator settings and backup imports are not undoable.
+
+Undo stacks are held in server memory while the board is loaded, shared by tabs
+with the same authenticated identity, and reset on server restart or board unload.
+The server retains up to 100 actions and 32 MiB of undo data per loaded board;
+a single action is limited to 1,000 objects and 8 MiB of restored data. Undoing
+older saved objects may read the edit journal. Undo/redo results are persisted
+in the board and timestamped history, including offline replays.
+
 ### Canvas chunks and following activity
 
 Choose a view mode beside the Users control:
@@ -414,6 +431,14 @@ Choose a view mode beside the Users control:
 | **Free** | Move 64 screen pixels | Move one configured chunk, preserving zoom |
 | **Focused on chunk** | Move one chunk | Move one chunk |
 | **Focused on last edited chunk** | Show a navigation reminder | Show a navigation reminder |
+
+Hold the middle mouse button to drag the canvas with any tool selected. In either
+focused mode, the first middle-button press shows a reminder; a second press
+within two seconds switches to Free mode and starts dragging.
+
+Shift+Left/Right moves five times farther: 320 screen pixels in Free mode, or
+five chunks in chunk focus. Latest-edit focus uses the same double-press
+confirmation, including the Shift modifier. Ctrl+Shift+Arrow is left unchanged.
 
 Free mode allows normal panning and zooming. Both focused modes center and fit
 an entire chunk with its configured margin. Chunk focus stays on the selected
@@ -428,7 +453,7 @@ Chunk changes ease into position. When your pencil stroke reaches another
 chunk, your camera waits until you finish the stroke. If another user's edit
 moves your camera, your current stroke ends first. Pencil input is blocked
 throughout the transition; release and press again to start a new stroke once
-the camera stops. Reduced-motion preferences disable the animation.
+the camera stops. These camera animations play regardless of reduced-motion preferences.
 
 Board moderators can open **Chunk settings** to set width, height, and the
 margin around each chunk, in unscaled board units. Width and height accept

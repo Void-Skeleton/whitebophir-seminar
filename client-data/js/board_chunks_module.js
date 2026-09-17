@@ -204,7 +204,8 @@ export class ChunksModule {
     if (
       event.altKey ||
       event.metaKey ||
-      event.shiftKey ||
+      (event.shiftKey &&
+        (event.ctrlKey || !/^Arrow(Left|Right)$/.test(event.key))) ||
       event.isComposing ||
       event.defaultPrevented ||
       !this.received ||
@@ -222,7 +223,41 @@ export class ChunksModule {
       return;
     if (!/^Arrow(Left|Right|Up|Down)$/.test(event.key)) return;
     event.preventDefault();
-    this.navigateByArrow(event.key, event.ctrlKey, event.repeat);
+    this.navigateByArrow(
+      event.key,
+      event.ctrlKey,
+      event.repeat,
+      "keyboard",
+      event.shiftKey ? 5 : 1,
+    );
+  }
+
+  /** A second middle-button press confirms leaving either focused mode. */
+  requestFreePan() {
+    if (this.mode === "free") return true;
+    const Tools = this.getTools();
+    const now = performance.now();
+    if (
+      this.pendingNavigation?.key === "middle" &&
+      now <= this.pendingNavigation.expiresAt
+    ) {
+      this.setMode("free");
+      return true;
+    }
+    this.pendingNavigation = {
+      key: "middle",
+      expiresAt: now + NAVIGATION_CONFIRM_MS,
+    };
+    this.navigationNotice = {
+      hidden: false,
+      state: "paused",
+      title: Tools.i18n.t(
+        this.following ? "chunk_view_latest" : "chunk_view_chunk",
+      ),
+      detail: Tools.i18n.t("chunk_drag_reminder"),
+    };
+    Tools.status.showBoardStatus(this.navigationNotice, NAVIGATION_CONFIRM_MS);
+    return false;
   }
 
   /**
@@ -231,8 +266,15 @@ export class ChunksModule {
    * @param {boolean} [ctrlKey]
    * @param {boolean} [repeat]
    * @param {"keyboard" | "wheel"} [source]
+   * @param {number} [distance]
    */
-  navigateByArrow(arrow, ctrlKey = false, repeat = false, source = "keyboard") {
+  navigateByArrow(
+    arrow,
+    ctrlKey = false,
+    repeat = false,
+    source = "keyboard",
+    distance = 1,
+  ) {
     const Tools = this.getTools();
     if (!this.received || Tools.replay.awaitingSnapshot) return;
     let dx = 0;
@@ -254,7 +296,7 @@ export class ChunksModule {
         return;
     }
     if (this.following) {
-      const key = `${source}:${ctrlKey ? "Ctrl+" : ""}${arrow}`;
+      const key = `${source}:${distance}:${ctrlKey ? "Ctrl+" : ""}${arrow}`;
       const now = performance.now();
       const pending = this.pendingNavigation;
       if (
@@ -287,6 +329,8 @@ export class ChunksModule {
       }
       this.setMode("chunk");
     }
+    dx *= distance;
+    dy *= distance;
     if (this.mode === "chunk") {
       const rect = chunkRect(this.state, this.focusedPoint);
       this.focusedPoint = {

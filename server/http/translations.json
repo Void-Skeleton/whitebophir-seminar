@@ -150,7 +150,12 @@
     "history_at": "وقت اللقطة",
     "history_from": "وقت البداية (شامل)",
     "history_to": "وقت النهاية (شامل)",
-    "history_download_failed": "تعذّر تنزيل السجل. تحقق من الفترة الزمنية والاتصال وصلاحيات الإشراف."
+    "history_download_failed": "تعذّر تنزيل السجل. تحقق من الفترة الزمنية والاتصال وصلاحيات الإشراف.",
+    "chunk_drag_reminder": "اضغط زر الفأرة الأوسط مرة أخرى خلال ثانيتين للتبديل إلى الوضع الحر وسحب اللوحة.",
+    "undo_empty": "لا توجد تعديلات للتراجع عنها.",
+    "redo_empty": "لا توجد تعديلات لإعادتها.",
+    "undo_conflict": "تغيّرت العناصر، ولم يعد التراجع عن هذا التعديل آمنًا.",
+    "undo_unavailable": "لا يمكن التراجع عن هذا التعديل أو إعادته حاليًا."
   },
   "be": {
     "white-out": "Замазка",
@@ -303,7 +308,12 @@
     "history_at": "Час здымка",
     "history_from": "Пачатак (уключна)",
     "history_to": "Канец (уключна)",
-    "history_download_failed": "Не ўдалося спампаваць гісторыю. Праверце перыяд, злучэнне і правы мадэратара."
+    "history_download_failed": "Не ўдалося спампаваць гісторыю. Праверце перыяд, злучэнне і правы мадэратара.",
+    "chunk_drag_reminder": "Націсніце сярэднюю кнопку мышы яшчэ раз на працягу 2 секунд, каб перайсці ў свабодны рэжым і перацягнуць палатно.",
+    "undo_empty": "Няма змен для адмены.",
+    "redo_empty": "Няма змен для паўтору.",
+    "undo_conflict": "Аб’екты змяніліся, таму бяспечна адмяніць гэтую змену ўжо нельга.",
+    "undo_unavailable": "Адмена або паўтор гэтай змены зараз недаступныя."
   },
   "ca": {
     "white-out": "Corrector blanc",
@@ -456,7 +466,12 @@
     "history_at": "Hora de la instantània",
     "history_from": "Inici (inclòs)",
     "history_to": "Final (inclòs)",
-    "history_download_failed": "No s’ha pogut baixar l’historial. Comprova el període, la connexió i els permisos de moderació."
+    "history_download_failed": "No s’ha pogut baixar l’historial. Comprova el període, la connexió i els permisos de moderació.",
+    "chunk_drag_reminder": "Torna a prémer el botó central del ratolí en un termini de 2 segons per passar al mode lliure i arrossegar el llenç.",
+    "undo_empty": "No hi ha canvis per desfer.",
+    "redo_empty": "No hi ha canvis per refer.",
+    "undo_conflict": "Els objectes han canviat i ja no es pot desfer aquest canvi de manera segura.",
+    "undo_unavailable": "Ara no es pot desfer ni refer aquest canvi."
   },
   "de": {
     "board_name_placeholder": "Name des Whiteboards…",
@@ -609,7 +624,12 @@
     "history_at": "Zeitpunkt des Boardstands",
     "history_from": "Beginn (einschließlich)",
     "history_to": "Ende (einschließlich)",
-    "history_download_failed": "Der Verlauf konnte nicht heruntergeladen werden. Prüfe Zeitraum, Verbindung und Moderationsrechte."
+    "history_download_failed": "Der Verlauf konnte nicht heruntergeladen werden. Prüfe Zeitraum, Verbindung und Moderationsrechte.",
+    "chunk_drag_reminder": "Drücke innerhalb von 2 Sekunden erneut die mittlere Maustaste, um in den freien Modus zu wechseln und die Zeichenfläche zu ziehen.",
+    "undo_empty": "Keine Änderungen zum Rückgängigmachen.",
+    "redo_empty": "Keine Änderungen zum Wiederherstellen.",
+    "undo_conflict": "Die Objekte wurden verändert. Diese Änderung kann nicht mehr sicher rückgängig gemacht werden.",
+    "undo_unavailable": "Diese Änderung kann derzeit nicht rückgängig gemacht oder wiederhergestellt werden."
   },
   "en": {
     "white-out": "White-out",
@@ -762,7 +782,12 @@
     "history_at": "Snapshot time",
     "history_from": "Start time (inclusive)",
     "history_to": "End time (inclusive)",
-    "history_download_failed": "Could not download history. Check the time range, connection, and moderator access."
+    "history_download_failed": "Could not download history. Check the time range, connection, and moderator access.",
+    "chunk_drag_reminder": "Press the middle mouse button again within 2 seconds to switch to Free mode and drag the canvas.",
+    "undo_empty": "No edits to undo.",
+    "redo_empty": "No edits to redo.",
+    "undo_conflict": "This edit can no longer be undone safely because the objects have changed.",
+    "undo_unavailable": "Undo or redo is unavailable for this edit."
   },
   "es": {
     "board_name_placeholder": "Nombre de la pizarra …",
@@ -915,7 +940,12 @@
     "history_at": "Hora de la instantánea",
     "history_from": "Inicio (incluido)",
     "history_to": "Fin (incluido)",
-    "history_download_failed": "No se pudo descargar el historial. Comprueba el intervalo, la conexión y los permisos de moderación."
+    "history_download_failed": "No se pudo descargar el historial. Comprueba el intervalo, la conexión y los permisos de moderación.",
+    "chunk_drag_reminder": "Pulsa de nuevo el botón central del ratón antes de 2 segundos para pasar al modo libre y arrastrar el lienzo.",
+    "undo_empty": "No hay cambios que deshacer.",
+    "redo_empty": "No hay cambios que rehacer.",
+    "undo_conflict": "Los objetos han cambiado y ya no se puede deshacer esta edición con seguridad.",
+    "undo_unavailable": "Ahora no se puede deshacer ni rehacer esta edición."
   },
   "fr": {
     "board_name_placeholder": "Nom du tableau…",
@@ -1067,7 +1097,12 @@
     "history_at": "Date et heure de l’instantané",
     "history_from": "Début (inclus)",
     "history_to": "Fin (incluse)",
-    "history_download_failed": "Impossible de télécharger l’historique. Vérifiez la période, la connexion et vos droits de modération."
+    "history_download_failed": "Impossible de télécharger l’historique. Vérifiez la période, la connexion et vos droits de modération.",
+    "chunk_drag_reminder": "Appuyez à nouveau sur le bouton central de la souris dans les 2 secondes pour passer en mode libre et déplacer le tableau.",
+    "undo_empty": "Aucune modification à annuler.",
+    "redo_empty": "Aucune modification à rétablir.",
+    "undo_conflict": "Les objets ont changé : cette modification ne peut plus être annulée sans risque.",
+    "undo_unavailable": "Impossible d’annuler ou de rétablir cette modification pour le moment."
   },
   "hu": {
     "white-out": "Lefedő",
@@ -1220,7 +1255,12 @@
     "history_at": "Pillanatkép időpontja",
     "history_from": "Kezdet (beleértve)",
     "history_to": "Vég (beleértve)",
-    "history_download_failed": "Nem sikerült letölteni az előzményeket. Ellenőrizd az időszakot, a kapcsolatot és a moderátori jogosultságot."
+    "history_download_failed": "Nem sikerült letölteni az előzményeket. Ellenőrizd az időszakot, a kapcsolatot és a moderátori jogosultságot.",
+    "chunk_drag_reminder": "Nyomd meg újra a középső egérgombot 2 másodpercen belül a szabad módra váltáshoz és a vászon húzásához.",
+    "undo_empty": "Nincs visszavonható módosítás.",
+    "redo_empty": "Nincs újra elvégezhető módosítás.",
+    "undo_conflict": "Az objektumok megváltoztak, ezért ez a módosítás már nem vonható vissza biztonságosan.",
+    "undo_unavailable": "Ez a módosítás jelenleg nem vonható vissza és nem végezhető el újra."
   },
   "id": {
     "white-out": "Cairan koreksi",
@@ -1373,7 +1413,12 @@
     "history_at": "Waktu snapshot",
     "history_from": "Waktu mulai (inklusif)",
     "history_to": "Waktu akhir (inklusif)",
-    "history_download_failed": "Tidak dapat mengunduh riwayat. Periksa rentang waktu, koneksi, dan akses moderator."
+    "history_download_failed": "Tidak dapat mengunduh riwayat. Periksa rentang waktu, koneksi, dan akses moderator.",
+    "chunk_drag_reminder": "Tekan lagi tombol tengah mouse dalam 2 detik untuk beralih ke mode bebas dan menyeret kanvas.",
+    "undo_empty": "Tidak ada suntingan untuk dibatalkan.",
+    "redo_empty": "Tidak ada suntingan untuk diulangi.",
+    "undo_conflict": "Objek telah berubah, sehingga suntingan ini tidak dapat dibatalkan dengan aman.",
+    "undo_unavailable": "Suntingan ini belum dapat dibatalkan atau diulangi."
   },
   "it": {
     "board_name_placeholder": "Nome della lavagna…",
@@ -1526,7 +1571,12 @@
     "history_at": "Data e ora dell’istantanea",
     "history_from": "Inizio (incluso)",
     "history_to": "Fine (inclusa)",
-    "history_download_failed": "Impossibile scaricare la cronologia. Controlla l’intervallo, la connessione e i permessi di moderazione."
+    "history_download_failed": "Impossibile scaricare la cronologia. Controlla l’intervallo, la connessione e i permessi di moderazione.",
+    "chunk_drag_reminder": "Premi di nuovo il pulsante centrale del mouse entro 2 secondi per passare alla modalità libera e trascinare la lavagna.",
+    "undo_empty": "Nessuna modifica da annullare.",
+    "redo_empty": "Nessuna modifica da ripristinare.",
+    "undo_conflict": "Gli oggetti sono cambiati: non è più possibile annullare questa modifica in sicurezza.",
+    "undo_unavailable": "Al momento non è possibile annullare o ripristinare questa modifica."
   },
   "ja": {
     "board_name_placeholder": "ボードの名前",
@@ -1679,7 +1729,12 @@
     "history_at": "スナップショットの日時",
     "history_from": "開始日時（含む）",
     "history_to": "終了日時（含む）",
-    "history_download_failed": "履歴をダウンロードできませんでした。期間、接続、モデレーター権限を確認してください。"
+    "history_download_failed": "履歴をダウンロードできませんでした。期間、接続、モデレーター権限を確認してください。",
+    "chunk_drag_reminder": "2秒以内にマウスの中央ボタンをもう一度押すと、自由モードに切り替えてキャンバスをドラッグできます。",
+    "undo_empty": "元に戻せる編集はありません。",
+    "redo_empty": "やり直せる編集はありません。",
+    "undo_conflict": "対象のオブジェクトが変更されたため、この編集を安全に元に戻すことはできません。",
+    "undo_unavailable": "この編集は現在、元に戻したりやり直したりできません。"
   },
   "my": {
     "board_name_placeholder": "ဝှိုက်ဘုတ်အမည် ... ",
@@ -1832,7 +1887,12 @@
     "history_at": "လျှပ်တစ်ပြက်အခြေအနေ အချိန်",
     "history_from": "စတင်ချိန် (အပါအဝင်)",
     "history_to": "ဆုံးချိန် (အပါအဝင်)",
-    "history_download_failed": "မှတ်တမ်းကို ဒေါင်းလုဒ်မလုပ်နိုင်ပါ။ အချိန်အပိုင်းအခြား၊ ချိတ်ဆက်မှုနှင့် ကြီးကြပ်သူခွင့်ပြုချက်ကို စစ်ဆေးပါ။"
+    "history_download_failed": "မှတ်တမ်းကို ဒေါင်းလုဒ်မလုပ်နိုင်ပါ။ အချိန်အပိုင်းအခြား၊ ချိတ်ဆက်မှုနှင့် ကြီးကြပ်သူခွင့်ပြုချက်ကို စစ်ဆေးပါ။",
+    "chunk_drag_reminder": "လွတ်လပ်မုဒ်သို့ ပြောင်းပြီး ပန်းချီချပ်ကို ဆွဲရွှေ့ရန် မောက်စ်အလယ်ခလုတ်ကို ၂ စက္ကန့်အတွင်း ထပ်နှိပ်ပါ။",
+    "undo_empty": "ပြန်ဖျက်နိုင်သော ပြင်ဆင်ချက် မရှိပါ။",
+    "redo_empty": "ပြန်လုပ်နိုင်သော ပြင်ဆင်ချက် မရှိပါ။",
+    "undo_conflict": "အရာဝတ္ထုများ ပြောင်းလဲသွားသဖြင့် ဤပြင်ဆင်ချက်ကို ဘေးကင်းစွာ ပြန်ဖျက်၍ မရတော့ပါ။",
+    "undo_unavailable": "ဤပြင်ဆင်ချက်ကို လောလောဆယ် ပြန်ဖျက်ခြင်း သို့မဟုတ် ပြန်လုပ်ခြင်း မပြုနိုင်ပါ။"
   },
   "pt": {
     "white-out": "Branquejar",
@@ -1985,7 +2045,12 @@
     "history_at": "Data e hora do estado",
     "history_from": "Início (inclusive)",
     "history_to": "Fim (inclusive)",
-    "history_download_failed": "Não foi possível descarregar o histórico. Verifique o intervalo, a ligação e as permissões de moderação."
+    "history_download_failed": "Não foi possível descarregar o histórico. Verifique o intervalo, a ligação e as permissões de moderação.",
+    "chunk_drag_reminder": "Prima novamente o botão central do rato dentro de 2 segundos para mudar para o modo livre e arrastar a tela.",
+    "undo_empty": "Não há alterações para anular.",
+    "redo_empty": "Não há alterações para refazer.",
+    "undo_conflict": "Os objetos foram alterados e já não é seguro anular esta edição.",
+    "undo_unavailable": "De momento, não é possível anular nem refazer esta edição."
   },
   "ru": {
     "board_name_placeholder": "Название доски",
@@ -2138,7 +2203,12 @@
     "history_at": "Время снимка",
     "history_from": "Начало (включительно)",
     "history_to": "Конец (включительно)",
-    "history_download_failed": "Не удалось скачать историю. Проверьте период, соединение и права модератора."
+    "history_download_failed": "Не удалось скачать историю. Проверьте период, соединение и права модератора.",
+    "chunk_drag_reminder": "Нажмите среднюю кнопку мыши ещё раз в течение 2 секунд, чтобы перейти в свободный режим и перетащить холст.",
+    "undo_empty": "Нет изменений для отмены.",
+    "redo_empty": "Нет изменений для повтора.",
+    "undo_conflict": "Объекты изменились, поэтому безопасно отменить это действие уже нельзя.",
+    "undo_unavailable": "Сейчас нельзя отменить или повторить это действие."
   },
   "sw": {
     "board_name_placeholder": "Jina la ubao mweupe ...",
@@ -2291,7 +2361,12 @@
     "history_at": "Wakati wa picha ya hali",
     "history_from": "Mwanzo (pamoja na wakati huo)",
     "history_to": "Mwisho (pamoja na wakati huo)",
-    "history_download_failed": "Imeshindikana kupakua historia. Angalia kipindi, muunganisho na ruhusa za msimamizi."
+    "history_download_failed": "Imeshindikana kupakua historia. Angalia kipindi, muunganisho na ruhusa za msimamizi.",
+    "chunk_drag_reminder": "Bonyeza kitufe cha katikati cha kipanya tena ndani ya sekunde 2 ili kubadili hali huru na kuburuta turubai.",
+    "undo_empty": "Hakuna mabadiliko ya kutengua.",
+    "redo_empty": "Hakuna mabadiliko ya kurudia.",
+    "undo_conflict": "Vitu vimebadilika, hivyo mabadiliko haya hayawezi kutenguliwa kwa usalama.",
+    "undo_unavailable": "Mabadiliko haya hayawezi kutenguliwa au kurudiwa kwa sasa."
   },
   "th": {
     "board_name_placeholder": "ชื่อไวท์บอร์ด ...",
@@ -2444,7 +2519,12 @@
     "history_at": "เวลาของภาพสถานะ",
     "history_from": "เวลาเริ่มต้น (รวม)",
     "history_to": "เวลาสิ้นสุด (รวม)",
-    "history_download_failed": "ดาวน์โหลดประวัติไม่ได้ โปรดตรวจสอบช่วงเวลา การเชื่อมต่อ และสิทธิ์ผู้ดูแล"
+    "history_download_failed": "ดาวน์โหลดประวัติไม่ได้ โปรดตรวจสอบช่วงเวลา การเชื่อมต่อ และสิทธิ์ผู้ดูแล",
+    "chunk_drag_reminder": "กดปุ่มกลางของเมาส์อีกครั้งภายใน 2 วินาที เพื่อเปลี่ยนเป็นโหมดอิสระและลากผืนผ้าใบ",
+    "undo_empty": "ไม่มีการแก้ไขให้เลิกทำ",
+    "redo_empty": "ไม่มีการแก้ไขให้ทำซ้ำ",
+    "undo_conflict": "วัตถุมีการเปลี่ยนแปลงแล้ว จึงไม่สามารถเลิกทำการแก้ไขนี้ได้อย่างปลอดภัย",
+    "undo_unavailable": "ขณะนี้ไม่สามารถเลิกทำหรือทำซ้ำการแก้ไขนี้ได้"
   },
   "uk": {
     "white-out": "Коректор",
@@ -2597,7 +2677,12 @@
     "history_at": "Час знімка",
     "history_from": "Початок (включно)",
     "history_to": "Кінець (включно)",
-    "history_download_failed": "Не вдалося завантажити історію. Перевірте період, з’єднання та права модератора."
+    "history_download_failed": "Не вдалося завантажити історію. Перевірте період, з’єднання та права модератора.",
+    "chunk_drag_reminder": "Натисніть середню кнопку миші ще раз протягом 2 секунд, щоб перейти у вільний режим і перетягнути полотно.",
+    "undo_empty": "Немає змін для скасування.",
+    "redo_empty": "Немає змін для повторення.",
+    "undo_conflict": "Об’єкти змінилися, тому безпечно скасувати цю дію вже неможливо.",
+    "undo_unavailable": "Зараз неможливо скасувати або повторити цю дію."
   },
   "vi": {
     "white-out": "Bút xóa",
@@ -2750,7 +2835,12 @@
     "history_at": "Thời điểm chụp trạng thái",
     "history_from": "Thời gian bắt đầu (bao gồm)",
     "history_to": "Thời gian kết thúc (bao gồm)",
-    "history_download_failed": "Không thể tải lịch sử. Hãy kiểm tra khoảng thời gian, kết nối và quyền điều hành."
+    "history_download_failed": "Không thể tải lịch sử. Hãy kiểm tra khoảng thời gian, kết nối và quyền điều hành.",
+    "chunk_drag_reminder": "Nhấn lại nút chuột giữa trong vòng 2 giây để chuyển sang chế độ tự do và kéo khung vẽ.",
+    "undo_empty": "Không có chỉnh sửa nào để hoàn tác.",
+    "redo_empty": "Không có chỉnh sửa nào để làm lại.",
+    "undo_conflict": "Các đối tượng đã thay đổi nên không thể hoàn tác chỉnh sửa này một cách an toàn.",
+    "undo_unavailable": "Hiện không thể hoàn tác hoặc làm lại chỉnh sửa này."
   },
   "zh-CN": {
     "board_name_placeholder": "白板名称",
@@ -2903,7 +2993,12 @@
     "history_at": "快照时间",
     "history_from": "开始时间（含）",
     "history_to": "结束时间（含）",
-    "history_download_failed": "无法下载历史记录。请检查时间范围、网络连接和版主权限。"
+    "history_download_failed": "无法下载历史记录。请检查时间范围、网络连接和版主权限。",
+    "chunk_drag_reminder": "请在 2 秒内再次按下鼠标中键，切换到自由模式并拖动画布。",
+    "undo_empty": "没有可撤销的编辑。",
+    "redo_empty": "没有可恢复的编辑。",
+    "undo_conflict": "相关对象已发生变化，无法安全撤销此编辑。",
+    "undo_unavailable": "此编辑暂时无法撤销或恢复。"
   },
   "zh-TW": {
     "board_name_placeholder": "白板名稱",
@@ -3056,7 +3151,12 @@
     "history_at": "快照時間",
     "history_from": "開始時間（含）",
     "history_to": "結束時間（含）",
-    "history_download_failed": "無法下載歷史紀錄。請檢查時間範圍、網路連線及管理員權限。"
+    "history_download_failed": "無法下載歷史紀錄。請檢查時間範圍、網路連線及管理員權限。",
+    "chunk_drag_reminder": "請在 2 秒內再次按下滑鼠中鍵，切換至自由模式並拖動畫布。",
+    "undo_empty": "沒有可復原的編輯。",
+    "redo_empty": "沒有可重做的編輯。",
+    "undo_conflict": "相關物件已發生變化，無法安全復原此編輯。",
+    "undo_unavailable": "此編輯暫時無法復原或重做。"
   },
   "pl": {
     "board_name_placeholder": "Nazwa tablicy",
@@ -3209,6 +3309,11 @@
     "history_at": "Czas migawki",
     "history_from": "Początek (włącznie)",
     "history_to": "Koniec (włącznie)",
-    "history_download_failed": "Nie udało się pobrać historii. Sprawdź zakres czasu, połączenie i uprawnienia moderatora."
+    "history_download_failed": "Nie udało się pobrać historii. Sprawdź zakres czasu, połączenie i uprawnienia moderatora.",
+    "chunk_drag_reminder": "Naciśnij ponownie środkowy przycisk myszy w ciągu 2 sekund, aby przejść do trybu swobodnego i przeciągnąć płótno.",
+    "undo_empty": "Brak zmian do cofnięcia.",
+    "redo_empty": "Brak zmian do ponowienia.",
+    "undo_conflict": "Obiekty zostały zmienione, więc nie można już bezpiecznie cofnąć tej edycji.",
+    "undo_unavailable": "Obecnie nie można cofnąć ani ponowić tej edycji."
   }
 }
